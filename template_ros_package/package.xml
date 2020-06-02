@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>rosTemplate</name>
+  <name>template_ros_package</name>
   <version>0.0.0</version>
-  <description>The rosTemplate package</description>
+  <description>The template_ros_package package</description>
 
   <maintainer email="user@todo.todo">user</maintainer>
 

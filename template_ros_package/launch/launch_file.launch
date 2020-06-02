@@ -1,0 +1,12 @@
+<launch>
+    <arg name="rviz" default="False">
+
+    <node pkg="template_ros_package" type="my_python_script.py" name="arg" output="arg"></node>
+
+    <!-- We start the rviz config-->
+    <group if="$(arg launch_rviz)">
+        <node type="rviz" name="rviz" pkg="rviz" args="-d $(find template_ros_package)/rviz/name.rviz"/>
+    </group>
+
+
+</launch>
