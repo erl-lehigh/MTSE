@@ -4,3 +4,4 @@ Team Member
   Vaibhav Anand
   Nathan Bowler
   Sarah Lange
+  Zehui Xiao
