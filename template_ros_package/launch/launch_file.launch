@@ -1,7 +1,16 @@
 <launch>
     <arg name="rviz" default="False">
+    <arg name="config" default="template" doc="Specify a config">
+    
+    <arg name="output" default="screen" doc="Output display">    
+    <arg name="param_file_name" default="default" doc="Specify a param file">
+    <arg name="req" default="true">
 
-    <node pkg="template_ros_package" type="my_python_script.py" name="arg" output="arg"></node>
+    <arg name="pkg_name" value="template_ros_package" doc="name of the package">
+    <arg name="node_name" default="sample_node" doc="name of the node">
+    <arg name="node_type" default="sample_type" doc="name of the type">
+
+    <node pkg="$(arg pkg_name)" type="$(arg sammple_node)" name="$(arg node_name)" output="$(arg output)"></node>
 
     <!-- We start the rviz config-->
     <group if="$(arg launch_rviz)">
