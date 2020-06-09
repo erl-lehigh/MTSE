@@ -1,3 +1,0 @@
-<launch>
-    <test test-name="test_code" pkg="template_ros_package" type="test_code.py">
-</launch>
