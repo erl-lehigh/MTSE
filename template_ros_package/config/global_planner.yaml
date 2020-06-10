@@ -1,0 +1,8 @@
+NavfnROS:
+  visualize_potential: # true/false
+  allow_unknow: # true/false 
+
+  planner_window_x: # number
+  planner_window_y: # number
+  default_tolerance: # number
+  
