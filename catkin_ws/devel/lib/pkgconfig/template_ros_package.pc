@@ -1,8 +1,0 @@
-prefix=/home/wbriang/Desktop/MTSE/catkin_ws/devel
-
-Name: template_ros_package
-Description: Description of template_ros_package
-Version: 0.0.0
-Cflags: 
-Libs: -L${prefix}/lib 
-Requires: rospy
