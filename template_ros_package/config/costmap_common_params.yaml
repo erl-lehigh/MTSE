@@ -1,0 +1,17 @@
+obstacle_range: # number
+raytrace_range: # number
+
+footprint: [[x0, y0], [x1, y1], ... [xn, yn]]
+footprint_padding: # number
+
+inflation_radius: # number
+
+resolution: # number
+
+obstacle_layer:
+  obstacal_sources: # NAME_OF_SENSOR
+  NAME_OF_SENSOR: {data_type: TYPE_OF_SENSOR, clearing: TRUE/FALSE, marking: TRUE/FALSE, topic: NAME_OF_TOPIC, inf_is_valid: TRUE/FALSE}
+
+static:
+  map_topic: NAME_OF_MAP_TOPIC
+  subscribe_to_updates: true/false

@@ -1,0 +1,12 @@
+global_costmap:
+  global_frame: # FRAME
+  robot_base_frame: # ROBOT FRAME
+  update_frequency: # number
+  static_map: # true/false
+  rolling_window: # true/false
+  width: # number
+  height: # number
+
+  plugins:
+    -{name: NAME_OF_PLUGIN_1,     type: "TYPE_OF_PLUGIN_1"}
+    -{name: NAME_OF_PLUGIN_2,     type: "TYPE_OF_PLUGIN_2"}
