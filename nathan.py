@@ -155,11 +155,11 @@ try:
 	lidar_sen.listen(lambda point_cloud: point_cloud.save_to_disk("Lidar_Data/%.6d.ply" % point_cloud.frame))
 
 	# Read the data produced by the server this frame.
-	measurements, sensor_data = client.read_data()                                              
-	for name, m in sensor_data.items():   
-		print('Sensor `name: %s' % name)  
-	if name == 'MyLidar':             
-		rospub_pcl.publish(convert_pointcloud_carla_to_ros(frame, m.point_cloud))
+	#measurements, sensor_data = client.read_data()                                              
+	#for name, m in sensor_data.items():   
+	#	print('Sensor `name: %s' % name)  
+	#if name == 'MyLidar':             
+	#	rospub_pcl.publish(convert_pointcloud_carla_to_ros(frame, m.point_cloud))
 
 	actor_list.append(lidar_sen)
 	
