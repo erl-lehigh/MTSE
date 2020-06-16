@@ -1,0 +1,10 @@
+python2
+import networkx as nx
+g = nx.grid_2d_graph(4, 4)                            #creates 4 x 4 grid graph
+g.nodes()                                             #shows list of ndoes
+g.edges()                                             #shows list of edges
+p = nx.shortest_path(g, source=(0, 1), target=(3, 3)) #p is list of shortest path from node (0,1) to node (3,3)
+p                                                     #prints list of above shortest path
+import matplotlib.pyplot as plt
+nx.draw(g)
+plt.show()                                            #displays graph is separate window
