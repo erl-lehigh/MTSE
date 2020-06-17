@@ -1,30 +1,23 @@
 import matplotlib.pyplot as plt
 import shapely.geometry as sp
 import numpy as np
-
-
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
-from math import cos, sin, pi
+from math import cos, sin, pi, sqrt
 from shapely.geometry import Point
 from shapely.geometry import LineString
-
 
 fig = plt.figure()
 ax1 = fig.add_subplot(1,1,1)
 
-
 # Variables for Pure Pursuit algorithm
 
-#A = Point(1,1)
-#B = Point(3,2)
-#AB = LineString([A, B])
+u = (0, 0) # initial velocity
+#acc =
 
-velocity = (0, 0)
+point = Point(2,3)  # vehicle coords
 
-
-point = Point(2,3)
-
+lookahead = 4  # look ahead distance set to 4 units
 
 line = LineString([(1, 1), (8, 4)])
 
@@ -37,43 +30,38 @@ ax1.set_xlim(xmin=0, xmax=10)
 ax1.arrow(point.x,point.y,dx=1,dy=1)
 ax1.plot(point.x,point.y,'ob')
 
-#d = line.project(point)
-##i = line.interpolate(d)
-#ax1.plot(i.x, i.y, 'og')
+d = line.project(point)
+i = line.interpolate(d)
+ax1.plot(i.x, i.y, 'og')
+ax1.axis('equal')
+
+project = LineString([(point.x, point.y), (i.x, i.y)])
+x1,y1 = project.xy
+ax1.plot(x1,y1)
+
+close_path = project.length
+dist_on_path = sqrt((lookahead ** 2) - (close_path ** 2))
+
+t = dist_on_path/line.length
 
 
+future_pt = Point((1-t)*i.x + t* line.coords[1][0], (1-t)*i.y + t*line.coords[1][1])
+#future_pt = line.ar
 
-x = np.array(point.coords[0])
-
-u = np.array(line.coords[0])
-v = np.array(line.coords[len(line.coords)-1])
-
-n = v - u
-n /= np.linalg.norm(n, 2)
-
-P = u + n*np.dot(x - u, n)
-
-ax1.plot(P.x, P.y, 'og')
+ax1.plot(future_pt.x, future_pt.y, 'oy')
 
 
-'''
+goal = LineString([(point.x, point.y), (future_pt.x, future_pt.y)])
+x2,y2 = goal.xy
+ax1.plot(x2,y2, color='y')
 
-x = 1;                          # X coordinate of arrow start
-y = 2;                          # Y coordinate of arrow start
-theta = pi/4;                   # Angle of arrow, from x-axis
-L = 2;                         # Length of arrow
-xEnd = x+L*cos(theta);          #X coordinate of arrow end
-yEnd = y+L*sin(theta);         # Y coordinate of arrow end
-points = np.linspace(0, theta);    # 100 points from 0 to theta
-xCurve = x+(L/2).* cos(points);  # X coordinates of curve
-yCurve = y+(L/2).*sin(points);  # Y coordinates of curve
-ax1.plot(x+[-L L], [y y], '--k');   # Plot dashed line
-plt.holdon;                        # Add subsequent plots to the current axes
-plt.axis([x + [-L L] y + [-L L]]);      # Set axis limits
-plt.axisequal;                   # Make tick increments of each axis equal
-ax1.arrow([x y], [xEnd yEnd]);     # Plot arrow
-ax1.plot(xCurve, yCurve, '-k');    # Plot curve
-ax1.plot(x, y, 'o', 'MarkerEdgeColor', 'k', 'MarkerFaceColor', 'w');
-'''
+
+print('vehicle coords: '+ str(point.x) + ',' + str(point.y) + '\n')
+print('closest pt: ' + str(i.x) + ',' + str(i.y) + '\n')
+print('path length: ' + str(line.length) + '\n')
+print('closest length: ' + str(project.length))
+print('dist on path length: ' + str(dist_on_path))
+#print(type(line.coords[1][1]))
+
 plt.show()
 
