@@ -1,6 +1,7 @@
 <launch>
     <arg name="rviz" default="False"/>
-    <arg name="config" default="template" doc="Specify a config"/>
+    <arg name="config" default="$(find route_planner)/config/route_planner.yaml"
+         doc="Specify a config"/>
 
     <arg name="output" default="screen" doc="Output display"/>
     <arg name="param_file_name" default="default" doc="Specify a param file"/>
@@ -13,6 +14,6 @@
     <node pkg="$(arg pkg_name)" type="$(arg node_type)" name="$(arg node_name)"
           output="$(arg output)" required="$(arg req)">
         <rosparam command="load"
-                  file="$(find route_planner)/config/$(arg config).yaml" />
+                  file="$(arg config)" />
     </node>
 </launch>
