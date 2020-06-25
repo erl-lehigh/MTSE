@@ -32,7 +32,7 @@ def process_img(image):
 		cv2.imshow("", i3)
 		cv2.waitKey(1)
 		return i3/255.0
-
+'''
 def convert_pointcloud_carla_to_ros(frame, points):
   rosmsg = PointCloud()
   rosmsg.header.seq = frame
@@ -45,59 +45,34 @@ def convert_pointcloud_carla_to_ros(frame, points):
      new_pt.z = - pt[2]
      rosmsg.points.append(new_pt)
   return rosmsg
-
 '''
-#From ego_vehicle.py
-self.control_subscriber = rospy.Subscriber(
-            self.get_topic_prefix() + "/vehicle_control_cmd",
-            CarlaEgoVehicleControl,
-            lambda data: self.control_command_updated(data, manual_override=False))
-
-#From the publisher
-self.publish_message(self.get_topic_prefix() + "/vehicle_info", vehicle_info, True)
-'''
-
-def talker():
-    pub = rospy.Publisher('/carla/ego_vehicle/ackermann_cmd', String, queue_size=10) #Problem with this line
-    rospy.init_node('talker', anonymous=True)
-    rate = rospy.Rate(10) # 10hz
-    while not rospy.is_shutdown():
-        hello_str = "hello world %s" % rospy.get_time()
-        rospy.loginfo(hello_str)
-        pub.publish(hello_str)
-        rate.sleep()
-   
-   	if __name__ == '__main__':
-		try:
-			talker()
-		except rospy.ROSInterruptException:
-			pass
-
-def callback(data):
-       rospy.loginfo(rospy.get_caller_id() + "I heard %s", data.data)
-       
-def listener():
-   
-       # In ROS, nodes are uniquely named. If two nodes with the same
-       # name are launched, the previous one is kicked off. The
-       # anonymous=True flag means that rospy will choose a unique
-       # name for our 'listener' node so that multiple listeners can
-       # run simultaneously.
-      rospy.init_node('listener', anonymous=True)
-      rospy.Subscriber("/carla/ego_vehicle/vehicle_control_cmd ", String, callback)
-       # spin() simply keeps python from exiting until this node is stopped
-      rospy.spin()
-  
-if __name__ == '__main__':
-      listener()
-
-
-
-#setup ROS node
-#rospy.init_node('carla_point_subscriber')
-#rospub_pcl = rospy.Publisher('points_lidar', PointCloud, queue_size = 1)
+speed = 0.0
+steering = 0.0
 
 actor_list = []
+
+
+def listener():
+    
+    # In ROS, nodes are uniquely named. If two nodes with the same
+    # name are launched, the previous one is kicked off. The
+    # anonymous=True flag means that rospy will choose a unique
+    # name for our 'listener' node so that multiple listeners can
+    # run simultaneously.
+    rospy.init_node('listener', anonymous=True)
+    rospy.Subscriber("/carla/ego_vehicle/ackermann_cmd", AckermannDrive, drive)
+    speed = AckermannDrive().speed
+    steering = AckermannDrive().steering_angle
+    # spin() simply keeps python from exiting until this node is stopped
+    rospy.spin()
+
+def drive(AckermannDrive):
+	speed = AckermannDrive.speed
+	steering = AckermannDrive.steering_angle
+	print("Current Speed: ", speed)
+	print("Current Steering: ", steering)
+	vehicle.apply_control(carla.VehicleControl(speed,steering))
+	#actor_list.append(vehicle)
 
 try:
 	client = carla.Client("localhost", 2000)
@@ -109,13 +84,25 @@ try:
 	print(vehicle_bp)
 
 	spawn_point = random.choice(world.get_map().get_spawn_points())
-
 	vehicle = world.spawn_actor(vehicle_bp, spawn_point)
-	#vehicle.set_autopilot(True)
-	#vehicle.apply_control(carla.VehicleControl(throttle=1.0, steer=0.0)) #Speed control
-	throttle = 1.0
+
 	actor_list.append(vehicle)
 	
+	
+	# ----------------------------------
+	# Add a RGB camera to the vehicle. 
+	# ----------------------------------
+	cam_bp = None
+	cam_bp = world.get_blueprint_library().find('sensor.camera.rgb')
+	cam_bp.set_attribute("image_size_x",str(IM_WIDTH))
+	cam_bp.set_attribute("image_size_y",str(IM_HEIGHT))
+	cam_bp.set_attribute("fov",str(105))
+	cam_location = carla.Location(2,0,1)
+	cam_rotation = carla.Rotation(0,180,0)
+	cam_transform = carla.Transform(cam_location,cam_rotation)
+	ego_cam = world.spawn_actor(cam_bp,cam_transform,attach_to=vehicle, attachment_type=carla.AttachmentType.SpringArm)
+	ego_cam.listen(lambda image: process_img(image))
+	actor_list.append(ego_cam)
 	'''
 	# --------------
 	# Add collision sensor to ego vehicle. 
@@ -160,20 +147,6 @@ try:
 	ego_obs.listen(lambda obs: obs_callback(obs))
 	actor_list.append(ego_obs)
 	'''
-	# ----------------------------------
-	# Add a RGB camera to the vehicle. 
-	# ----------------------------------
-	cam_bp = None
-	cam_bp = world.get_blueprint_library().find('sensor.camera.rgb')
-	cam_bp.set_attribute("image_size_x",str(IM_WIDTH))
-	cam_bp.set_attribute("image_size_y",str(IM_HEIGHT))
-	cam_bp.set_attribute("fov",str(105))
-	cam_location = carla.Location(2,0,1)
-	cam_rotation = carla.Rotation(0,180,0)
-	cam_transform = carla.Transform(cam_location,cam_rotation)
-	ego_cam = world.spawn_actor(cam_bp,cam_transform,attach_to=vehicle, attachment_type=carla.AttachmentType.SpringArm)
-	ego_cam.listen(lambda image: process_img(image))
-	actor_list.append(ego_cam)
 	'''
 	# ----------------------------------
 	# Add a Depth camera to the vehicle. 
@@ -205,18 +178,9 @@ try:
 	# Saves to /opt/carla-simulator/PythonAPI/examples/Lidar_Data
 	lidar_sen.listen(lambda point_cloud: point_cloud.save_to_disk("Lidar_Data/%.6d.ply" % point_cloud.frame))
 
-	# Read the data produced by the server this frame.
-	#measurements, sensor_data = client.read_data()                                              
-	#for name, m in sensor_data.items():   
-	#	print('Sensor `name: %s' % name)  
-	#if name == 'MyLidar':             
-	#	rospub_pcl.publish(convert_pointcloud_carla_to_ros(frame, m.point_cloud))
-
-	actor_list.append(lidar_sen)
 	'''
-	
-	
-	time.sleep(10)
+	listener()
+	time.sleep(120)
 
 finally:
 	for actor in actor_list:
