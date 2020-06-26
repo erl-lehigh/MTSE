@@ -260,6 +260,38 @@ def dubins_path_planning(start, end, radius, dist_step=0.05, turn_step=0.01745,
 
     return path, mode, clen
 
+def position_distance(state1, state2):
+        '''Returns the distance between two states as the Euclidean distance
+        between their locations.
+        Parameters
+        ---------
+        a (DubinsState)
+        b (DubinsState)
+        Return
+        ------
+        distance (float) the Euclidean distance between the locations associate
+            with the two states.
+        '''
+        dx = state1.x - state2.x
+        dy = state1.y - state2.y
+        return np.sqrt(dx * dx + dy * dy)
+
+def dubins_isclose(state1, state2, dtol=0.01, atol=0.05):
+    '''Determines if two states are close in terms of position and
+    orientation.
+    Parameters
+    ----------
+    state1 (DubinsState)
+    state2 (DubinsState)
+    dtol (float, default=0.01) distance tolerance
+    atol (float, default=0.05) angle tolerance in radians
+    Returns
+    -------
+    (bool) - whether the two Dubins states are close
+    '''
+    return (position_distance(state1, state2) <= dtol
+            and np.abs(pi_2_pi(state1.yaw - state2.yaw)) <= atol)
+
 
 class DynamicDubinsVehicle(object):
     '''
