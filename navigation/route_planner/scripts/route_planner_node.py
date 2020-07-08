@@ -53,7 +53,7 @@ class RoutePlannerNode(object):
         #print('Message received.')
         center_point = (40.6038914, -75.3739361)
         g = ox.graph_from_point(center_point, distance=1500, network_type='drive')
-        orig = (40.6119486, -75.3785700)  
+        orig = msg  
         dest = (40.6054017, -75.3758301)
         origin_node = ox.get_nearest_node(g, orig)
         destination_node = ox.get_nearest_node(g, dest)
