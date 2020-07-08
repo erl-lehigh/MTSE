@@ -5,6 +5,7 @@ from nav_msgs.msg import Path
 import matplotlib.pyplot as plt
 #import Rtree==0.8.3
 #import osmnx==0.9 as ox
+import osmnx as ox
 import networkx as nx
 
 #from route_planner import RoutePlanner
