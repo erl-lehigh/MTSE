@@ -3,12 +3,14 @@
 import rospy
 from nav_msgs.msg import Path
 import matplotlib.pyplot as plt
+#import sys
+#print(sys.path)
 #import Rtree==0.8.3
-#import osmnx==0.9 as ox
+import osmnx as ox
 import networkx as nx
 
-#from route_planner import RoutePlanner
-
+from route_planner import RoutePlanner
+from std_msgs.msg import Float64MultiArray
 #RoutePlanner
 class RoutePlannerNode(object):
     '''TODO:
@@ -27,33 +29,20 @@ class RoutePlannerNode(object):
         # Create publishers
         # TODO:
         # second parameter is the message type for the topic
-        '''self.example_pub  = rospy.Publisher('publisher_example', Path,
-                                            queue_size=1)'''
-        curr_location = (40.6119486, -75.3785700)
-        self.example_pub = rospy.Publisher('', float64, queue_size=10)
-        rospy.init_node('location', anonymous=True)
-        rate = rospy.Rate(0.25) # 0.25hz = 4s
-        msg = curr_location
-        while not rospy.is_shutdown():
-            rospy.loginfo('current location x: %f, y: %f', msg[0], msg[1])
-            pub.publish(msg)
-            rate.sleep()
+        self.example_pub = rospy.Publisher('currPos', Float64MultiArray , queue_size=10)
 
         # Create subscribers
-        '''self.example_sub = rospy.Subscriber('~subscriber_example', Path,
-                                            self.example_callback)'''
-        rospy.init_node('location', anonymous=True)
-        rospy.Subscriber('', float64, example_callback(self, msg))
-        # spin() simply keeps python from exiting until this node is stopped
-        rospy.spin()
+        #CHECK MESSAGE FORMAT FOR FLOAT63MultiArray
+        rospy.Subscriber('currPos', Float64MultiArray, example_callback(self, msg))
         rospy.loginfo('[%s] Node started!', self.node_name)
+
 
     def example_callback(self, msg):
         '''Example message callback.'''
         #print('Message received.')
         center_point = (40.6038914, -75.3739361)
         g = ox.graph_from_point(center_point, distance=1500, network_type='drive')
-        orig = msg  
+        orig = msg #msg.values or something then convert tuple
         dest = (40.6054017, -75.3758301)
         origin_node = ox.get_nearest_node(g, orig)
         destination_node = ox.get_nearest_node(g, dest)
@@ -62,11 +51,18 @@ class RoutePlannerNode(object):
         ox.plot_graph(g)
 
 
-
 if __name__ == "__main__":
     # Initialize node with rospy
     rospy.init_node('route_planner', anonymous=False)
     # Create the node object
     _ = RoutePlannerNode()
+    curr_location = (40.6119486, -75.3785700)
+    msg = Float64MultiArray()
+    rate = rospy.Rate(0.5) # 0.5hz
+    while not rospy.is_shutdown():
+        msg.value = curr_location #Not correct (look for fields)
+        #rospy.loginfo('current location x: %f, y: %f', msg[0], msg[1]) #msg.first, msg.second or similiar
+        pub.publish(msg)
+        rate.sleep()
     # Keep the node alive
-    rospy.spin()
+    #rospy.spin()
