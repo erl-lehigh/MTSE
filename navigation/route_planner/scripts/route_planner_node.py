@@ -25,7 +25,6 @@ class RoutePlannerNode(object):
         destination_node = ox.get_nearest_node(g, dest)
         route = nx.shortest_path(g, origin_node, destination_node)
         fig, ax = ox.plot.plot_graph_route(g, route, route_linewidth=6, node_size=0, bgcolor='k')
-        ox.plot_graph(g)
 
     def __init__(self):
         '''TODO:
@@ -50,27 +49,24 @@ class RoutePlannerNode(object):
 
 
 if __name__ == "__main__":
+    #plt.ion()
     # Initialize node with rospy
     rospy.init_node('route_planner', anonymous=True)
     # Create the node object
     node1 = RoutePlannerNode()
-    #curr_location = (40.6119486, -75.3785700) #Where the car is
-    curr_location = (40.6079000,-75.3810000)
     msg = Float64MultiArray()
     rate = rospy.Rate(0.2) # 0.2hz
-    msg.data.append(curr_location[0])
-    msg.data.append(curr_location[1])
+    msg.data = [0.0, 0.0]
     while not rospy.is_shutdown():
+        #plt.gca().clear()
         curr_location = (40.6079000,-75.3810000)
-        msg.data[0] = curr_location[0]
-        msg.data[1] = curr_location[1]
+        msg.data = curr_location
         rospy.loginfo('current location x: %f, y: %f', msg.data[0], msg.data[1]) 
         node1.example_pub.publish(msg)
         rate.sleep()
         #fig.close()
         curr_location = (40.6083000, -75.3743000)
-        msg.data[0] = curr_location[0]
-        msg.data[1] = curr_location[1]
+        msg.data = curr_location
         rospy.loginfo('current location x: %f, y: %f', msg.data[0], msg.data[1]) 
         node1.example_pub.publish(msg)
         rate.sleep()
