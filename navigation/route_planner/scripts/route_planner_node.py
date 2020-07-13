@@ -11,64 +11,100 @@ import networkx as nx
 
 from route_planner import RoutePlanner
 from std_msgs.msg import *
+from nav_msgs.msg import Path
+from geometry_msgs.msg import PoseStamped, Pose, Point, Quaternion
 #RoutePlanner
 class RoutePlannerNode(object):
     '''TODO:
     '''
-    @staticmethod
-    def printGraph(msg):
-        center_point = (40.6038914, -75.3739361)
+
+    '''
+    [258574407, 258574525, 259255502]
+    [INFO] [1594667836.981949]: current location x: 40.608300, y: -75.374300
+    [258574401, 259349128, 258574406, 258574407, 258574525, 259255502]
+    '''
+    def printGraph(self, msg):
+        #The center point of the map
+        center_point = (40.6038914, -75.3739361) #(y,x)
+        #Gets all the roads a distance away on which can be driven
         g = ox.graph_from_point(center_point, distance=1500, network_type='drive')
+        #Gets the current location from the message sent via pub/sub
         orig = (msg.data[0],msg.data[1]) 
-        dest = (40.6054017, -75.3758301)
+        #Sets the destination point
+        dest = (40.6054017, -75.3758301) #(y,x)
+        #Finds the nearest intersection to the current location
         origin_node = ox.get_nearest_node(g, orig)
+        #Finds the nearest intersection to the destination point
         destination_node = ox.get_nearest_node(g, dest)
+        #Calculates the shortest path from the current location to the destination
         route = nx.shortest_path(g, origin_node, destination_node)
+        #print(g.node[route[0]]) #Turns node IDs into Coordinates
+        #Graphs the figure
         fig, ax = ox.plot.plot_graph_route(g, route, route_linewidth=6, node_size=0, bgcolor='k')
 
-    def __init__(self):
-        '''TODO:
-        '''
-        self.node_name = rospy.get_name()
+        msg2 = Path()
+        msg2.header.frame_id = "/map"
+        #msg2.header.stamp =  rospy.rostime.time
+        for node in route:
+            x = g.node[node]["x"]
+            y = g.node[node]["y"]
+            pose = PoseStamped()
+            pose.pose.position.x = x
+            pose.pose.position.y = y
+            msg2.poses.append(pose)
+        self.route_pub.publish(msg2)
 
-        # Read parameters
-        #TODO: read parameters
-        # second parameter is default value
+    def __init__(self):
+        #Sets the node's name
+        self.node_name = rospy.get_name()
+        #Gets any parameters on the node
         self.example = rospy.get_param('~parameter', 0)
 
-        # Create publishers
-        # TODO:
-        # second parameter is the message type for the topic
-        self.example_pub = rospy.Publisher('currPos', Float64MultiArray , queue_size=10)
+        # Creates publishers:
+
+        #Publishes Current Postion
+        self.currPos_pub = rospy.Publisher('currPos', Float64MultiArray , queue_size=10)
+        #Publish the Nodes along a path (that can be turned into coordinates with g.node[])
+        self.route_pub = rospy.Publisher('route', Path , queue_size=10)
+
 
         # Create subscribers
-        #CHECK MESSAGE FORMAT FOR FLOAT64MultiArray
-        rospy.Subscriber('currPos', Float64MultiArray, RoutePlannerNode.printGraph)
+        rospy.Subscriber('currPos', Float64MultiArray, self.printGraph)
         rospy.loginfo('[%s] Node started!', self.node_name)
 
 
 
 if __name__ == "__main__":
-    #plt.ion()
     # Initialize node with rospy
     rospy.init_node('route_planner', anonymous=True)
     # Create the node object
     node1 = RoutePlannerNode()
+    #Initializes the msg as a Float64MultiArray
     msg = Float64MultiArray()
+    #Sets how often the messages are sent
     rate = rospy.Rate(0.2) # 0.2hz
+    #Initializes the msg to a generic location
     msg.data = [0.0, 0.0]
+    
+
+
+
+
+    #Control Loop
     while not rospy.is_shutdown():
-        #plt.gca().clear()
-        curr_location = (40.6079000,-75.3810000)
-        msg.data = curr_location
-        rospy.loginfo('current location x: %f, y: %f', msg.data[0], msg.data[1]) 
-        node1.example_pub.publish(msg)
-        rate.sleep()
-        #fig.close()
-        curr_location = (40.6083000, -75.3743000)
-        msg.data = curr_location
-        rospy.loginfo('current location x: %f, y: %f', msg.data[0], msg.data[1]) 
-        node1.example_pub.publish(msg)
-        rate.sleep()
-    # Keep the node alive
-    #rospy.spin()
+        #Sets the First Point
+        curr_location = (40.6079000,-75.3810000) #(y,x)
+        msg.data = curr_location #Updates msg with new location
+        rospy.loginfo('current location x: %f, y: %f', msg.data[1], msg.data[0]) #Outputs Debugging information
+        node1.currPos_pub.publish(msg) #Publishes the msg
+        rate.sleep()  #Waits the sleep time
+        #plt.close(1)
+
+        #Sets the Second Point
+        curr_location = (40.6083000, -75.3743000) #(y,x)
+        msg.data = curr_location #Updates msg with new location
+        rospy.loginfo('current location x: %f, y: %f', msg.data[1], msg.data[0]) #Outputs Debugging information
+        node1.currPos_pub.publish(msg) #Publishes the msg
+        rate.sleep() #Waits the sleep time
+        #plt.close(1)
+
