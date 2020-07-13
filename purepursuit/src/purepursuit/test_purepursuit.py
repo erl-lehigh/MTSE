@@ -1,7 +1,7 @@
 from math import pi
 import matplotlib.pyplot as plt
 from shapely.geometry import Point, LineString
-from PurePursuit import PurePursuit
+from purepursuit import PurePursuit
 
 fig = plt.figure()
 ax1 = fig.add_subplot(1,1,1)

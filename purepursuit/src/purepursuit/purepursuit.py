@@ -31,7 +31,8 @@ class PurePursuit:
         return future_pt
 
     def compute_speed(self):
-        print(str(self.speed))
+        return self.speed
+        #print(str(self.speed))
 
     def vehicle_front_pt(self):
         ft_x = self.vehicle_cords.x + self.L * cos(self.theta)
@@ -69,8 +70,3 @@ class PurePursuit:
         seg_1 = seg_1[1] - seg_1[0]
         angle_l1 = np.angle(complex(*(seg_1)), deg=True)
         return abs(angle_l1 - angle_l2)
-
-
-
-
-
