@@ -1,0 +1,11 @@
+<launch>
+    <arg name="rviz" default="False"/>
+    
+    <include file="$(find template_ros_package)/launch/launch_file.launch"/>
+
+    <include file="$(find rrt)/launch/rrt.launch"/>
+    
+
+  
+
+</launch>
