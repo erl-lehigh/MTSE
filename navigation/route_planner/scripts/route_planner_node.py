@@ -45,22 +45,33 @@ class RoutePlannerNode(object):
         destination_node = ox.get_nearest_node(g, dest)
         #Calculates the shortest path from the current location to the destination
         route = nx.shortest_path(g, origin_node, destination_node)
-        print list(g.get_edge_data(route[0],route[1])[0]["geometry"].coords)
         #print(g.node[route[0]]) #Turns node IDs into Coordinates
         #Graphs the figure
         fig, ax = ox.plot.plot_graph_route(g, route, route_linewidth=6, node_size=0, bgcolor='k')
 
-        msg2 = Path()
-        msg2.header.frame_id = "/map"
-        msg2.header.stamp =  rospy.Time.now()
-        for node in route:
-            x = g.node[node]["x"]
-            y = g.node[node]["y"]
-            pose = PoseStamped()
-            pose.pose.position.x = x
-            pose.pose.position.y = y
-            msg2.poses.append(pose)
-        self.route_pub.publish(msg2)
+        #Broadcasts the intersections (nodes) remaining on the route
+        msg2 = Path() #Instantiate the msg2 object as a Path object
+        msg2.header.frame_id = "/map" #Set the frame_id
+        msg2.header.stamp =  rospy.Time.now() #Set the stamp
+        for node in route: #For each node in route
+            pose = PoseStamped() #Instantiate the pose object as a PoseStamped object
+            pose.pose.position.x = g.node[node]["x"] #Set the message's x value to the node's x value
+            pose.pose.position.y = g.node[node]["y"] #Set the message's y value to the node's y value
+            msg2.poses.append(pose) #Add the coordinate to the list of coordinates in msg2
+        self.route_pub.publish(msg2) #Broadcast the message
+        print(msg2) #Print for debugging
+
+        #Broadcasts the roads (edges) remaining on the route (Geometrical Path)
+        msg3 = Path() #Instantiate the msg2 object as a Path object
+        msg3.header.frame_id = "/map" #Set the frame_id
+        msg3.header.stamp = rospy.Time.now() #Set the stamp
+        for node in range(len(route)-1):
+            msg3.poses.append(g.get_edge_data(route[node], route[node+1])[0]["geometry"].coords) #Add each edge to msg3
+        self.refPath_pub.publish(msg3) #Broadcast the message
+        print(msg3) #Print for debugging
+
+
+
 
     def __init__(self):
         #Sets the node's name
@@ -74,7 +85,8 @@ class RoutePlannerNode(object):
         self.currPos_pub = rospy.Publisher('currPos', Float64MultiArray , queue_size=10)
         #Publish the Nodes along a path (that can be turned into coordinates with g.node[])
         self.route_pub = rospy.Publisher('route', Path , queue_size=10)
-
+        #Publish the reference path
+        self.refPath_pub = rospy.Publisher('referencePath', Path , queue_size=10)
 
         # Create subscribers
         rospy.Subscriber('currPos', Float64MultiArray, self.printGraph)
