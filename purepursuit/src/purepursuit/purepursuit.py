@@ -1,72 +1,85 @@
-from math import cos, sin, radians, atan, degrees, tan
-from shapely.geometry import Point, LineString
 import numpy as np
-class PurePursuit:
+from shapely.geometry import Point, LineString
 
-    # data members / class attributes
-    L = 1 # distance between front and rear axle
-    lookahead = 4  # look ahead distance set to 4 unit
+
+class PurePursuit:
+    '''TODO: docstring
+    '''
 
     # constructor
-    def __init__(self, path, speed, vehicle_cords, theta):
+    def __init__(self, wheelbase, lookahead, speed=None, vehicle_pose=None,
+                 path=None):
+        '''TODO: docstring
+
+        vehicle_pose = (x, y, theta)
+        '''
+        # distance between front and rear axles
+        self.wheelbase = wheelbase
+        # look ahead distance to the
+        self.lookahead = lookahead
+
         self.path = path
         self.speed = speed
-        self.vehicle_cords = vehicle_cords
-        self.theta = theta
+        self.set_vehicle_pose(vehicle_pose)
 
-    def construct_path(self):
-        line = self.path
-        x, y = line.xy
-        return x, y
+    def set_vehicle_pose(self, vehicle_pose):
+        '''TODO: docstring
+        '''
+        if vehicle_pose is None:
+            self.vehicle_position = None
+            self.vehicle_orientation = None
+        else:
+            self.vehicle_position = Point(vehicle_pose[:2])
+            self.vehicle_orientation = vehicle_pose[2]
 
     def closest_point(self):
-        d = (self.path).project(self.vehicle_cords)
-        closest_pt = (self.path).interpolate(d)
-        return closest_pt
+        '''TODO: docstring
+        '''
+        path_length = self.path.project(self.vehicle_position)
+        return self.path.interpolate(path_length)
 
     def future_point(self):
-        closest_path = min(self.vehicle_cords.distance(self.closest_point()), self.lookahead)
+        '''TODO: docstring
+        '''
+        closest_dist = min(self.vehicle_position.distance(self.closest_point()),
+                           self.lookahead)
         dist_on_path = (self.lookahead ** 2 - closest_path ** 2) ** 0.5
-        future_pt = self.path.interpolate(dist_on_path)
-        return future_pt
+        return self.path.interpolate(dist_on_path)
 
     def compute_speed(self):
+        '''TODO: docstring
+        '''
         return self.speed
-        #print(str(self.speed))
 
-    def vehicle_front_pt(self):
-        ft_x = self.vehicle_cords.x + self.L * cos(self.theta)
-        ft_y = self.vehicle_cords.y + self.L * sin(self.theta)
-        front_pt = Point(ft_x, ft_y)
-        return front_pt
+    def vehicle_front_point(self):
+        '''TODO: docstring
+        '''
+        direction = np.array((np.cos(self.vehicle_orientation),
+                              np.sin(self.vehicle_orientation)))
+        return Point(self.vehicle_position + self.wheelbase * direction)
 
-    # compute steering angle
-    def compute_delta(self):
-        ls1 = LineString([self.vehicle_cords, self.vehicle_front_pt()])
-        ls2 = LineString([self.vehicle_cords, self.future_point()])
-        eta = radians(self.compute_angle(ls1, ls2))
-        delta = atan((2* self.L * sin(eta)) / self.lookahead)
-        return (delta)
+    def compute_steering_angle(self):
+        '''TODO: docstring
+        '''
+        lookahead_point = np.array(self.future_point()) - self.vehicle_position
+        line_of_sight_angle = np.arctan2(lookahead_point[1], lookahead_point[0])
+        eta = line_of_sight_angle - self.vehicle_orientation
+        return -np.arctan2(2 * self.wheelbase * np.sin(eta) / self.lookahead)
 
-    # compute angular velocity
-    def compute_omega(self):
-        omega = (self.speed/self.L)*tan(self.compute_delta())
-        return omega
+    def compute_angular_speed(self):
+        '''TODO: docstring
+        '''
+        return self.speed * tan(self.compute_steering_angle()) / self.wheelbase
 
     def compute_curvature(self):
-        closest_path = min(self.vehicle_cords.distance(self.closest_point()), self.lookahead)
-        curvature = 1/((self.lookahead ** 2) / (2 * closest_path))
-        return curvature
+        '''TODO: docstring
+        '''
+        lookahead_point = np.array(self.future_point()) - self.vehicle_position
+        line_of_sight_angle = np.arctan2(lookahead_point[1], lookahead_point[0])
+        eta = line_of_sight_angle - self.vehicle_orientation
+        return 2 * np.abs(np.sin(eta)) / self.lookahead
 
     def compute_r(self):
-        r = self.compute_curvature()
-        return r
-
-    def compute_angle(self, ls1, ls2):
-        seg = np.array(ls2)
-        seg = seg[1] - seg[0]
-        angle_l2 = np.angle(complex(*(seg)), deg=True)
-        seg_1 = np.array(ls1)
-        seg_1 = seg_1[1] - seg_1[0]
-        angle_l1 = np.angle(complex(*(seg_1)), deg=True)
-        return abs(angle_l1 - angle_l2)
+        '''TODO: docstring
+        '''
+        return 1.0 / self.compute_curvature()
