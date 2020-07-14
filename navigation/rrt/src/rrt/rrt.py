@@ -23,6 +23,7 @@ class RRTPlanner(object):
         #TODO:
         '''
         self.vehicle = vehicle
+        self.costmap = None
 
         # initialize RRT tree
         self.g = nx.DiGraph()
@@ -264,3 +265,30 @@ class RRTPlanner(object):
     def check_path(self, path):
         '''TODO:
         '''
+        ogm = self.costmap 
+        if ogm is None:
+            return None
+            
+        height = ogm.info.height
+        width = ogm.info.width
+        grid = np.asarray(ogm.data).reshape((height, width))
+        positionX = ogm.info.origin.position.x
+        positionY = ogm.info.origin.position.y
+        resolution = ogm.info.resolution
+        for dubinsState in path:
+            px = dubinsState.x
+            py = dubinsState.y
+            x = (px - positionX)/resolution
+            y = (py - positionY)/resolution
+            if(0 <= x <= width or 0 <= y <= height):
+                if(grid[int(x),int(y)] >= 100):
+                    return False
+                elif(0 <= grid[int(x),int(y)] < 100):
+                    continue
+                else:
+                    return False
+            else:
+                return False
+        return True
+
+            
