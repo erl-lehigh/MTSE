@@ -7,64 +7,80 @@ import cv2
 import rospy
 from ackermann_msgs.msg import AckermannDrive
 from carla_msgs.msg import CarlaEgoVehicleInfo 
-from sensor_msgs.msg import Image
+from sensor_msgs.msg import Image, NavSatFix
+from cv_bridge import CvBridge
 
-def speed_and_steering():
-    #Creates a publisher node, broadcasting the AckermannDrive messages found in /carla/ego_vehicle/ackermann_cmd
-    pub = rospy.Publisher('/carla/ego_vehicle/ackermann_cmd', AckermannDrive, queue_size=10)
-    #Initializes the node on which to broadcast
-    rospy.init_node('ackermannCtrl', anonymous=True)
-    #Sets how often it broadcasts
-    rate = rospy.Rate(0.25) # 0.25hz = 4s
-    #Stores the AcermanDrive data into a message object
-    msg = AckermannDrive()
-    while not rospy.is_shutdown():
-        #Changes the speed
-        msg.speed = 1.0 - msg.speed
-        msg.steering_angle = 1.0 - msg.steering_angle
-        #Broadcasts text
-        rospy.loginfo('Set speed to: %f, and steering to %f', msg.speed, msg.steering_angle)
-        #Broadcasts the message
-        pub.publish(msg)
-        #Sleeps for time equal to the rate
-        rate.sleep()
+class VehicleControllerNode(object):
+    IM_WIDTH = 640
+    IM_HEIGHT = 480
+    def __init__(self):
+        #Publishers
+        #Creates a publisher node, broadcasting the AckermannDrive messages found in /carla/ego_vehicle/ackermann_cmd
+        self.aCtrl_pub = rospy.Publisher('/carla/ego_vehicle/ackermann_cmd', AckermannDrive, queue_size=10)
 
-def v_info():
-    pub = rospy.Publisher('/carla/ego_vehicle/vehicle_info', CarlaEgoVehicleInfo, queue_size=10)
-    rospy.init_node('vehicle_info', anonymous=True)
-    #rate = rospy.Rate(0.25) # 0.25hz = 4s
-    msg = CarlaEgoVehicleInfo()
-    msg.type = "prius"
-    rospy.loginfo('Set vehicle type to %f', msg.type)
-    #Broadcasts the message
-    pub.publish(msg)
-    #Sleeps for time equal to the rate
-    #rate.sleep()
+        #Node for setting the vehicle information
+        self.vInfo_pub = rospy.Publisher('/carla/ego_vehicle/vehicle_info', CarlaEgoVehicleInfo, queue_size=10)
 
-def rgbCam():
-    rospy.init_node('rgbCam', anonymous=True)
-    rospy.Subscriber("/carla/ego_vehicle/camera/rgb/front/image_color", Image, process_img)
-    # spin() simply keeps python from exiting until this node is stopped
-    rospy.spin()
+        #Subscribers
+        rospy.Subscriber("/carla/ego_vehicle/camera/rgb/front/image_color", Image, self.process_img)
+        rospy.Subscriber("/carla/ego_vehicle/gnss/front/gnss", NavSatFix, self.print_location)
 
+    def process_img(self, image):
+        bridge = CvBridge()
+        img = bridge.imgmsg_to_cv2(image, "bgr8")
+        cv2.imshow("", img)
+        cv2.waitKey(1)
 
-IM_WIDTH = 640
-IM_HEIGHT = 480
+    def print_location(self, nav):
+        print("lat: %f, lon: %f", nav.latitude, nav.longitude)
 
-def process_img(image):
-    i = np.array(image)
-    #i = np.split(image, (image.height*image.width))
-	#print(dir(image))
-	#i2 = i.reshape((image.height, image.width, 4))
-    #i3 = i[:, :, :3] #Just the RGB values of RGBA
-    cv2.imshow("", i)
-    cv2.waitKey(1)
-    #return i3/255.0
+def control(s, a, j, st, av):
+        msg.speed = s
+        msg.acceleration = a
+        msg.jerk = j
+        msg.steering_angle =  st
+        msg.steering_angle_velocity = av
+        rospy.loginfo('Desired, s: %f, a: %f, j: %f, st: %f, av: %f', msg.speed, msg.acceleration, msg.jerk, msg.steering_angle, msg.steering_angle_velocity) #prints text
+        vNode.aCtrl_pub.publish(msg) #Broadcasts the message
+        rate.sleep() #Sleeps for time equal to the rate
 
 if __name__ == '__main__':
     try:
-        #v_info()
-        rgbCam()
-        speed_and_steering()
+        # Initialize nodes with rospy
+        rospy.init_node('ackermannCtrl', anonymous=True)
+
+        # Create the node object
+        vNode = VehicleControllerNode()
+        #Initializes the msgs
+        msg = AckermannDrive()
+        msg2 = CarlaEgoVehicleInfo()
+        #Sets how often the messages are sent
+        rate = rospy.Rate(0.2) # 0.2hz
+        #Initializes the vehicle type
+        msg2.type = "prius"
+             
+        #Message publication
+        rospy.loginfo('Set vehicle type to %s', msg2.type)
+        vNode.vInfo_pub.publish(msg2) #Broadcasts the message
+
+        #Control Loop
+        while not rospy.is_shutdown():
+            #Speed in m/s
+            #Acceleration in m/s^2
+            #Jerk in m/s^3
+            #Steering angle in radians
+            #Sterring angle velocity in radians/s
+
+            pi = 3.14159265358979
+            straight = 0.0
+            right = pi / 3.0
+            left = pi / -3.0
+
+            control(5 ,1 ,0.3 ,straight ,0.2)
+            control(5 ,1 ,0.3 ,right, 0.2)
+            control(5 ,1 ,0.3 ,left, 0.2)
+
+           
+
     except rospy.ROSInterruptException:
         pass
