@@ -289,6 +289,7 @@ def dubins_isclose(state1, state2, dtol=0.01, atol=0.05):
     -------
     (bool) - whether the two Dubins states are close
     '''
+    #print(position_distance(state1, state2))
     return (position_distance(state1, state2) <= dtol
             and np.abs(pi_2_pi(state1.yaw - state2.yaw)) <= atol)
 
@@ -478,7 +479,7 @@ def test_vehicle_drive(start=None, end=None, figure_number=1, arrow_length=1,
                             yaw=0.082673490883941936,
                             v=10.0, omega=0.082673490883941936)
     if end is None:
-        end = DubinsState(x=101.55, y=0.0, yaw=0.0, v=0, omega=0)
+        end = DubinsState(x=101.55, y=57.0, yaw=0.0, v=0, omega=0)
 
     veh = DynamicDubinsVehicle(start)
 

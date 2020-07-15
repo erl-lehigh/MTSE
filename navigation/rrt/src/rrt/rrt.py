@@ -1,6 +1,5 @@
 '''
 RRT Planner.
-
 @author: Cristian-Ioan Vasile (cvasile@lehigh.edu)
 '''
 
@@ -13,12 +12,17 @@ import networkx as nx
 from dubins import DubinsState
 from dubins import dubins_isclose, position_distance as distance
 from dubins import dubins_path_planning as vehicle_path
+from dubins import DynamicDubinsVehicle
 
+import random
+
+#import "bitbucket.org/binet/go-python/pkg/python"
+import sys
 
 class RRTPlanner(object):
     '''Implementation of RRT*.'''
 
-    def __init__(self, vehicle, max_iterations=3000, gamma=40.0):
+    def __init__(self, vehicle, max_iterations=9000, gamma=40.0):
         '''Constructor
         #TODO:
         '''
@@ -36,11 +40,9 @@ class RRTPlanner(object):
     def plan(self, goal):
         '''Generates a dynamically feasible path for the ego-car and associated
         speeds (linear, turning).
-
         Parameters
         ----------
         TODO:
-
         Returns
         -------
         path (list of DubinsState) - dynamically feasible path
@@ -56,11 +58,10 @@ class RRTPlanner(object):
 
             new_node = self.steer(q_nearest, q_rand)
             q_new = new_node[0]
-
             if self.check_path(new_node[1]['trajectory']):
                 near_states = self.near(q_new)
                 new_node = self.choose_parent(new_node, near_states)
-
+                
                 if new_node is not None:
                     q_new, data_new = new_node
                     parent = data_new['parent']
@@ -77,6 +78,7 @@ class RRTPlanner(object):
                     self.rewire(new_node, near_states)
 
         # save best plan
+
         self.best_state = self.get_best_state(goal)
         if self.best_state is None:
             path = [self.vehicle.current_state] * 2 # Stay in place
@@ -88,16 +90,17 @@ class RRTPlanner(object):
     def get_best_state(self, goal):
         '''Returns the optimal state w.r.t. cost from root that is close to the
         target (goal) state.
-
         Parameters
         ----------
         goal (DubinsState) - goal state to plan towards
-
         Returns
         -------
         node (tuple) - pair of DubinsState and associated data from the RRT tree
         '''
-        nodes = [(state, data) for state, data in self.g.nodes_iter(True)
+        #for state in list(self.g.nodes(True)):
+        #    print(state[0].x)
+
+        nodes = [(state, data) for state, data in list(self.g.nodes(True))
                     if dubins_isclose(state, goal,self.dist_threshold,
                                       self.angle_threshold)]
         if not nodes:
@@ -110,11 +113,9 @@ class RRTPlanner(object):
     def get_trajectory_from_root(self, state):
         '''Returns the trajectory from the state at the root of the RRT tree to
         the state given state.  It assumes that the state is in the RRT tree.
-
         Parameters
         ----------
         state (DubinsState) - a state in the RRT tree
-
         Returns
         -------
         trajectory (list of DubinsState) - the trajectory from the root to the
@@ -123,8 +124,9 @@ class RRTPlanner(object):
 
         trajectory = [state]
         while self.g.pred[state]:
-            parent = next(self.g.predecessors_iter(state))
-            from_parent = self.g[parent][state]['trajectory']
+#           parent = next(self.g.predecessors_iter(state))
+            parent = next(iter(self.g.predecessors(state)))
+            from_parent = self.g[parent][state]['attr_dict']['trajectory']
             trajectory = from_parent[:-1] + trajectory
             state = parent
         return trajectory
@@ -132,25 +134,26 @@ class RRTPlanner(object):
     def sample(self, goal):
         '''TODO:
         '''
+        max_rand = 100
+        min_rand = -100
+
+        return DubinsState(random.uniform(max_rand, min_rand), random.uniform(max_rand, min_rand), 0, 0, 0)
 
     def steer(self, start, end):
         '''Steers the vehicle from the start state towards the end state, and
         returns a node (the new state and it's associated data).
-
         Parameters
         ----------
         start (DubinsState) - state where the motion starts
         end (DubinsState) - state towards the vehicle is steered
-
         Returns
         -------
         node (tuple) - pair of DubinsState and associated data
         '''
         state, _, path, length = self.vehicle.drive(start, end)
-
         data = {
             'cost_from_parent': length,
-            'cost_from_root': self.g.node[start]['cost_from_root'] + length,
+            'cost_from_root': self.g.node[start]['attr_dict']['cost_from_root'] + length,
             'parent': start,
             'trajectory': path
         }
@@ -159,13 +162,11 @@ class RRTPlanner(object):
     def choose_parent(self, node, near_states):
         '''Determine the best parent for the given node from the given set of
         of near states in the RRT tree.
-
         Parameters
         ---------
         node (DubinsState) - pair of DubinsState and associated data dict
         near_states (list of DubinsState) - state in the RRT tree near the given
             node
-
         Return
         ------
         new_node (tuple or None) the parent node (pair of DubinsState and
@@ -174,7 +175,7 @@ class RRTPlanner(object):
         state = node[0]
         if not near_states:
             return None
-
+        DBL_MAX = sys.float_info.max
         cost = DBL_MAX
         new_node = None
         for candidate in near_states:
@@ -191,25 +192,22 @@ class RRTPlanner(object):
 
     def nearest(self, q_rand):
         '''Returns the nearest state in the RRT tree.
-
         Parameters
         ----------
         q_rand (DubinsState) - the query state
-
         Returns
         -------
         (DubinsState) - the closes state in the RRT tree to `q_rand`
         '''
-        return min(self.g.nodes_iter(), key=lambda q: distance(q_rand, q))
+        #return min(self.g.nodes_iter(), key=lambda q: distance(q_rand, q))
+        return min(list(self.g.nodes()), key=lambda q: distance(q_rand, q))
 
     def near(self, q_rand):
         '''Returns all states from the tree that are within the RRT* radius from
         the random sample.
-
         Parameters
         ----------
         q_rand (DubinsState) - the query state
-
         Returns
         -------
         (list of DubinsState) - states from the RRT tree that are close to
@@ -219,12 +217,11 @@ class RRTPlanner(object):
         n = self.g.number_of_nodes()
         # NOTE: Assumes planar workspace, i.e., dimension is 2
         r = self.gamma * np.sqrt(np.log(n + 1.0)/(n + 1.0))
-        return [v for v in self.g.nodes_iter() if distance(q_rand, v) <= r]
+        return [v for v in list(self.g.nodes()) if distance(q_rand, v) <= r]
 
     def rewire(self, node, near_states):
         '''Re-configures the tree based on the newly added node if costs to
         nearby states can be improved.
-
         Parameters
         ----------
         node (pair DubinsState and dict) - state and associated data from the
@@ -247,11 +244,12 @@ class RRTPlanner(object):
 
             #TODO: expose tolerances
             if dubins_isclose(q_new, candidate, 0.01, 0.05):
-                improved = (data_new['cost_from_root'] < data['cost_from_root'])
+                improved = (data_new['cost_from_root'] < data['attr_dict']['cost_from_root'])
 
                 if self.check_path(data_new['trajectory']) and improved:
                     # remove old parent
-                    parent = next(self.g.predecessors_iter(candidate))
+#                    parent = next(self.g.predecessors_iter(candidate))
+                    parent = next(iter(self.g.predecessors(candidate)))
                     self.g.remove_edge(parent, candidate)
                     # add new parent and update cost from root
                     data['cost_from_root'] = data_new['cost_from_root']
@@ -263,4 +261,17 @@ class RRTPlanner(object):
 
     def check_path(self, path):
         '''TODO:
-        '''
+        '''    
+        return True
+        
+def main():
+    print("start " + __file__)
+    
+    rrt = RRTPlanner(DynamicDubinsVehicle(DubinsState(0, 0, 0, 0, 0)))
+    path = rrt.plan(DubinsState(x=29.988612382203414, y=-4.3868679359233935,
+                            yaw=0.082673490883941936,
+                            v=10.0, omega=0.082673490883941936))
+    print(path)
+    
+if __name__ == '__main__':
+    main()
