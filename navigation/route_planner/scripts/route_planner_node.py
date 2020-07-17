@@ -66,9 +66,11 @@ class RoutePlannerNode(object):
         msg3.header.frame_id = "/map" #Set the frame_id
         msg3.header.stamp = rospy.Time.now() #Set the stamp
         for node in range(len(route)-1):
-            msg3.poses.append(g.get_edge_data(route[node], route[node+1])[0]["geometry"].coords) #Add each edge to msg3
+            msg3.poses.append(g.get_edge_data(route[node], route[node+1])[0]["geometry"].coords.xy) #Add each edge to msg3
         self.refPath_pub.publish(msg3) #Broadcast the message
         print(msg3) #Print for debugging
+        for edge in range(len(msg3.poses)):
+            plt.scatter(msg3.poses[edge][0],msg3.poses[edge][1])
 
 
 
