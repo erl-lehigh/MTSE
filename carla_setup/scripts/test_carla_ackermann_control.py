@@ -14,16 +14,16 @@ class VehicleControllerNode(object):
     IM_WIDTH = 640
     IM_HEIGHT = 480
     def __init__(self):
-        #Publishers
-        #Creates a publisher node, broadcasting the AckermannDrive messages found in /carla/ego_vehicle/ackermann_cmd
+        #---Publishers---#
+        #Node to broadcast driving commands
         self.aCtrl_pub = rospy.Publisher('/carla/ego_vehicle/ackermann_cmd', AckermannDrive, queue_size=10)
-
         #Node for setting the vehicle information
         self.vInfo_pub = rospy.Publisher('/carla/ego_vehicle/vehicle_info', CarlaEgoVehicleInfo, queue_size=10)
-
-        #Subscribers
+        #---Subscribers---#
+        #Camera
         rospy.Subscriber("/carla/ego_vehicle/camera/rgb/front/image_color", Image, self.process_img)
-        rospy.Subscriber("/carla/ego_vehicle/gnss/front/gnss", NavSatFix, self.print_location)
+        #Gnss
+        rospy.Subscriber("/carla/ego_vehicle/gnss/gnss1/fix", NavSatFix, self.print_location)
 
     def process_img(self, image):
         bridge = CvBridge()
@@ -32,7 +32,8 @@ class VehicleControllerNode(object):
         cv2.waitKey(1)
 
     def print_location(self, nav):
-        print("lat: %f, lon: %f", nav.latitude, nav.longitude)
+        rospy.loginfo('lat: %f, lon: %f', nav.latitude, nav.longitude)
+        rate.sleep()
 
 def control(s, a, j, st, av):
         msg.speed = s
