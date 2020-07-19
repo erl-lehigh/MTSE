@@ -1,0 +1,6 @@
+rate: 1.0 # control loop frequency [Hz]
+parent_frame: world # TODO: set correct value
+child_frame: vehicle # TODO: set correct value
+address: 'Lehigh University' # Address of the network's center
+network_range: 1500 # Distance aroud the network's center [m]
+network_type: 'drive' # Type of links/roads to populate the network
