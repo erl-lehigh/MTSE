@@ -13,7 +13,6 @@
 
     <node pkg="$(arg pkg_name)" type="$(arg node_type)" name="$(arg node_name)"
           output="$(arg output)" required="$(arg req)">
-        <rosparam command="load"
-                  file="$(arg config)" />
+        <rosparam command="load" file="$(arg config)" />
     </node>
 </launch>
