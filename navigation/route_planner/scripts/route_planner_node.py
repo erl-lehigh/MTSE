@@ -1,126 +1,128 @@
 #! /usr/bin/env python
 
 import rospy
+import tf2_ros
+
+from std_msgs.msg import Header
 from nav_msgs.msg import Path
-import matplotlib.pyplot as plt
-#import sys
-#print(sys.path)
-#import Rtree==0.8.3
-import osmnx as ox
-import networkx as nx
+from geometry_msgs.msg import PoseStamped
 
 from route_planner import RoutePlanner
-from std_msgs.msg import *
-from nav_msgs.msg import Path
-from geometry_msgs.msg import PoseStamped, Pose, Point, Quaternion
 
-#RoutePlanner
+
 class RoutePlannerNode(object):
-    '''TODO:
+    '''TODO: docstring
     '''
-
-    '''
-    [258574407, 258574525, 259255502]
-    [INFO] [1594667836.981949]: current location x: 40.608300, y: -75.374300
-    [258574401, 259349128, 258574406, 258574407, 258574525, 259255502]
-
-    print(g.get_edge_data(route[0],route[1])) #THIS LINE GIVES:
-    {0: {'length': 135.28, 'osmid': 31977833, 'oneway': False, 'geometry': <shapely.geometry.linestring.LineString object at 0x7f1c7d853e90>, 'highway': u'residential', 'name': u'Taylor Street'}}
-    [INFO] [1594677784.641976]: current location x: -75.381000, y: 40.607900
-    {0: {'length': 127.473, 'osmid': 30956376, 'oneway': False, 'geometry': <shapely.geometry.linestring.LineString object at 0x7f1c7c238490>, 'highway': u'residential', 'name': u'West Packer Avenue'}}
-
-    '''
-    def printGraph(self, msg):
-        #The center point of the map
-        center_point = (40.6038914, -75.3739361) #(y,x)
-        #Gets all the roads a distance away on which can be driven
-        g = ox.graph_from_point(center_point, distance=1500, network_type='drive')
-        #Gets the current location from the message sent via pub/sub
-        orig = (msg.data[0],msg.data[1]) 
-        #Sets the destination point
-        dest = (40.6054017, -75.3758301) #(y,x)
-        #Finds the nearest intersection to the current location
-        origin_node = ox.get_nearest_node(g, orig)
-        #Finds the nearest intersection to the destination point
-        destination_node = ox.get_nearest_node(g, dest)
-        #Calculates the shortest path from the current location to the destination
-        route = nx.shortest_path(g, origin_node, destination_node)
-        #print(g.node[route[0]]) #Turns node IDs into Coordinates
-        #Graphs the figure
-        fig, ax = ox.plot.plot_graph_route(g, route, route_linewidth=6, node_size=0, bgcolor='k')
-
-        #Broadcasts the intersections (nodes) remaining on the route
-        msg2 = Path() #Instantiate the msg2 object as a Path object
-        msg2.header.frame_id = "/map" #Set the frame_id
-        msg2.header.stamp =  rospy.Time.now() #Set the stamp
-        for node in route: #For each node in route
-            pose = PoseStamped() #Instantiate the pose object as a PoseStamped object
-            pose.pose.position.x = g.node[node]["x"] #Set the message's x value to the node's x value
-            pose.pose.position.y = g.node[node]["y"] #Set the message's y value to the node's y value
-            msg2.poses.append(pose) #Add the coordinate to the list of coordinates in msg2
-        self.route_pub.publish(msg2) #Broadcast the message
-        print(msg2) #Print for debugging
-
-        #Broadcasts the roads (edges) remaining on the route (Geometrical Path)
-        msg3 = Path() #Instantiate the msg2 object as a Path object
-        msg3.header.frame_id = "/map" #Set the frame_id
-        msg3.header.stamp = rospy.Time.now() #Set the stamp
-        for node in range(len(route)-1):
-            msg3.poses.append(g.get_edge_data(route[node], route[node+1])[0]["geometry"].coords) #Add each edge to msg3
-        self.refPath_pub.publish(msg3) #Broadcast the message
-        print(msg3) #Print for debugging
-
-
-
 
     def __init__(self):
-        #Sets the node's name
+        '''TODO: docstring
+        '''
+        # Set the node's name
         self.node_name = rospy.get_name()
-        #Gets any parameters on the node
-        self.example = rospy.get_param('~parameter', 0)
+        # Gets any parameters on the node
+        self.rate = rospy.get_param('~rate', 1)
+        self.parent_frame = rospy.get_param('~parent_frame', 'world')
+        self.child_frame = rospy.get_param('~child_frame', 'vehicle')
+        self.address = rospy.get_param('~address')
+        self.network_range = rospy.get_param('~network_range', 1500)
+        self.network_type = rospy.get_param('~network_type', 'drive')
 
-        # Creates publishers:
+        self.period = rospy.Duration(1.0 / self.rate)
 
-        #Publishes Current Postion
-        self.currPos_pub = rospy.Publisher('currPos', Float64MultiArray , queue_size=10)
-        #Publish the Nodes along a path (that can be turned into coordinates with g.node[])
+        self.route_planner = RoutePlanner(self.address,
+                                          distance=self.network_range,
+                                          network_type=self.network_type)
+        # Plot graph
+        self.route_planner.setup_plot()
+
+        # Sets the destination point
+        self.dest = (40.6054017, -75.3758301) #(y,x) #TODO: get from user
+
+        # Common header for all
+        self.header = Header(frame_id=self.parent_frame)
+
+        self.route_msg = Path() # Path message for route publishing
+        self.route_msg.header.frame_id = self.parent_frame # Set the frame_id
+
+        self.path_msg = Path() # Path message for reference path publishing
+        self.path_msg.header.frame_id = self.parent_frame # Set the frame_id
+
+        # Creates publishers
+        # Publisher for route
         self.route_pub = rospy.Publisher('route', Path , queue_size=10)
-        #Publish the reference path
-        self.refPath_pub = rospy.Publisher('referencePath', Path , queue_size=10)
+        # Publisher for reference path
+        self.reference_path_pub = rospy.Publisher('reference_path', Path,
+                                                  queue_size=10)
 
-        # Create subscribers
-        rospy.Subscriber('currPos', Float64MultiArray, self.printGraph)
+        # Create transform listener
+        self.tf_buffer = tf2_ros.Buffer()
+        self.ts_listener = tf2_ros.TransformListener(self.tf_buffer)
+
+        # Crate timers
+        self.timer = rospy.Timer(self.period, self.control_loop)
+
         rospy.loginfo('[%s] Node started!', self.node_name)
 
+    def get_vehicle_location(self):
+        '''TODO: docstring
+        '''
+        try:
+            trans = self.tf_buffer.lookup_transform(self.child_frame,
+                                                    self.parent_frame,
+                                                    rospy.Time.now(),
+                                                    self.period)
+        except (tf2_ros.LookupException, tf2_ros.ConnectivityException,
+                tf2_ros.ExtrapolationException):
+            return
+        return trans.transform.translation.x, trans.transform.translation.y
+
+    def coordinates_to_poses(self, coords):
+        '''TODO:docstring
+        '''
+        poses = []
+        self.header.stamp = rospy.Time.now()
+        for x, y in coords: # Add poses (stamped)
+            pose = PoseStamped(header=self.header)
+            pose.pose.position.x = x
+            pose.pose.position.y = y
+            poses.append(pose)
+        return poses
+
+    def control_loop(self, event):
+        '''TODO: docstring
+        '''
+        # Get the current location
+        orig = self.get_vehicle_location()
+        if orig is None:
+            rospy.logdebug('Vehicle position not available!')
+            return
+
+        route = self.route_planner.get_route(orig, self.dest)
+        route_coords = self.route_planner.get_route_coords(route)
+        road_coords = self.route_planner.get_road_coords(route)
+        self.route_planner.plot_route(road_coords)
+
+        # Publish route
+        self.route_msg.header.stamp =  rospy.Time.now() #Set the stamp
+        self.route_msg.poses = self.coordinates_to_poses(route_coords)
+        self.route_pub.publish(self.route_msg)
+        rospy.logdebug('Route message: %s', self.route_msg)
+
+        # Publish reference path associated with roads
+        self.path_msg.header.stamp = rospy.Time.now() # Set the stamp
+        self.path_msg.poses = self.coordinates_to_poses(road_coords)
+        self.reference_path_pub.publish(self.path_msg)
+        rospy.logdebug('Reference path: %s', self.path_msg)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     # Initialize node with rospy
     rospy.init_node('route_planner', anonymous=True)
     # Create the node object
-    node1 = RoutePlannerNode()
-    #Initializes the msg as a Float64MultiArray
-    msg = Float64MultiArray()
-    #Sets how often the messages are sent
-    rate = rospy.Rate(0.1) # 0.1hz
-    #Initializes the msg to a generic location
-    msg.data = [0.0, 0.0]
-    
-    #Control Loop
+    route_planner_node = RoutePlannerNode()
+    # Keep the node alive
+    # rospy.spin()
+    # Hack to update plot from the main thread due to TkInter issue
     while not rospy.is_shutdown():
-        plt.ion()
-        #Sets the First Point
-        curr_location = (40.6079000,-75.3810000) #(y,x)
-        msg.data = curr_location #Updates msg with new location
-        rospy.loginfo('current location x: %f, y: %f', msg.data[1], msg.data[0]) #Outputs Debugging information
-        node1.currPos_pub.publish(msg) #Publishes the msg
-        rate.sleep()  #Waits the sleep time
-
-
-        #Sets the Second Point
-        curr_location = (40.6083000, -75.3743000) #(y,x)
-        msg.data = curr_location #Updates msg with new location
-        rospy.loginfo('current location x: %f, y: %f', msg.data[1], msg.data[0]) #Outputs Debugging information
-        node1.currPos_pub.publish(msg) #Publishes the msg
-        rate.sleep() #Waits the sleep time
-
+        route_planner_node.route_planner.update_plot()
+        rospy.sleep(route_planner_node.period)
