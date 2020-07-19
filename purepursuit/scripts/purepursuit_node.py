@@ -41,8 +41,11 @@ class PurePursuitNode(object):
     def set_path(self, msg):
         '''TODO: docstring
         '''
+	vehicle_pose = (0,0,0) # TODO: read it in using tf
+	self.purepursuit.set_vehicle_pose(vehicle_pose)
         pose_list = [(pose.pose.position.x, pose.pose.position.y)
                      for pose in msg.poses]
+	print(pose_list)
         self.purepursuit.path = LineString(pose_list)
 
     def control_loop(self, event=None):

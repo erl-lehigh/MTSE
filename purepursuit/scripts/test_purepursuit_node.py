@@ -28,7 +28,7 @@ class TESTPUREPURSUITROSNode(object):
 
         # Create publishers
         # second parameter is the message type for the topic
-        self.example_pub  = rospy.Publisher('subscriber_example', Path, queue_size=1)
+        self.example_pub  = rospy.Publisher('planned_path', Path, queue_size=1)
         self.timer = rospy.Timer(rospy.Duration(1),self.call_pubpath , oneshot=True)
         rospy.loginfo('[%s] Node started!', self.node_name)
 
@@ -49,7 +49,27 @@ class TESTPUREPURSUITROSNode(object):
         goal.pose.orientation.z = 0.0
         goal.pose.orientation.w = 1.0
 
+
         path.poses.append(goal)
+	
+	goal = PoseStamped()
+
+	goal.header.seq = 1
+        goal.header.stamp = rospy.Time.now()
+        goal.header.frame_id = "map"
+
+        goal.pose.position.x = 3.0
+        goal.pose.position.y = 5.0
+        goal.pose.position.z = 0.0
+
+        goal.pose.orientation.x = 0.0
+        goal.pose.orientation.y = 0.0
+        goal.pose.orientation.z = 0.0
+        goal.pose.orientation.w = 1.0
+
+	path.poses.append(goal)
+
+	
         self.example_pub.publish(path)
 
 
