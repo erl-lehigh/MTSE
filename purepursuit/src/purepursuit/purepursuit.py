@@ -1,5 +1,10 @@
+'''
+TODO: docstring
+'''
+
+
 import numpy as np
-from shapely.geometry import Point, LineString
+from shapely.geometry import Point
 
 
 class PurePursuit:
@@ -64,7 +69,7 @@ class PurePursuit:
         lookahead_point = np.array(self.future_point()) - self.vehicle_position
         line_of_sight_angle = np.arctan2(lookahead_point[1], lookahead_point[0])
         eta = line_of_sight_angle - self.vehicle_orientation
-        return -np.arctan2(2 * self.wheelbase * np.sin(eta) / self.lookahead)
+        return -np.arctan(2 * self.wheelbase * np.sin(eta) / self.lookahead)
 
     def compute_angular_speed(self):
         '''TODO: docstring
