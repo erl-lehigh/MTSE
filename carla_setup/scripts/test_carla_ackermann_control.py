@@ -8,6 +8,8 @@ import rospy
 from ackermann_msgs.msg import AckermannDrive
 from carla_msgs.msg import CarlaEgoVehicleInfo 
 from sensor_msgs.msg import Image, NavSatFix
+from nav_msgs.msg import Odometry
+from geometry_msgs.msg import PoseWithCovariance, TwistWithCovariance
 from cv_bridge import CvBridge
 
 class VehicleControllerNode(object):
@@ -24,6 +26,8 @@ class VehicleControllerNode(object):
         rospy.Subscriber("/carla/ego_vehicle/camera/rgb/front/image_color", Image, self.process_img)
         #Gnss
         rospy.Subscriber("/carla/ego_vehicle/gnss/gnss1/fix", NavSatFix, self.print_location)
+        #Odometry
+        rospy.Subscriber("/carla/ego_vehicle/odometry",Odometry, self.print_location2)
 
     def process_img(self, image):
         bridge = CvBridge()
@@ -33,6 +37,10 @@ class VehicleControllerNode(object):
 
     def print_location(self, nav):
         rospy.loginfo('lat: %f, lon: %f', nav.latitude, nav.longitude)
+        rate.sleep()
+
+    def print_location2(self, loc):
+        rospy.loginfo('x: %f, y: %f, z: %f', loc.pose.pose.position.x , loc.pose.pose.position.y, loc.pose.pose.position.z)
         rate.sleep()
 
 def control(s, a, j, st, av):
