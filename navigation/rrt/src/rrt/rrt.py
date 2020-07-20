@@ -3,7 +3,7 @@ RRT Planner.
 @author: Cristian-Ioan Vasile (cvasile@lehigh.edu)
 '''
 
-
+import sys
 import itertools as it
 
 import numpy as np
@@ -14,15 +14,14 @@ from dubins import dubins_isclose, position_distance as distance
 from dubins import dubins_path_planning as vehicle_path
 from dubins import DynamicDubinsVehicle
 
-import random
 
-#import "bitbucket.org/binet/go-python/pkg/python"
-import sys
+DBL_MAX = sys.float_info.max
+
 
 class RRTPlanner(object):
     '''Implementation of RRT*.'''
 
-    def __init__(self, vehicle, max_iterations=9000, gamma=40.0):
+    def __init__(self, vehicle, max_iterations=2000, gamma=40.0):
         '''Constructor
         #TODO:
         '''
@@ -30,6 +29,9 @@ class RRTPlanner(object):
 
         # initialize RRT tree
         self.g = nx.DiGraph()
+
+        self.check_path = lambda path: True
+        self.sample = None
 
         self.max_iterations = max_iterations
         self.gamma = gamma
@@ -50,7 +52,7 @@ class RRTPlanner(object):
         start = self.vehicle.current_state
 
         self.g.clear()
-        self.g.add_node(start, attr_dict={'cost_from_root': 0})
+        self.g.add_node(start, cost_from_root=0)
 
         for k in range(self.max_iterations):
             q_rand = self.sample(goal)
@@ -61,7 +63,7 @@ class RRTPlanner(object):
             if self.check_path(new_node[1]['trajectory']):
                 near_states = self.near(q_new)
                 new_node = self.choose_parent(new_node, near_states)
-                
+
                 if new_node is not None:
                     q_new, data_new = new_node
                     parent = data_new['parent']
@@ -69,11 +71,9 @@ class RRTPlanner(object):
                     added_cost = data_new['cost_from_parent']
                     trajectory = data_new['trajectory']
 
-                    self.g.add_node(q_new,
-                                    attr_dict={'cost_from_root': total_cost})
-                    self.g.add_edge(parent, q_new,
-                                    attr_dict={'cost_from_parent': added_cost,
-                                               'trajectory': trajectory})
+                    self.g.add_node(q_new, cost_from_root=total_cost)
+                    self.g.add_edge(parent, q_new, cost_from_parent=added_cost,
+                                    trajectory=trajectory)
 
                     self.rewire(new_node, near_states)
 
@@ -97,10 +97,7 @@ class RRTPlanner(object):
         -------
         node (tuple) - pair of DubinsState and associated data from the RRT tree
         '''
-        #for state in list(self.g.nodes(True)):
-        #    print(state[0].x)
-
-        nodes = [(state, data) for state, data in list(self.g.nodes(True))
+        nodes = [(state, data) for state, data in self.g.nodes(True)
                     if dubins_isclose(state, goal,self.dist_threshold,
                                       self.angle_threshold)]
         if not nodes:
@@ -124,20 +121,11 @@ class RRTPlanner(object):
 
         trajectory = [state]
         while self.g.pred[state]:
-#           parent = next(self.g.predecessors_iter(state))
             parent = next(iter(self.g.predecessors(state)))
-            from_parent = self.g[parent][state]['attr_dict']['trajectory']
+            from_parent = self.g[parent][state]['trajectory']
             trajectory = from_parent[:-1] + trajectory
             state = parent
         return trajectory
-
-    def sample(self, goal):
-        '''TODO:
-        '''
-        max_rand = 100
-        min_rand = -100
-
-        return DubinsState(random.uniform(max_rand, min_rand), random.uniform(max_rand, min_rand), 0, 0, 0)
 
     def steer(self, start, end):
         '''Steers the vehicle from the start state towards the end state, and
@@ -153,7 +141,7 @@ class RRTPlanner(object):
         state, _, path, length = self.vehicle.drive(start, end)
         data = {
             'cost_from_parent': length,
-            'cost_from_root': self.g.node[start]['attr_dict']['cost_from_root'] + length,
+            'cost_from_root': self.g.node[start]['cost_from_root'] + length,
             'parent': start,
             'trajectory': path
         }
@@ -175,7 +163,6 @@ class RRTPlanner(object):
         state = node[0]
         if not near_states:
             return None
-        DBL_MAX = sys.float_info.max
         cost = DBL_MAX
         new_node = None
         for candidate in near_states:
@@ -199,8 +186,7 @@ class RRTPlanner(object):
         -------
         (DubinsState) - the closes state in the RRT tree to `q_rand`
         '''
-        #return min(self.g.nodes_iter(), key=lambda q: distance(q_rand, q))
-        return min(list(self.g.nodes()), key=lambda q: distance(q_rand, q))
+        return min(self.g.nodes(), key=lambda q: distance(q_rand, q))
 
     def near(self, q_rand):
         '''Returns all states from the tree that are within the RRT* radius from
@@ -217,7 +203,7 @@ class RRTPlanner(object):
         n = self.g.number_of_nodes()
         # NOTE: Assumes planar workspace, i.e., dimension is 2
         r = self.gamma * np.sqrt(np.log(n + 1.0)/(n + 1.0))
-        return [v for v in list(self.g.nodes()) if distance(q_rand, v) <= r]
+        return [v for v in self.g.nodes() if distance(q_rand, v) <= r]
 
     def rewire(self, node, near_states):
         '''Re-configures the tree based on the newly added node if costs to
@@ -244,11 +230,10 @@ class RRTPlanner(object):
 
             #TODO: expose tolerances
             if dubins_isclose(q_new, candidate, 0.01, 0.05):
-                improved = (data_new['cost_from_root'] < data['attr_dict']['cost_from_root'])
+                improved = (data_new['cost_from_root'] < data['cost_from_root'])
 
                 if self.check_path(data_new['trajectory']) and improved:
                     # remove old parent
-#                    parent = next(self.g.predecessors_iter(candidate))
                     parent = next(iter(self.g.predecessors(candidate)))
                     self.g.remove_edge(parent, candidate)
                     # add new parent and update cost from root
@@ -256,22 +241,29 @@ class RRTPlanner(object):
                     added_cost = data_new['cost_from_parent']
                     trajectory = data_new['trajectory']
                     self.g.add_edge(state, candidate,
-                                    attr_dict={'cost_from_parent': added_cost,
-                                               'trajectory': trajectory})
+                                    cost_from_parent=added_cost,
+                                    trajectory=trajectory)
 
-    def check_path(self, path):
-        '''TODO:
-        '''    
-        return True
-        
+
 def main():
     print("start " + __file__)
-    
+
+    np.random.seed(1) # set random number generator seed to get repeatability
+
     rrt = RRTPlanner(DynamicDubinsVehicle(DubinsState(0, 0, 0, 0, 0)))
+
+    def sample(goal):
+        max_rand = 100
+        min_rand = -100
+        x, y = np.random.uniform(min_rand, max_rand, 2)
+        return DubinsState(x, y, 0, 0, 0)
+
+    rrt.sample = sample
+
     path = rrt.plan(DubinsState(x=29.988612382203414, y=-4.3868679359233935,
-                            yaw=0.082673490883941936,
-                            v=10.0, omega=0.082673490883941936))
+                                yaw=0.082673490883941936,
+                                v=10.0, omega=0.082673490883941936))
     print(path)
-    
+
 if __name__ == '__main__':
     main()
