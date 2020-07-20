@@ -1,5 +1,7 @@
 '''
-TODO: docstring
+The Route Planner Object contains all of the information needed to create a route
+and is called by the route_planner_node to plan the route from a position to a
+given destination.
 '''
 
 import itertools as it
@@ -11,11 +13,15 @@ import matplotlib.pyplot as plt
 
 
 class RoutePlanner(object):
-    '''TODO: docstring
+    '''
+    Methods needed to plan a route from a given postion to a destination on a map
     '''
 
     def __init__(self, address, distance, network_type):
-        '''TODO: docstring
+        '''
+        Constructor that takes the central address, a radial distance away
+        from that address and what type of paths to display in order to
+        generate a map of all of the roads.
         '''
         self.address = address
         self.distance = distance
@@ -26,19 +32,24 @@ class RoutePlanner(object):
                                        network_type=self.network_type)
 
     def get_route_coords(self, route):
-        '''TODO: docstring
+        '''
+        Takes each node along the route and returns their corresponding coordinates
         '''
         return [(self.g.node[u]['x'], self.g.node[u]['y']) for u in route]
 
     def get_road_coords(self, route):
-        '''TODO: docstring
         '''
-        # Concatenate all road gemotries
+        Takes each edge and breaks it into nodes with linear connections and
+        returns the nodes' coordinates
+        '''
+        # Concatenate all road geometries
         return list(it.chain(*[self.g.get_edge_data(u, v)[0]['geometry'].coords
                                for u, v in zip(route, route[1:])]))
 
     def get_route(self, origin, destination):
-        '''TODO: docstring
+        '''
+        Uses Dijkstra's algorithm to compute the shortest distance between
+        the vehicles current location (origin) and a given destination.
         '''
         # Find the nearest intersection to the current location
         origin_node = ox.get_nearest_node(self.g, origin)
@@ -48,7 +59,8 @@ class RoutePlanner(object):
         return nx.shortest_path(self.g, origin_node, destination_node)
 
     def setup_plot(self):
-        '''TODO: docstring
+        '''
+        Displays the blank map.
         '''
         self.figure, self.ax = ox.plot_graph(self.g, show=False, close=False)
         # Create route line
@@ -57,7 +69,8 @@ class RoutePlanner(object):
         plt.pause(0.001) # Display changes
 
     def plot_route(self, route_coords):
-        '''TODO: docstring
+        '''
+        Plots the route onto the blank map.
 
         NOTE: Due to the use of osmnx version 0.9, we need to manually draw the
         route.
@@ -68,7 +81,8 @@ class RoutePlanner(object):
         self.route_line.set_data(zip(*route_coords))
 
     def update_plot(self):
-        '''TODO: docstring
+        '''
+        Updates the map with the new route.
         '''
         plt.draw()
         plt.pause(0.001)

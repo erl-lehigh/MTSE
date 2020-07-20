@@ -1,7 +1,8 @@
 #! /usr/bin/env python
 
 '''
-TODO: docstring
+This is the Route Planner Node. It takes in the location of the vehicle and calculates the
+route and the reference path needed to reach a destination.
 '''
 
 import rospy
@@ -15,11 +16,23 @@ from route_planner import RoutePlanner
 
 
 class RoutePlannerNode(object):
-    '''TODO: docstring
+    '''
+    The Route planner Node class contains various methods.
+    The __init__ method acts as a constructor for the RoutePlannerNode Object.
+    The get_vehicle_location method returns the current location of the vehicle.
+    The coordinates_to_poses method converts coordinates to pose objects.
+    The control_loop updates the route based on the new location.
     '''
 
     def __init__(self):
-        '''TODO: docstring
+        '''
+        Initializes the RoutePlannerNode object.
+        Takes in various parameters and assigns them to the object.
+        Creates and plots a blank map of the roads to traverse.
+        Marks the destination goal point.
+        Creates a message for both the path and route.
+        Publishes the message.
+        Listens for changes in location that would update the data.
         '''
         # Set the node's name
         self.node_name = rospy.get_name()
@@ -68,7 +81,8 @@ class RoutePlannerNode(object):
         rospy.loginfo('[%s] Node started!', self.node_name)
 
     def get_vehicle_location(self):
-        '''TODO: docstring
+        '''
+        Uses a tf buffer to get the location of the vehicle and return its coordinates
         '''
         try:
             trans = self.tf_buffer.lookup_transform(self.child_frame,
@@ -81,7 +95,8 @@ class RoutePlannerNode(object):
         return trans.transform.translation.x, trans.transform.translation.y
 
     def coordinates_to_poses(self, coords):
-        '''TODO:docstring
+        '''
+        Iterates through the coordinates to create a pose for each.
         '''
         poses = []
         self.header.stamp = rospy.Time.now()
@@ -93,7 +108,9 @@ class RoutePlannerNode(object):
         return poses
 
     def control_loop(self, event):
-        '''TODO: docstring
+        '''
+        Updates the route based on changing location.
+        Then publishes both the route and its reference path.
         '''
         # Get the current location
         orig = self.get_vehicle_location()
