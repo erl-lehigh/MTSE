@@ -1,7 +1,5 @@
 '''
-The Route Planner Object contains all of the information needed to create a route
-and is called by the route_planner_node to plan the route from a position to a
-given destination.
+Route planning using Open Street Maps
 '''
 
 import itertools as it
@@ -14,14 +12,53 @@ import matplotlib.pyplot as plt
 
 class RoutePlanner(object):
     '''
-    Methods needed to plan a route from a given postion to a destination on a map
+    Route planner from a given position to a destination on a map
+    Attributes
+    ----------
+    address :  string
+        the address to geocode and use as the central point around which to construct the graph
+    distance : int
+        retain only those nodes within this many meters of the center of the graph  
+    network_type : string
+        what type of street network to get
+    g : networkx multidigraph or tuple
+        multidigraph or optionally (multidigraph, tuple)
+    TODO 
+
+    Methods
+    -------
+    get_route_coords(self, route):
+        Takes each node along the route and returns their corresponding coordinates
+    get_road_coords(self, route):
+        TODO
+    get_route(self, origin, destination):
+        TODO
+    setup_plot(self):
+        TODO
+    plot_route(self, route_coords):
+        TODO    
+    update_plot(self):
+        TODO
+    
     '''
 
     def __init__(self, address, distance, network_type):
         '''
-        Constructor that takes the central address, a radial distance away
-        from that address and what type of paths to display in order to
-        generate a map of all of the roads.
+        RoutePlanner Constructor
+
+        Parameters
+        ----------
+        address :  string
+            the address to geocode and use as the central point around which to construct the graph
+        distance : int
+            retain only those nodes within this many meters of the center of the graph  
+        network_type : string
+            what type of street network to get 
+
+        Returns
+        -------
+        None
+        
         '''
         self.address = address
         self.distance = distance

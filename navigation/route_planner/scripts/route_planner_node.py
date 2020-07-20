@@ -1,8 +1,7 @@
 #! /usr/bin/env python
 
 '''
-This is the Route Planner Node. It takes in the location of the vehicle and calculates the
-route and the reference path needed to reach a destination.
+This is the Route Planner Node. It takes in the location of the vehicle and calculates theroute and the reference path needed to reach a destination.
 '''
 
 import rospy
@@ -53,20 +52,20 @@ class RoutePlannerNode(object):
         self.route_planner.setup_plot()
 
         # Sets the destination point
-        self.dest = (40.6054017, -75.3758301) #(y,x) #TODO: get from user
+        self.dest = (40.6054017, -75.3758301)  # (y,x) #TODO: get from user
 
         # Common header for all
         self.header = Header(frame_id=self.parent_frame)
 
-        self.route_msg = Path() # Path message for route publishing
-        self.route_msg.header.frame_id = self.parent_frame # Set the frame_id
+        self.route_msg = Path()  # Path message for route publishing
+        self.route_msg.header.frame_id = self.parent_frame  # Set the frame_id
 
-        self.path_msg = Path() # Path message for reference path publishing
-        self.path_msg.header.frame_id = self.parent_frame # Set the frame_id
+        self.path_msg = Path()  # Path message for reference path publishing
+        self.path_msg.header.frame_id = self.parent_frame  # Set the frame_id
 
         # Creates publishers
         # Publisher for route
-        self.route_pub = rospy.Publisher('route', Path , queue_size=10)
+        self.route_pub = rospy.Publisher('route', Path, queue_size=10)
         # Publisher for reference path
         self.reference_path_pub = rospy.Publisher('reference_path', Path,
                                                   queue_size=10)
@@ -100,7 +99,7 @@ class RoutePlannerNode(object):
         '''
         poses = []
         self.header.stamp = rospy.Time.now()
-        for x, y in coords: # Add poses (stamped)
+        for x, y in coords:  # Add poses (stamped)
             pose = PoseStamped(header=self.header)
             pose.pose.position.x = x
             pose.pose.position.y = y
@@ -124,13 +123,13 @@ class RoutePlannerNode(object):
         self.route_planner.plot_route(road_coords)
 
         # Publish route
-        self.route_msg.header.stamp =  rospy.Time.now() #Set the stamp
+        self.route_msg.header.stamp = rospy.Time.now()  # Set the stamp
         self.route_msg.poses = self.coordinates_to_poses(route_coords)
         self.route_pub.publish(self.route_msg)
         rospy.logdebug('Route message: %s', self.route_msg)
 
         # Publish reference path associated with roads
-        self.path_msg.header.stamp = rospy.Time.now() # Set the stamp
+        self.path_msg.header.stamp = rospy.Time.now()  # Set the stamp
         self.path_msg.poses = self.coordinates_to_poses(road_coords)
         self.reference_path_pub.publish(self.path_msg)
         rospy.logdebug('Reference path: %s', self.path_msg)
