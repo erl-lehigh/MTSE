@@ -1,10 +1,13 @@
 #! /usr/bin/env python
 
 import rospy
+import tf2_ros
+import tf.transformations as tr
+
 from nav_msgs.msg import Path
 from ackermann_msgs.msg import AckermannDrive
 
-from shapely.geometry import Point, LineString
+from shapely.geometry import LineString
 
 from purepursuit import PurePursuit
 
@@ -55,12 +58,15 @@ class PurePursuitNode(object):
 
         # Read parameters
         self.rate = rospy.get_param('~rate', 1)
+        self.parent_frame = rospy.get_param('~parent_frame', 'world')
+        self.child_frame = rospy.get_param('~child_frame', 'vehicle')
         lookahead = rospy.get_param('~lookahead', 4)
         wheelbase = rospy.get_param('~wheelbase', 1)
+        speed = rospy.get_param('~speed', 3)
 
-        self.purepursuit = PurePursuit(wheelbase, lookahead)
-        # Initialize the speed of the vehicle
-        self.purepursuit.speed = 3
+        self.period = rospy.Duration(1.0 / self.rate)
+
+        self.purepursuit = PurePursuit(wheelbase, lookahead, speed)
 
         # Create publishers
         self.command_pub = rospy.Publisher('speed_command', AckermannDrive,
@@ -73,11 +79,31 @@ class PurePursuitNode(object):
         #declares that the node is subscribing to the 'planned_path' which is of Path.
         #when new messages are received, self.set_path is invoked with the message as the first argument.
 
+        # Create transform listener
+        self.tf_buffer = tf2_ros.Buffer()
+        self.ts_listener = tf2_ros.TransformListener(self.tf_buffer)
         # Create timers
         self.timer = rospy.Timer(rospy.Duration(1.0 / self.rate),
                                  self.control_loop)
 
         rospy.loginfo('[%s] Node started!', self.node_name)
+
+    def get_vehicle_pose(self):
+        '''TODO: docstring
+        '''
+        try:
+            trans = self.tf_buffer.lookup_transform(self.child_frame,
+                                                    self.parent_frame,
+                                                    rospy.Time.now(),
+                                                    self.period)
+        except (tf2_ros.LookupException, tf2_ros.ConnectivityException,
+                tf2_ros.ExtrapolationException):
+            return
+        quaternion = trans.transform.rotation
+        quaternion = (quaternion.x, quaternion.y, quaternion.z, quaternion.w)
+        _, _, orientation = tr.euler_from_quaternion(quaternion)
+        return (trans.transform.translation.x, trans.transform.translation.y,
+                orientation)
 
     def set_path(self, msg):
         '''
@@ -92,11 +118,11 @@ class PurePursuitNode(object):
         -------
         None
         '''
-        vehicle_pose = (0,0,0) # TODO: read it in using tf
-	    self.purepursuit.set_vehicle_pose(vehicle_pose)
+
+        vehicle_pose = self.get_vehicle_pose()
+        self.purepursuit.set_vehicle_pose(vehicle_pose)
         pose_list = [(pose.pose.position.x, pose.pose.position.y)
                      for pose in msg.poses]
-	    print(pose_list)
         self.purepursuit.path = LineString(pose_list)
 
     def control_loop(self, event=None):

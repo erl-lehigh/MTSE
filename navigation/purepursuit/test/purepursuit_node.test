@@ -1,0 +1,25 @@
+<launch>
+    <arg name="pkg_name" value="purepursuit" doc="name of the package"/>
+    <arg name="node_name" default="purepursuit_test_node" doc="name of the node"/>
+    <arg name="node_type" default="purepursuit_test_node.py" doc="name of the type"/>
+
+    <arg name="config" default="$(find purepursuit)/config/purepursuit.yaml"/>
+
+    <!-- launch purepursuit node -->
+    <include file="$(find purepursuit)/launch/purepursuit.launch">
+        <arg name="config" value="$(arg config)"/>
+    </include>
+
+    <!-- launch dummy static path publisher. TODO: repplace this with rostest
+    unit test. -->
+    <node pkg="$(arg pkg_name)" type="test_purepursuit_node.py"
+          name="$(arg node_name)_path"/>
+
+    <!-- launch dummy static vehicle transform w.r.t. world frame -->
+    <node pkg="tf2_ros" type="static_transform_publisher"
+          name="vehicle_broadcaster"
+          args="1 1 0 0 0 0 1 world vehicle"/>
+
+    <!-- TODO: write test code and add it here as a test. -->
+    <!-- test test-name="test" pkg="purepursuit" type="test_code.py"/ -->
+</launch>
