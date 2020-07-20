@@ -10,11 +10,46 @@ from purepursuit import PurePursuit
 
 
 class PurePursuitNode(object):
-    '''TODO: docstring
+    '''
+    A class to represent a PurePursuit Node in ROS
+
+    Attributes
+    ----------
+    node_name : str
+        name of the node
+    rate : float
+        specifies the rate which influences the period of the callback timer
+    lookahead : float
+        specifies the lookahead distance to the path
+    wheelbase : float
+        specifies the wheelbase length i.e. the distance between the midpoint of the rear and front axle.
+    purepursuit : PurePursuit
+        a variable called "purepursuit" that holds an instance of the class PurePursuit
+    purepursuit.speed : float
+        specifies the speed of the vehicle
+    command_pub : rospy.publisher
+        a variable called "command_pub" that holds an instance of the class rospy.Publisher
+    example_pub : rospy.Subscriber
+        a variable called "example_pub" that holds an instance of the class rospy.Subscriber
+    timer : rospy.Timer
+        a variable called "timer" that holds an instance of the class rospy.Timer
+
+    Methods
+    -------
+    set_path(msg):
+        generates a path LineString (to be tracked) from a set of position coordinates (pose)
+    control_loop(event=None):
+        publishes AckermannDrive msg consisting of the computed vehicle speed and steering angle
+
     '''
 
     def __init__(self):
-        '''TODO: docstring
+        '''
+        Constructs all the necessary attributes for the PurePursuitNode object.
+
+        Parameters
+        ----------
+
         '''
         self.node_name = rospy.get_name()
 
@@ -30,8 +65,14 @@ class PurePursuitNode(object):
         # Create publishers
         self.command_pub = rospy.Publisher('speed_command', AckermannDrive,
                                            queue_size=1)
+        #declares that the node is publishing to the 'speed_command' topic using the message type AckermannDrive
+
+
         # Create subscribers
         self.example_sub = rospy.Subscriber('planned_path', Path, self.set_path)
+        #declares that the node is subscribing to the 'planned_path' which is of Path.
+        #when new messages are received, self.set_path is invoked with the message as the first argument.
+
         # Create timers
         self.timer = rospy.Timer(rospy.Duration(1.0 / self.rate),
                                  self.control_loop)
@@ -39,17 +80,37 @@ class PurePursuitNode(object):
         rospy.loginfo('[%s] Node started!', self.node_name)
 
     def set_path(self, msg):
-        '''TODO: docstring
         '''
-	vehicle_pose = (0,0,0) # TODO: read it in using tf
-	self.purepursuit.set_vehicle_pose(vehicle_pose)
+        Generates a path LineString (to be tracked) from a set of position coordinates (pose)
+
+        Parameters
+        ----------
+        msg :  #?????? what type would this be?
+            #
+
+        Returns
+        -------
+        None
+        '''
+        vehicle_pose = (0,0,0) # TODO: read it in using tf
+	    self.purepursuit.set_vehicle_pose(vehicle_pose)
         pose_list = [(pose.pose.position.x, pose.pose.position.y)
                      for pose in msg.poses]
-	print(pose_list)
+	    print(pose_list)
         self.purepursuit.path = LineString(pose_list)
 
     def control_loop(self, event=None):
-        '''TODO: docstring
+        '''
+        Publishes AckermannDrive msg consisting of the computed vehicle speed and steering angle if a path is passed
+
+        Parameters
+        ----------
+        event=None :  #?????? what type would this be?
+            #
+
+        Returns
+        -------
+        None
         '''
         msg = AckermannDrive()
         if self.purepursuit.path is not None:

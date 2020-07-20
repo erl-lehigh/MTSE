@@ -12,11 +12,36 @@ from shapely.geometry import Point, LineString
 #from purepursuit import test_purepursuit
 
 class TESTPUREPURSUITROSNode(object):
-    '''TODO:
+    '''
+    A class to represent a TESTPUREPURSUITROS Node in ROS
+
+    Attributes
+    ----------
+    node_name : str
+        name of the node
+    example : # ? not sure?
+        #
+    example_pub : rospy.Publisher
+        a variable called "example_pub" that holds an instance of the class rospy.Publisher
+    timer : rospy.Timer
+        a variable called "timer" that holds an instance of the class rospy.Timer
+
+
+    Methods
+    -------
+    call_pubpath(event=None):
+        publishes path (coordinates) /poses to be tracked by PurePursuit algorithm
+
     '''
 
     def __init__(self):
-        '''TODO:
+        '''
+        Constructs all the necessary attributes for the TESTPUREPURSUITROSNode object.
+
+        Parameters
+        ----------
+        None
+
         '''
 
         self.node_name = rospy.get_name()
@@ -34,6 +59,18 @@ class TESTPUREPURSUITROSNode(object):
 
 
     def call_pubpath(self, event=None):
+        '''
+        Publishes path (coordinates) /poses to be tracked by PurePursuit algorithm
+
+        Parameters
+        ----------
+        event=None : # not sure ??
+            #
+
+        Returns
+        -------
+        None
+        '''
         path = Path()
         goal = PoseStamped()
         goal.header.seq = 1
@@ -51,7 +88,7 @@ class TESTPUREPURSUITROSNode(object):
 
 
         path.poses.append(goal)
-	
+
 	goal = PoseStamped()
 
 	goal.header.seq = 1
@@ -69,7 +106,7 @@ class TESTPUREPURSUITROSNode(object):
 
 	path.poses.append(goal)
 
-	
+
         self.example_pub.publish(path)
 
 
