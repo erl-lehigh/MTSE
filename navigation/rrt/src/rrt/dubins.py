@@ -289,7 +289,6 @@ def dubins_isclose(state1, state2, dtol=0.01, atol=0.05):
     -------
     (bool) - whether the two Dubins states are close
     '''
-    #print(position_distance(state1, state2))
     return (position_distance(state1, state2) <= dtol
             and np.abs(pi_2_pi(state1.yaw - state2.yaw)) <= atol)
 
