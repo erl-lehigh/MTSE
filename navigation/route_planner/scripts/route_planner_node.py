@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 
 '''
-This is the Route Planner Node. It takes in the location of the vehicle and calculates theroute and the reference path needed to reach a destination.
+Route Planner Node that communicates with ROS
 '''
 
 import rospy
@@ -16,22 +16,50 @@ from route_planner import RoutePlanner
 
 class RoutePlannerNode(object):
     '''
-    The Route planner Node class contains various methods.
-    The __init__ method acts as a constructor for the RoutePlannerNode Object.
-    The get_vehicle_location method returns the current location of the vehicle.
-    The coordinates_to_poses method converts coordinates to pose objects.
-    The control_loop updates the route based on the new location.
+    Attributes
+    ----------
+        node_name : string
+            the name of the node
+        rate : integer
+            how many times per second the node updates
+        parent_frame : string
+            the parent reference frame (often world)
+        child_frame : string
+            the child reference frame (often the vehicle)
+        address : string
+            the central address of the map
+        network_range : integer
+            radius away from the center of the map to generate
+        network_type : string
+            what type of street network to get 
+        period : float
+            the inverse of the rate
+        route_planner : RoutePlanner()
+            the object that does all of the route planning
+    Methods
+    -------
+    get_vehicle_location(self):
+        Uses a tf buffer to get the location of the vehicle and return its coordinates
+    coordinates_to_poses(self, coords):
+        Iterates through the coordinates to create a pose for each.
+    control_loop(self, event):
+        Updates the route based on changing location.
+        Then publishes both the route and its reference path.
+
+
     '''
 
     def __init__(self):
         '''
-        Initializes the RoutePlannerNode object.
-        Takes in various parameters and assigns them to the object.
-        Creates and plots a blank map of the roads to traverse.
-        Marks the destination goal point.
-        Creates a message for both the path and route.
-        Publishes the message.
-        Listens for changes in location that would update the data.
+        RoutePlannerNode Constructor
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        None
         '''
         # Set the node's name
         self.node_name = rospy.get_name()
@@ -52,6 +80,8 @@ class RoutePlannerNode(object):
         self.route_planner.setup_plot()
 
         # Sets the destination point
+        #destination = input("Address of Destination (in quotes) : ")
+        #self.dest = self.route_planner.get_point_of_interest(destination, 1)
         self.dest = (40.6054017, -75.3758301)  # (y,x) #TODO: get from user
 
         # Common header for all
@@ -82,6 +112,15 @@ class RoutePlannerNode(object):
     def get_vehicle_location(self):
         '''
         Uses a tf buffer to get the location of the vehicle and return its coordinates
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        (x,y) point
+            location of the vehicle
         '''
         try:
             trans = self.tf_buffer.lookup_transform(self.child_frame,
@@ -96,6 +135,16 @@ class RoutePlannerNode(object):
     def coordinates_to_poses(self, coords):
         '''
         Iterates through the coordinates to create a pose for each.
+
+        Parameters
+        ----------
+        coords : list of coordinates
+            the coordinates to be converted into poses
+
+        Returns
+        -------
+        list of poses
+            the pose equivalent of the inputted coordinates
         '''
         poses = []
         self.header.stamp = rospy.Time.now()
@@ -110,6 +159,15 @@ class RoutePlannerNode(object):
         '''
         Updates the route based on changing location.
         Then publishes both the route and its reference path.
+
+        Parameters
+        ----------
+        event : event
+            the current event state
+
+        Returns
+        -------
+        None
         '''
         # Get the current location
         orig = self.get_vehicle_location()

@@ -23,22 +23,31 @@ class RoutePlanner(object):
         what type of street network to get
     g : networkx multidigraph or tuple
         multidigraph or optionally (multidigraph, tuple)
-    TODO 
+    figure : tuple
+        figure information
+    ax : tuple
+        axis information
+    route_line : MatPlotLib plot
+        The lines representing the route
 
     Methods
     -------
     get_route_coords(self, route):
         Takes each node along the route and returns their corresponding coordinates
     get_road_coords(self, route):
-        TODO
+        Takes each edge and breaks it into nodes with linear connections and
+        returns the nodes' coordinates
     get_route(self, origin, destination):
-        TODO
+        Uses Dijkstra's algorithm to compute the shortest distance between
+        the vehicles current location (origin) and a given destination.
+    get_point_of_interest(self, destination, distance):
+        Gets the coordinates of a point of interest (address)
     setup_plot(self):
-        TODO
+        Displays the blank map.
     plot_route(self, route_coords):
-        TODO    
+        Plots the route onto the map.    
     update_plot(self):
-        TODO
+        Updates the map with the new route.
     
     '''
 
@@ -71,6 +80,16 @@ class RoutePlanner(object):
     def get_route_coords(self, route):
         '''
         Takes each node along the route and returns their corresponding coordinates
+
+        Parameters
+        ----------
+        route :  tuple
+            the route you want the coordinates of
+
+        Returns
+        -------
+        tuple
+            the coordinates corresponding to the given route
         '''
         return [(self.g.node[u]['x'], self.g.node[u]['y']) for u in route]
 
@@ -78,6 +97,16 @@ class RoutePlanner(object):
         '''
         Takes each edge and breaks it into nodes with linear connections and
         returns the nodes' coordinates
+
+        Parameters
+        ----------
+        route :  tuple
+            the route you want the coordinates of
+
+        Returns
+        -------
+        list
+            the coordinates of each point along the route that has only a straight line connecting them
         '''
         # Concatenate all road geometries
         return list(it.chain(*[self.g.get_edge_data(u, v)[0]['geometry'].coords
@@ -87,6 +116,18 @@ class RoutePlanner(object):
         '''
         Uses Dijkstra's algorithm to compute the shortest distance between
         the vehicles current location (origin) and a given destination.
+
+        Parameters
+        ----------
+        origin :  point
+            the location of the vehicle
+        destination : point
+            the desired destination point
+
+        Returns
+        -------
+        path
+            the path connecting the origin and the destination
         '''
         # Find the nearest intersection to the current location
         origin_node = ox.get_nearest_node(self.g, origin)
@@ -95,9 +136,36 @@ class RoutePlanner(object):
         # Get the shortest path from the current location to the destination
         return nx.shortest_path(self.g, origin_node, destination_node)
 
+    def get_point_of_interest(self, destination, distance):
+        '''
+        Gets the coordinates of a point of interest (address)
+
+        Parameters
+        ----------
+        destination : string
+            the desired destination address
+        distance : integer
+            how far away from the address to look for a node (meters)
+
+        Returns
+        -------
+        point
+            the cooridinates of the destination
+        '''
+        # Get the coordinates of the destination
+        return ox.pois.pois_from_address(destination, distance)
+
     def setup_plot(self):
         '''
         Displays the blank map.
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        None
         '''
         self.figure, self.ax = ox.plot_graph(self.g, show=False, close=False)
         # Create route line
@@ -107,7 +175,16 @@ class RoutePlanner(object):
 
     def plot_route(self, route_coords):
         '''
-        Plots the route onto the blank map.
+        Plots the route onto the map.
+
+        Parameters
+        ----------
+        route_coords : list
+            the coordinates of each point along the route 
+
+        Returns
+        -------
+        None
 
         NOTE: Due to the use of osmnx version 0.9, we need to manually draw the
         route.
@@ -120,6 +197,14 @@ class RoutePlanner(object):
     def update_plot(self):
         '''
         Updates the map with the new route.
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        None
         '''
         plt.draw()
         plt.pause(0.001)
