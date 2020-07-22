@@ -71,6 +71,15 @@ class RRTNode(object):
 
     def set_goal(self, msg):
         '''TODO: docstring
+        Converte the user input goal from orientation into quaternion
+        Parameters
+        ----------
+        msg: 
+        coordinate for the goal
+
+        Return
+        ------
+        None
         '''
         assert msg.header.frame_id == self.parent_frame
         quaternion = msg.pose.orientation
@@ -103,12 +112,46 @@ class RRTNode(object):
                 orientation)
 
     def check_path(self, path):
-        '''TODO: docstring
         '''
-        if self.costmap is None:
+        Iterates through all the coordinates in the path check if that 
+        position is ocupied or not
+
+        Parameters
+        ----------
+        path: list of coordinates
+            the coordinates for the path
+        
+        Returns
+        -------
+        true or false
+            true if the path is collition free, false if not
+        '''
+        ogm = self.costmap
+        if ogm is None:
             rospy.logwarn('No costmap set!')
             return
-        # TODO: path collision checking code here
+            
+        height = ogm.info.height
+        width = ogm.info.width
+        grid = np.asarray(ogm.data).reshape((height, width))
+        positionX = ogm.info.origin.position.x
+        positionY = ogm.info.origin.position.y
+        resolution = ogm.info.resolution
+        for dubinsState in path:
+            px = dubinsState.x
+            py = dubinsState.y
+            x = (px - positionX)/resolution
+            y = (py - positionY)/resolution
+            if(0 <= x <= width or 0 <= y <= height):
+                if(grid[int(x),int(y)] >= 100):
+                    return False
+                elif(0 <= grid[int(x),int(y)] < 100):
+                    continue
+                else:
+                    return False
+            else:
+                return False
+        return True
 
     def sample(self, goal):
         '''TODO: docstring
