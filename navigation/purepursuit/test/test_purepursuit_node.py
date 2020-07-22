@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 
 '''
-TODO: docstring
+Test Pure Pusrsuit Node
 '''
 
 import rospy
@@ -12,11 +12,34 @@ from purepursuit import PurePursuit
 
 
 class TestPurePursuitNode(object):
-    '''TODO: docstring
+    '''
+    A class to represent a TestPurePursuitNode
+
+    Attributes
+    ----------
+    node_name : str
+        name of the node
+    path_pub : rospy.publisher
+        a variable called "command_pub" that holds an instance of the class
+        rospy.Publisher
+    timer : rospy.Timer
+        a variable called "timer" that holds an instance of the class
+        rospy.Timer
+
+    Methods
+    -------
+    publish_path(event=None)
+        Publishes the path coordinates for the vehcile to track/follow
     '''
 
     def __init__(self):
-        '''TODO: docstring
+        '''
+        Constructs all the necessary attributes for the TestPurePursuitNode
+        object.
+
+        Parameters
+        ----------
+
         '''
         self.node_name = rospy.get_name()
 
@@ -27,7 +50,17 @@ class TestPurePursuitNode(object):
         rospy.loginfo('[%s] Node started!', self.node_name)
 
     def publish_path(self, event=None):
-        '''TODO: docstring
+        '''
+        Publishes the path coordinates for the vehcile to track/follow
+
+        Parameters
+        ----------
+        event=None : ?? not sure
+            # not sure ???
+
+        Returns
+        -------
+        None
         '''
         path = Path()
         path.header.stamp = rospy.Time.now()

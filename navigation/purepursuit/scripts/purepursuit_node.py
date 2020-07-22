@@ -25,24 +25,33 @@ class PurePursuitNode(object):
     lookahead : float
         specifies the lookahead distance to the path
     wheelbase : float
-        specifies the wheelbase length i.e. the distance between the midpoint of the rear and front axle.
+        specifies the wheelbase length i.e. the distance between the midpoint
+        of the rear and front axle.
     purepursuit : PurePursuit
-        a variable called "purepursuit" that holds an instance of the class PurePursuit
+        a variable called "purepursuit" that holds an instance of the class
+        PurePursuit
     purepursuit.speed : float
         specifies the speed of the vehicle
     command_pub : rospy.publisher
-        a variable called "command_pub" that holds an instance of the class rospy.Publisher
+        a variable called "command_pub" that holds an instance of the class
+        rospy.Publisher
     example_pub : rospy.Subscriber
-        a variable called "example_pub" that holds an instance of the class rospy.Subscriber
+        a variable called "example_pub" that holds an instance of the class
+        rospy.Subscriber
     timer : rospy.Timer
-        a variable called "timer" that holds an instance of the class rospy.Timer
+        a variable called "timer" that holds an instance of the class
+        rospy.Timer
 
     Methods
     -------
     set_path(msg):
-        generates a path LineString (to be tracked) from a set of position coordinates (pose)
+        generates a path LineString (to be tracked) from a set of position
+        coordinates (pose)
     control_loop(event=None):
-        publishes AckermannDrive msg consisting of the computed vehicle speed and steering angle
+        publishes AckermannDrive msg consisting of the computed vehicle speed
+        and steering angle
+    get_vehicle_pose():
+        returns the vehicle coordinates (position) for purepursuit computation
 
     '''
 
@@ -71,13 +80,16 @@ class PurePursuitNode(object):
         # Create publishers
         self.command_pub = rospy.Publisher('speed_command', AckermannDrive,
                                            queue_size=1)
-        #declares that the node is publishing to the 'speed_command' topic using the message type AckermannDrive
+        #declares that the node is publishing to the 'speed_command' topic
+        #using the message type AckermannDrive
 
 
         # Create subscribers
         self.example_sub = rospy.Subscriber('planned_path', Path, self.set_path)
-        #declares that the node is subscribing to the 'planned_path' which is of Path.
-        #when new messages are received, self.set_path is invoked with the message as the first argument.
+        #declares that the node is subscribing to the 'planned_path'
+        #which is of Path.
+        #when new messages are received, self.set_path is invoked with the
+        #message as the first argument.
 
         # Create transform listener
         self.tf_buffer = tf2_ros.Buffer()
@@ -89,7 +101,18 @@ class PurePursuitNode(object):
         rospy.loginfo('[%s] Node started!', self.node_name)
 
     def get_vehicle_pose(self):
-        '''TODO: docstring
+        '''
+        Returns the vehicle coordinates (position) for purepursuit computation
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        (trans.transform.translation.x, trans.transform.translation.y,
+                orientation)
+            vehicle coordinates and orientation (angle)
         '''
         try:
             trans = self.tf_buffer.lookup_transform(self.child_frame,
@@ -107,12 +130,13 @@ class PurePursuitNode(object):
 
     def set_path(self, msg):
         '''
-        Generates a path LineString (to be tracked) from a set of position coordinates (pose)
+        Generates a path LineString (to be tracked) from a set of position
+        coordinates (pose)
 
         Parameters
         ----------
-        msg :  #?????? what type would this be?
-            #
+        msg :  nav_msgs.msg.Path
+            ROS navigation path message
 
         Returns
         -------
@@ -127,7 +151,8 @@ class PurePursuitNode(object):
 
     def control_loop(self, event=None):
         '''
-        Publishes AckermannDrive msg consisting of the computed vehicle speed and steering angle if a path is passed
+        Publishes AckermannDrive msg consisting of the computed vehicle speed
+        and steering angle if a path is passed
 
         Parameters
         ----------

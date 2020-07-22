@@ -1,5 +1,5 @@
 '''
-TODO: docstring
+Pure Pursuit Algorithm for path tracking and speed/steerig angle computation
 '''
 
 
@@ -14,7 +14,8 @@ class PurePursuit:
     Attributes
     ----------
     wheelbase : float
-        specifies the wheelbase length i.e. the distance between the midpoint of the rear and front axle.
+        specifies the wheelbase length i.e. the distance between the midpoint of
+         the rear and front axle.
     lookahead : float
         specifies the lookahead distance to the path
     path : Path
@@ -29,7 +30,8 @@ class PurePursuit:
     Methods
     -------
     set_path(msg):
-        generates a path LineString (to be tracked) from a set of position coordinates (pose)
+        generates a path LineString (to be tracked) from a set of position
+        coordinates (pose)
     control_loop(event=None):
     '''
 
@@ -42,7 +44,8 @@ class PurePursuit:
         Parameters
         ----------
         wheelbase : float
-            specifies the wheelbase length i.e. the distance between the midpoint of the rear and front axle.
+            specifies the wheelbase length i.e. the distance between the
+            midpoint of the rear and front axle.
         lookahead : float
             specifies the lookahead distance to the path
         path : Path
@@ -67,7 +70,8 @@ class PurePursuit:
 
     def set_vehicle_pose(self, vehicle_pose):
         '''
-        sets the vehicle position and the orientation if vehicle_pose is not None
+        sets the vehicle position and the orientation if vehicle_pose is not
+        None
 
         Parameters
         ----------
@@ -87,7 +91,8 @@ class PurePursuit:
 
     def closest_point(self):
         '''
-        returns the computed closest point on the path from the midpoint of the rear axle of the vehicle
+        returns the computed closest point on the path from the midpoint of the
+        rear axle of the vehicle
 
         Parameters
         ----------
@@ -95,14 +100,16 @@ class PurePursuit:
 
         Returns
         -------
-        None
+        self.path.interpolate(path_length) : point
+            computed closest point
         '''
         path_length = self.path.project(self.vehicle_position)
         return self.path.interpolate(path_length)
 
     def future_point(self):
         '''
-        returns the computed future point on the path for the vehicle to keep track of
+        returns the computed future point on the path for the vehicle to keep
+        track of
 
         Parameters
         ----------
@@ -110,7 +117,8 @@ class PurePursuit:
 
         Returns
         -------
-        None
+        self.path.interpolate(dist_on_path) : Point
+            computed future point
         '''
         closest_dist = min(self.vehicle_position.distance(self.closest_point()),
                            self.lookahead)
@@ -127,7 +135,8 @@ class PurePursuit:
 
         Returns
         -------
-        None
+        self.speed : float
+            vehicle speed
         '''
         return self.speed
 
@@ -141,7 +150,8 @@ class PurePursuit:
 
         Returns
         -------
-        None
+        Point(self.vehicle_position + self.wheelbase * direction) : Point
+            vehicle front axle midpoint
         '''
         direction = np.array((np.cos(self.vehicle_orientation),
                               np.sin(self.vehicle_orientation)))
@@ -149,7 +159,8 @@ class PurePursuit:
 
     def compute_steering_angle(self):
         '''
-        returns the computed steering angle of the vehicle based on where the vehicle is in relation to the path that it is following
+        returns the computed steering angle of the vehicle based on where the
+        vehicle is in relation to the path that it is following
 
         Parameters
         ----------
@@ -157,7 +168,8 @@ class PurePursuit:
 
         Returns
         -------
-        None
+        -np.arctan(2 * self.wheelbase * np.sin(eta) / self.lookahead) : float
+            computed steering angle
         '''
         lookahead_point = np.array(self.future_point()) - self.vehicle_position
         line_of_sight_angle = np.arctan2(lookahead_point[1], lookahead_point[0])
@@ -174,7 +186,8 @@ class PurePursuit:
 
         Returns
         -------
-        None
+        self.speed * tan(self.compute_steering_angle()) / self.wheelbase : float
+            computed speed
         '''
         return self.speed * tan(self.compute_steering_angle()) / self.wheelbase
 
@@ -188,7 +201,8 @@ class PurePursuit:
 
         Returns
         -------
-        None
+        2 * np.abs(np.sin(eta)) / self.lookahead : float
+            computed curvature
         '''
         lookahead_point = np.array(self.future_point()) - self.vehicle_position
         line_of_sight_angle = np.arctan2(lookahead_point[1], lookahead_point[0])
@@ -205,6 +219,7 @@ class PurePursuit:
 
         Returns
         -------
-        None
+        1.0 / self.compute_curvature() : float
+            computed radius
         '''
         return 1.0 / self.compute_curvature()
