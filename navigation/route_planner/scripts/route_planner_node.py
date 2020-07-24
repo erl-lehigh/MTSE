@@ -36,15 +36,16 @@ class RoutePlannerNode(object):
             the inverse of the rate
         route_planner : RoutePlanner()
             the object that does all of the route planning
+            
     Methods
     -------
-    get_vehicle_location(self):
-        Uses a tf buffer to get the location of the vehicle and return its coordinates
-    coordinates_to_poses(self, coords):
-        Iterates through the coordinates to create a pose for each.
-    control_loop(self, event):
-        Updates the route based on changing location.
-        Then publishes both the route and its reference path.
+        get_vehicle_location(self):
+            Uses a tf buffer to get the location of the vehicle and return its coordinates
+        coordinates_to_poses(self, coords):
+            Iterates through the coordinates to create a pose for each.
+        control_loop(self, event):
+            Updates the route based on changing location.
+            Then publishes both the route and its reference path.
 
 
     '''
@@ -79,11 +80,12 @@ class RoutePlannerNode(object):
         # Plot graph
         self.route_planner.setup_plot()
 
-        # Sets the destination point
-        #destination = input("Address of Destination (in quotes) : ")
-        #self.dest = self.route_planner.get_point_of_interest(destination, 1)
-        self.dest = (40.6054017, -75.3758301)  # (y,x) #TODO: get from user
+        # Gets the destination from the user
+        destination = input("Address of Destination (in quotes) : ")
 
+        # Converts the address given to latitude and longitude
+        self.dest = self.route_planner.geocode(query=destination)
+        
         # Common header for all
         self.header = Header(frame_id=self.parent_frame)
 

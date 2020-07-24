@@ -7,6 +7,8 @@ import itertools as it
 import networkx as nx
 import osmnx as ox
 import matplotlib.pyplot as plt
+import requests
+
 
 
 
@@ -136,24 +138,36 @@ class RoutePlanner(object):
         # Get the shortest path from the current location to the destination
         return nx.shortest_path(self.g, origin_node, destination_node)
 
-    def get_point_of_interest(self, destination, distance):
-        '''
-        Gets the coordinates of a point of interest (address)
+    def geocode(self, query):
+        """
+        Geocode a query string to (lat, lon) with the Nominatim geocoder.
 
         Parameters
         ----------
-        destination : string
-            the desired destination address
-        distance : integer
-            how far away from the address to look for a node (meters)
+        query : string
+            the query string to geocode
 
         Returns
         -------
-        point
-            the cooridinates of the destination
-        '''
-        # Get the coordinates of the destination
-        return ox.pois.pois_from_address(destination, distance)
+        point : tuple
+            the (lat, lon) coordinates returned by the geocoder
+        """
+
+        # send the query to the nominatim geocoder and parse the json response
+        url_template = 'https://nominatim.openstreetmap.org/search?format=json&limit=1&q={}'
+        url = url_template.format(query)
+        response = requests.get(url, timeout=60)
+        results = response.json()
+
+        # if results were returned, parse lat and long out of the result
+        if len(results) > 0 and 'lat' in results[0] and 'lon' in results[0]:
+            lat = float(results[0]['lat'])
+            lon = float(results[0]['lon'])
+            point = (lat, lon)
+            return point
+        else:
+            raise Exception('Nominatim geocoder returned no results for query "{}"'.format(query))
+
 
     def setup_plot(self):
         '''
