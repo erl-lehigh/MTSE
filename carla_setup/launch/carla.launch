@@ -1,5 +1,8 @@
 <launch>
     <arg name="rviz" default="False"/>
+    <arg name="config" default="$(find carla_setup)/config/ackermann.yaml"
+         doc="Specify a config"/>
+    <rosparam command="load" file="$(arg config)" />
 
     <arg name='host' default='localhost'/>
     <arg name='port' default='2000'/>
