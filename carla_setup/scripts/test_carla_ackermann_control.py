@@ -58,22 +58,22 @@ class VehicleControllerNode(object):
         '''
 
         #---Publishers---#
-        #Node to broadcast driving commands
+        # Node to broadcast driving commands
         self.ack_control_pub = rospy.Publisher(
             '/carla/ego_vehicle/ackermann_cmd', AckermannDrive,
             queue_size=10)
-        #Node for setting the vehicle information
+        # Node for setting the vehicle information
         self.vehicle_info_pub = rospy.Publisher(
             '/carla/ego_vehicle/vehicle_info', CarlaEgoVehicleInfo, queue_size=10)
             
         #---Subscribers---#
-        #Camera
+        # Camera
         rospy.Subscriber("/carla/ego_vehicle/camera/rgb/front/image_color",
             Image, self.process_img)
-        #Gnss
+        # Gnss
         rospy.Subscriber("/carla/ego_vehicle/gnss/gnss1/fix", NavSatFix,
              self.print_GNSS_location)
-        #Odometry
+        # Odometry
         rospy.Subscriber("/carla/ego_vehicle/odometry",Odometry, 
             self.print_odometry_location)
 
@@ -152,10 +152,10 @@ def control(s, a, j, st, av):
         ackermann_msg.steering_angle =  st
         ackermann_msg.steering_angle_velocity = av
         rospy.loginfo('Desired, s: %f, a: %f, j: %f, st: %f, av: %f', 
-            ackermann_msg.speed, ackermann_msg.acceleration, ackermann_msg.jerk, ackermann_msg.steering_angle, ackermann_msg.steering_angle_velocity) #prints text
+            ackermann_msg.speed, ackermann_msg.acceleration, ackermann_msg.jerk, ackermann_msg.steering_angle, ackermann_msg.steering_angle_velocity) # Prints text
         # Broadcasts the message
         vehicle_node.ack_control_pub.publish(ackermann_msg) 
-        rate.sleep() #Sleeps for time equal to the rate
+        rate.sleep() # Sleeps for time equal to the rate
 
 if __name__ == '__main__':
     try:
@@ -177,7 +177,7 @@ if __name__ == '__main__':
         # Broadcasts the message
         vehicle_node.vehicle_info_pub.publish(vehicle_info_msg) 
 
-        #Control Loop
+        # Control Loop
         while not rospy.is_shutdown():
             pi = np.pi
             straight = 0.0
