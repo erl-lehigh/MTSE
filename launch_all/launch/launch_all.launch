@@ -1,11 +1,26 @@
 <launch>
+    <arg name="carla_bridge" default="True"/>
+    <arg name="purepursuit" default="True"/>
+    <arg name="rrt" default="True"/>
+    <arg name="route_planner" default="True"/>
     <arg name="rviz" default="False"/>
-    
-    <include file="$(find template_ros_package)/launch/launch_file.launch"/>
 
-    <include file="$(find rrt)/launch/rrt.launch"/>
-    
+    <!-- include file="$(find template_ros_package)/launch/launch_file.launch"/ -->
 
-  
+    <group if="$(arg carla_bridge)">
+        <include file="$(find carla_setup)/launch/carla.launch"/>
+    </group>
+
+    <group if="$(arg purepursuit)">
+        <include file="$(find purepursuit)/launch/purepursuit.launch"/>
+    </group>
+
+    <group if="$(arg rrt)">
+        <include file="$(find rrt)/launch/rrt.launch"/>
+    </group>
+
+    <group if="$(arg route_planner)">
+        <include file="$(find route_planner)/launch/route_planner.launch"/>
+    </group>
 
 </launch>
