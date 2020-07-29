@@ -4,8 +4,12 @@ import unittest
 import rostest
 
 class testCase(unittest.TestCase):
-    def NAME_OF_THE_TEST(self):
+    def starting_point(self):
+        pass
+    def end_point(self):
+        pass
+    def check_collison(self):
         pass
 
 if __name__ == "__main__":
-    rostest.rosrun('template_ros_package', 'test_code', testCase)
+    rostest.rosrun('rrt', 'test_code', testCase)

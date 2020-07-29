@@ -26,6 +26,7 @@ class RRTPlanner(object):
         #TODO:
         '''
         self.vehicle = vehicle
+        self.costmap = None
 
         # initialize RRT tree
         self.g = nx.DiGraph()

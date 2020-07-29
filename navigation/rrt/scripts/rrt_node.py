@@ -74,7 +74,7 @@ class RRTNode(object):
         Converte the user input goal from orientation into quaternion
         Parameters
         ----------
-        msg: 
+        msg:
         coordinate for the goal
 
         Return
@@ -113,14 +113,14 @@ class RRTNode(object):
 
     def check_path(self, path):
         '''
-        Iterates through all the coordinates in the path check if that 
+        Iterates through all the coordinates in the path check if that
         position is ocupied or not
 
         Parameters
         ----------
         path: list of coordinates
             the coordinates for the path
-        
+
         Returns
         -------
         true or false
@@ -130,7 +130,7 @@ class RRTNode(object):
         if ogm is None:
             rospy.logwarn('No costmap set!')
             return
-            
+
         height = ogm.info.height
         width = ogm.info.width
         grid = np.asarray(ogm.data).reshape((height, width))
