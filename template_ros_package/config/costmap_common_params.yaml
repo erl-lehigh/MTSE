@@ -15,3 +15,4 @@ obstacle_layer:
 static:
   map_topic: NAME_OF_MAP_TOPIC
   subscribe_to_updates: true/false
+  
