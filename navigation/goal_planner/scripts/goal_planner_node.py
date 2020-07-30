@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 
 '''
-Route Planner Node that communicates with ROS
+Goal Planner Node that communicates with ROS
 '''
 
 import rospy
@@ -11,10 +11,10 @@ from std_msgs.msg import Header
 from nav_msgs.msg import Path
 from geometry_msgs.msg import PoseStamped
 
-from route_planner import RoutePlanner
+from goal_planner import GoalPlanner
 
 
-class RoutePlannerNode(object):
+class GoalPlannerNode(object):
     '''
     Attributes
     ----------
@@ -34,7 +34,7 @@ class RoutePlannerNode(object):
             what type of street network to get 
         period : float
             the inverse of the rate
-        route_planner : RoutePlanner()
+        goal_planner : GoalPlanner()
             the object that does all of the route planning
             
     Methods
@@ -50,7 +50,7 @@ class RoutePlannerNode(object):
 
     def __init__(self):
         '''
-        RoutePlannerNode Constructor
+        GoalPlannerNode Constructor
         Parameters
         ----------
         None
@@ -70,17 +70,17 @@ class RoutePlannerNode(object):
 
         self.period = rospy.Duration(1.0 / self.rate)
 
-        self.route_planner = RoutePlanner(self.address,
+        self.goal_planner = GoalPlanner(self.address,
                                           distance=self.network_range,
                                           network_type=self.network_type)
         # Plot graph
-        self.route_planner.setup_plot()
+        self.goal_planner.setup_plot()
 
         # Gets the destination from the user
         destination = input("Address of Destination (in quotes) : ")
 
         # Converts the address given to latitude and longitude
-        self.dest = self.route_planner.geocode(query=destination)
+        self.dest = self.goal_planner.geocode(query=destination)
         
         # Common header for all
         self.header = Header(frame_id=self.parent_frame)
@@ -167,10 +167,10 @@ class RoutePlannerNode(object):
             rospy.logdebug('Vehicle position not available!')
             return
 
-        route = self.route_planner.get_route(orig, self.dest)
-        route_coords = self.route_planner.get_route_coords(route)
-        road_coords = self.route_planner.get_road_coords(route)
-        self.route_planner.plot_route(road_coords)
+        route = self.goal_planner.get_route(orig, self.dest)
+        route_coords = self.goal_planner.get_route_coords(route)
+        road_coords = self.goal_planner.get_road_coords(route)
+        self.goal_planner.plot_route(road_coords)
 
         # Publish route
         self.route_msg.header.stamp = rospy.Time.now()  # Set the stamp
@@ -187,12 +187,12 @@ class RoutePlannerNode(object):
 
 if __name__ == '__main__':
     # Initialize node with rospy
-    rospy.init_node('route_planner', anonymous=True)
+    rospy.init_node('goal_planner', anonymous=True)
     # Create the node object
-    route_planner_node = RoutePlannerNode()
+    goal_planner_node = GoalPlannerNode()
     # Keep the node alive
     # rospy.spin()
     # Hack to update plot from the main thread due to TkInter issue
     while not rospy.is_shutdown():
-        route_planner_node.route_planner.update_plot()
-        rospy.sleep(route_planner_node.period)
+        goal_planner_node.goal_planner.update_plot()
+        rospy.sleep(goal_planner_node.period)

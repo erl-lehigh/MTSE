@@ -8,6 +8,7 @@ import networkx as nx
 import osmnx as ox
 import matplotlib.pyplot as plt
 import requests
+import math
 
 
 
@@ -52,35 +53,56 @@ class GoalPlanner(object):
     
     '''
 
-    def __init__(self, address, distance, network_type):
+    def __init__(self, current_location, orientation, graph, route):
         '''
         RoutePlanner Constructor
         Parameters
         ----------
-        address :  string
-            the address to geocode and use as the central point around which to construct the graph
-        distance : int
-            retain only those nodes within this many meters of the center of the graph  
-        network_type : string
-            what type of street network to get 
+        current_location :  tuple
+            the current location of the vehicle (x,y)
+        orientation : tuple
+            the direction of the vehicle (-1 is 360deg, 1 is 0deg, 0 is 180deg)
+        graph : networkx multidigraph or tuple
+            multidigraph or optionally (multidigraph, tuple)
+         route :  tuple
+        the route being traversed
         Returns
         -------
         None
         
         '''
-        self.address = address
-        self.distance = distance
-        self.network_type = network_type
+        # Gets the two neighbors of the nearest node
+        pn = graph.neighbors(ox.get_nearest_node(graph, current_location))
+        # Sets the previous and next nodes to the nearest node
+        self.previous_node = pn[0]
+        self.next_node = pn[1]
+        # Gets the closest node
+        self.closest_node = ox.get_nearest_node(graph, current_location)
+        # Converts the node to x,y
+        cn_x = self.graph.node[self.closest_node]['x']
+        cn_y = self.graph.node[self.closest_node]['y']
+        # Determines the difference between the current location and nearest x,y
+        dx = cn_x - current_location.x
+        dy = cn_y - current_location.y
+        # Calculates the angle, in radians, to the nearest node
+        needed_orientaion = math.atan2(dy,dx)
+        # Converts from radians to w
+        w = (math.pi - needed_orientaion)/math.pi
+        # If the nearest node is in front, its the goal, else, its the next node
+        if (orientation - w < 1.0 and orientation - w > -1.0):
+            self.goal_node = self.closest_node
+        else
+            self.goal_node = self.next_node
 
-        # Gets all the roads a distance away on which can be driven
-        self.g = ox.graph_from_address(self.address, distance=self.distance,
-                                       network_type=self.network_type)
 
-    def get_route_coords(self, route):
+
+    def get_route_coords(self, graph, route):
         '''
         Takes each node along the route and returns their corresponding coordinates
         Parameters
         ----------
+        graph : networkx multidigraph or tuple
+            multidigraph or optionally (multidigraph, tuple)
         route :  tuple
             the route you want the coordinates of
         Returns
@@ -88,46 +110,8 @@ class GoalPlanner(object):
         tuple
             the coordinates corresponding to the given route
         '''
-        return [(self.g.node[u]['x'], self.g.node[u]['y']) for u in route]
-
-    def get_road_coords(self, route):
-        '''
-        Takes each edge and breaks it into nodes with linear connections and
-        returns the nodes' coordinates
-        Parameters
-        ----------
-        route :  tuple
-            the route you want the coordinates of
-        Returns
-        -------
-        list
-            the coordinates of each point along the route that has only a straight line connecting them
-        '''
-        # Concatenate all road geometries
-        return list(it.chain(*[self.g.get_edge_data(u, v)[0]['geometry'].coords
-                               for u, v in zip(route, route[1:])]))
-
-    def get_route(self, origin, destination):
-        '''
-        Uses Dijkstra's algorithm to compute the shortest distance between
-        the vehicles current location (origin) and a given destination.
-        Parameters
-        ----------
-        origin :  point
-            the location of the vehicle
-        destination : point
-            the desired destination point
-        Returns
-        -------
-        path
-            the path connecting the origin and the destination
-        '''
-        # Find the nearest intersection to the current location
-        origin_node = ox.get_nearest_node(self.g, origin)
-        # Find the nearest intersection to the destination point
-        destination_node = ox.get_nearest_node(self.g, destination)
-        # Get the shortest path from the current location to the destination
-        return nx.shortest_path(self.g, origin_node, destination_node)
+        return [(self.graph.node[u]['x'], self.graph.node[u]['y']) 
+            for u in route]
 
     def geocode(self, query):
         """
@@ -156,51 +140,3 @@ class GoalPlanner(object):
             return point
         else:
             raise Exception('Nominatim geocoder returned no results for query "{}"'.format(query))
-
-
-    def setup_plot(self):
-        '''
-        Displays the blank map.
-        Parameters
-        ----------
-        None
-        Returns
-        -------
-        None
-        '''
-        self.figure, self.ax = ox.plot_graph(self.g, show=False, close=False)
-        # Create route line
-        self.route_line, = plt.plot([], [], '-', color='red', linewidth=6)
-        plt.draw() # Draw canvas and mark as changed
-        plt.pause(0.001) # Display changes
-
-    def plot_route(self, route_coords):
-        '''
-        Plots the route onto the map.
-        Parameters
-        ----------
-        route_coords : list
-            the coordinates of each point along the route 
-        Returns
-        -------
-        None
-        NOTE: Due to the use of osmnx version 0.9, we need to manually draw the
-        route.
-        '''
-        # # Graphs the figure
-        # fig, ax = ox.plot_graph_route(self.g, route, route_linewidth=6,
-        #                               node_size=0, bgcolor='k')
-        self.route_line.set_data(zip(*route_coords))
-
-    def update_plot(self):
-        '''
-        Updates the map with the new route.
-        Parameters
-        ----------
-        None
-        Returns
-        -------
-        None
-        '''
-        plt.draw()
-        plt.pause(0.001)
