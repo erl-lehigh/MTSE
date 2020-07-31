@@ -96,6 +96,9 @@ class GoalPlanner(object):
 
 
 
+    def get_goal_node(self):
+        return self.goal_node
+
     def get_route_coords(self, graph, route):
         '''
         Takes each node along the route and returns their corresponding coordinates

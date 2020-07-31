@@ -64,39 +64,24 @@ class GoalPlannerNode(object):
         self.rate = rospy.get_param('~rate', 1)
         self.parent_frame = rospy.get_param('~parent_frame', 'world')
         self.child_frame = rospy.get_param('~child_frame', 'vehicle')
-        self.address = rospy.get_param('~address')
-        self.network_range = rospy.get_param('~network_range', 1500)
-        self.network_type = rospy.get_param('~network_type', 'drive')
 
         self.period = rospy.Duration(1.0 / self.rate)
 
-        self.goal_planner = GoalPlanner(self.address,
-                                          distance=self.network_range,
-                                          network_type=self.network_type)
-        # Plot graph
-        self.goal_planner.setup_plot()
+        self.goal_planner = GoalPlanner(self.get_vehicle_location(), 
+            orientation, graph, route)
 
-        # Gets the destination from the user
-        destination = input("Address of Destination (in quotes) : ")
-
-        # Converts the address given to latitude and longitude
-        self.dest = self.goal_planner.geocode(query=destination)
-        
         # Common header for all
         self.header = Header(frame_id=self.parent_frame)
 
-        self.route_msg = Path()  # Path message for route publishing
-        self.route_msg.header.frame_id = self.parent_frame  # Set the frame_id
+        # Path message for route publishing
+        self.goal_point_msg = PoseStamped()
+        # Set the frame_id  
+        self.goal_point_msg.header.frame_id = self.parent_frame  
 
-        self.path_msg = Path()  # Path message for reference path publishing
-        self.path_msg.header.frame_id = self.parent_frame  # Set the frame_id
-
-        # Creates publishers
-        # Publisher for route
-        self.route_pub = rospy.Publisher('route', Path, queue_size=10)
-        # Publisher for reference path
-        self.reference_path_pub = rospy.Publisher('reference_path', Path,
-                                                  queue_size=10)
+        # Creates publisher
+        # Publisher for goal point
+        self.goal_point_pub = rospy.Publisher('goal_point', PoseStamped,
+            queue_size=10)
 
         # Create transform listener
         self.tf_buffer = tf2_ros.Buffer()
@@ -168,21 +153,15 @@ class GoalPlannerNode(object):
             return
 
         route = self.goal_planner.get_route(orig, self.dest)
-        route_coords = self.goal_planner.get_route_coords(route)
-        road_coords = self.goal_planner.get_road_coords(route)
-        self.goal_planner.plot_route(road_coords)
+        goal_node = self.goal_planner.get_goal_node()
 
         # Publish route
-        self.route_msg.header.stamp = rospy.Time.now()  # Set the stamp
-        self.route_msg.poses = self.coordinates_to_poses(route_coords)
-        self.route_pub.publish(self.route_msg)
-        rospy.logdebug('Route message: %s', self.route_msg)
+        self.goal_point_msg.header.stamp = rospy.Time.now()  # Set the stamp
+        self.goal_point_msg.poses = self.coordinates_to_poses(goal_node)
+        self.goal_point_pub.publish(self.goal_point_msg)
+        rospy.logdebug('Goal Point: %s', self.goal_point_msg)
 
-        # Publish reference path associated with roads
-        self.path_msg.header.stamp = rospy.Time.now()  # Set the stamp
-        self.path_msg.poses = self.coordinates_to_poses(road_coords)
-        self.reference_path_pub.publish(self.path_msg)
-        rospy.logdebug('Reference path: %s', self.path_msg)
+
 
 
 if __name__ == '__main__':
