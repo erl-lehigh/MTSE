@@ -6,9 +6,11 @@ Goal Planner Node that communicates with ROS
 
 import rospy
 import tf2_ros
+import tf.transformations as tr
 
 from std_msgs.msg import Header
 from nav_msgs.msg import Path
+from shapely.geometry import LineString
 from geometry_msgs.msg import PoseStamped
 
 from goal_planner import GoalPlanner
@@ -65,7 +67,7 @@ class GoalPlannerNode(object):
         self.parent_frame = rospy.get_param('~parent_frame', 'world')
         self.child_frame = rospy.get_param('~child_frame', 'vehicle')
 
-        self.path = Path()
+        self.path = LineString()
 
 
         # Create transform listener
@@ -83,7 +85,7 @@ class GoalPlannerNode(object):
         self.goal_point_msg.header.frame_id = self.parent_frame  
 
         #Creates a subscriber
-        rospy.Subscriber("reference_path", Path, self.update_path)
+        rospy.Subscriber("reference_path", Path, self.set_path)
 
         # Creates publisher
         # Publisher for goal point
@@ -103,8 +105,26 @@ class GoalPlannerNode(object):
 
         rospy.loginfo('[%s] Node started!', self.node_name)
 
-    def update_path(self, ref_path):
-        self.path = ref_path
+    def set_path(self, msg):
+        '''
+        Generates a path LineString (to be tracked) from a set of position
+        coordinates (pose).
+        Parameters
+        ----------
+        msg :  nav_msgs.msg.Path
+            ROS navigation path message
+        Returns
+        -------
+        None
+        '''
+
+        vehicle_pose = self.get_vehicle_pose()
+        self.purepursuit.set_vehicle_pose(vehicle_pose)
+        pose_list = [(pose.pose.position.x, pose.pose.position.y)
+                     for pose in msg.poses]
+        self.purepursuit.path = LineString(pose_list)
+
+
 
     def get_vehicle_location(self):
         '''

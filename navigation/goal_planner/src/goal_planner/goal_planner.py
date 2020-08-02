@@ -9,6 +9,9 @@ import osmnx as ox
 import matplotlib.pyplot as plt
 import requests
 import math
+import numpy as np
+import shapely
+
 
 
 
@@ -53,7 +56,7 @@ class GoalPlanner(object):
     
     '''
 
-    def __init__(self, current_location, orientation, graph, route):
+    def __init__(self, current_location, orientation, ref_path):
         '''
         RoutePlanner Constructor
         Parameters
@@ -64,12 +67,18 @@ class GoalPlanner(object):
             the direction of the vehicle (-1 is 360deg, 1 is 0deg, 0 is 180deg)
         graph : networkx multidigraph or tuple
             multidigraph or optionally (multidigraph, tuple)
-         route :  tuple
-        the route being traversed
+        ref_path :  tuple
+        the reference_path being traversed
         Returns
         -------
         None
         
+        '''
+        self.path = ref_path
+        self.vehicle_position = current_location
+        self.vehicle_orientation = orientation
+        closest_point = self.closest_point()
+        print(closest_point)
         '''
         # Gets the two neighbors of the nearest node
         pn = graph.neighbors(ox.get_nearest_node(graph, current_location))
@@ -93,8 +102,41 @@ class GoalPlanner(object):
             self.goal_node = self.closest_node
         else
             self.goal_node = self.next_node
+        '''
 
+    def set_vehicle_pose(self, vehicle_pose):
+        '''
+        Sets the vehicle position and the orientation if vehicle_pose is not
+        None.
+        Parameters
+        ----------
+        vehicle_pose : Tuple
+            pose of the vehicle as a 3-tuple (x, y, yaw)
+        Returns
+        -------
+        None
+        '''
+        if vehicle_pose is None:
+            self.vehicle_position = None
+            self.vehicle_orientation = None
+        else:
+            self.vehicle_position = Point(vehicle_pose[:2])
+            self.vehicle_orientation = vehicle_pose[2]
 
+    def closest_point(self):
+        '''
+        Returns the computed closest point on the path from the midpoint of the
+        rear axle of the vehicle.
+        Parameters
+        ----------
+        None
+        Returns
+        -------
+        self.path.interpolate(path_length) : point
+            computed closest point
+        '''
+        path_length = self.path.project(self.vehicle_position)
+        return self.path.interpolate(path_length)
 
     def get_goal_node(self):
         return self.goal_node
