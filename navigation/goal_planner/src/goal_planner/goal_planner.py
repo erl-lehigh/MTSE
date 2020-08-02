@@ -9,6 +9,7 @@ import osmnx as ox
 import matplotlib.pyplot as plt
 import requests
 import math
+import shapely
 
 
 
@@ -53,7 +54,7 @@ class GoalPlanner(object):
     
     '''
 
-    def __init__(self, current_location, orientation, graph, route):
+    def __init__(self, current_location, orientation, route):
         '''
         RoutePlanner Constructor
         Parameters
@@ -70,6 +71,40 @@ class GoalPlanner(object):
         -------
         None
         
+        '''
+        ref_path = list(route.coords)
+        try:
+            node1 = ref_path[0]
+            node2 = ref_path[1]
+        except (IndexError):
+            print("Out of bounds!!")
+            node1 = (1.0,1.0)
+            node2 = (2.0,1.0)
+        
+        cn_x = node1[0]
+        cn_y = node1[1]
+        # Determines the difference between the current location and nearest x,y
+        try:
+            current_location[0]
+            current_location[1]
+        except (IndexError, TypeError):
+            print("Out of bounds!!")
+            current_location = tuple([0.0,0.0])
+
+        dx = cn_x - current_location[0]
+        dy = cn_y - current_location[1]
+        # Calculates the angle, in radians, to the nearest node
+        needed_orientaion = math.atan2(dy,dx)
+        # Converts from radians to w
+        w = (math.pi - needed_orientaion)/math.pi
+        print(w)
+        # If the nearest node is in front, its the goal, else, its the next node
+        if (orientation - w < 1.0 and orientation - w > -1.0):
+            self.goal_node = node1
+        else:
+            self.goal_node = node2
+
+
         '''
         # Gets the two neighbors of the nearest node
         pn = graph.neighbors(ox.get_nearest_node(graph, current_location))
@@ -91,8 +126,9 @@ class GoalPlanner(object):
         # If the nearest node is in front, its the goal, else, its the next node
         if (orientation - w < 1.0 and orientation - w > -1.0):
             self.goal_node = self.closest_node
-        else
+        else:
             self.goal_node = self.next_node
+        '''
 
 
 
