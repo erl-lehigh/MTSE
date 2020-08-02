@@ -65,10 +65,14 @@ class GoalPlannerNode(object):
         self.parent_frame = rospy.get_param('~parent_frame', 'world')
         self.child_frame = rospy.get_param('~child_frame', 'vehicle')
 
-        self.period = rospy.Duration(1.0 / self.rate)
+        self.path = Path()
 
-        self.goal_planner = GoalPlanner(self.get_vehicle_location(), 
-            orientation, graph, route)
+
+        # Create transform listener
+        self.tf_buffer = tf2_ros.Buffer()
+        self.ts_listener = tf2_ros.TransformListener(self.tf_buffer)
+
+        self.period = rospy.Duration(1.0 / self.rate)
 
         # Common header for all
         self.header = Header(frame_id=self.parent_frame)
@@ -78,10 +82,17 @@ class GoalPlannerNode(object):
         # Set the frame_id  
         self.goal_point_msg.header.frame_id = self.parent_frame  
 
+        #Creates a subscriber
+        rospy.Subscriber("reference_path", Path, self.update_path)
+
         # Creates publisher
         # Publisher for goal point
         self.goal_point_pub = rospy.Publisher('goal_point', PoseStamped,
             queue_size=10)
+
+
+        self.goal_planner = GoalPlanner(self.get_vehicle_location(), 
+            self.get_vehicle_orientation(), self.path)
 
         # Create transform listener
         self.tf_buffer = tf2_ros.Buffer()
@@ -91,6 +102,9 @@ class GoalPlannerNode(object):
         self.timer = rospy.Timer(self.period, self.control_loop)
 
         rospy.loginfo('[%s] Node started!', self.node_name)
+
+    def update_path(self, ref_path):
+        self.path = ref_path
 
     def get_vehicle_location(self):
         '''
@@ -112,6 +126,30 @@ class GoalPlannerNode(object):
                 tf2_ros.ExtrapolationException):
             return
         return trans.transform.translation.x, trans.transform.translation.y
+
+    def get_vehicle_orientation(self):
+        '''
+        Returns the vehicle's orientation.
+        Parameters
+        ----------
+        None
+        Returns
+        -------
+        Tuple # Is this correct???
+            vehicle coordinates (x,y) and orientation (angle)
+        '''
+        try:
+            trans = self.tf_buffer.lookup_transform(self.child_frame,
+                                                    self.parent_frame,
+                                                    rospy.Time.now(),
+                                                    self.period)
+        except (tf2_ros.LookupException, tf2_ros.ConnectivityException,
+                tf2_ros.ExtrapolationException):
+            return
+        quaternion = trans.transform.rotation
+        quaternion = (quaternion.x, quaternion.y, quaternion.z, quaternion.w)
+        _, _, orientation = tr.euler_from_quaternion(quaternion)
+        return orientation
 
     def coordinates_to_poses(self, coords):
         '''
@@ -152,7 +190,7 @@ class GoalPlannerNode(object):
             rospy.logdebug('Vehicle position not available!')
             return
 
-        route = self.goal_planner.get_route(orig, self.dest)
+        #route = self.goal_planner.get_route(orig, self.dest)
         goal_node = self.goal_planner.get_goal_node()
 
         # Publish route
