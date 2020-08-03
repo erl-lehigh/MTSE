@@ -51,11 +51,8 @@ class PurePursuit:
             path to be tracked for the vehicle
         speed : float
             specifies the speed of the vehicle
-        vehicle_pose : Tuple
-            position of the vehicle in tuple form
-
-        vehicle_pose = (x, y, theta)
-
+        vehicle_pose : tuple
+            pose of the vehicle in tuple form (x, y, theta)
         '''
 
         # distance between front and rear axles
@@ -74,7 +71,7 @@ class PurePursuit:
 
         Parameters
         ----------
-        vehicle_pose : Tuple
+        vehicle_pose : tuple
             pose of the vehicle as a 3-tuple (x, y, yaw)
 
         Returns
@@ -99,7 +96,7 @@ class PurePursuit:
 
         Returns
         -------
-        self.path.interpolate(path_length) : point
+        self.path.interpolate(path_length) : shapely.geometry.Point
             computed closest point
         '''
         path_length = self.path.project(self.vehicle_position)
@@ -116,7 +113,7 @@ class PurePursuit:
 
         Returns
         -------
-        self.path.interpolate(dist_on_path) : Point
+        self.path.interpolate(dist_on_path) : shapely.geometry.Point
             computed future point
         '''
         closest_dist = min(self.vehicle_position.distance(self.closest_point()),
@@ -149,7 +146,7 @@ class PurePursuit:
 
         Returns
         -------
-        vehicle front point : Point
+        vehicle front point : shapely.geometry.Point
             vehicle front axle midpoint
         '''
         direction = np.array((np.cos(self.vehicle_orientation),
