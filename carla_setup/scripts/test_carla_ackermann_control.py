@@ -7,6 +7,8 @@ Node that controls the vehicle in CARLA using ROS
 import numpy as np
 import cv2
 import rospy
+import networkx as nx
+
 
 from cv_bridge import CvBridge
 
@@ -15,6 +17,9 @@ from carla_msgs.msg import CarlaEgoVehicleInfo
 from sensor_msgs.msg import Image, NavSatFix
 from nav_msgs.msg import Odometry
 from geometry_msgs.msg import PoseWithCovariance, TwistWithCovariance
+from carla_ros_bridge.world_info import CarlaWorldInfo
+
+import carla
 
 
 class VehicleControllerNode(object):
@@ -76,6 +81,9 @@ class VehicleControllerNode(object):
         # Odometry
         rospy.Subscriber("/carla/ego_vehicle/odometry",Odometry, 
             self.print_odometry_location)
+        # Map
+        rospy.Subscriber("/carla/world_info", CarlaWorldInfo, 
+            self.convert_to_2D_map)
 
     def process_img(self, image):
         '''
@@ -125,6 +133,40 @@ class VehicleControllerNode(object):
              loc.pose.pose.position.y, loc.pose.pose.position.z)
         rate.sleep()
 
+    def convert_to_2D_map(self, map3D):
+        '''
+        Converts the opendrive map msg into a 2D topological map.
+        Parameters
+        ----------
+        map3D : CarlaWorldInfo.msg
+            info about the CARLA world/level (e.g. OPEN Drive map)
+
+        Returns
+        -------
+        None
+        '''
+        
+        rospy.loginfo(map3D.opendrive)
+
+        client = carla.Client('localhost', 2000)
+        client.set_timeout(2)
+        carla_world = client.get_world()
+        cmap = carla_world.get_map()
+
+        # The following is a list(tuple(carla.Waypoint,carla.Waypoint))
+        cmap_topology = cmap.get_topology()
+
+        rospy.loginfo(cmap_topology[0][0].transform.location)
+        graph = nx.DiGraph()
+        graph.add_edges_from(cmap_topology)
+        for u in graph:
+            location = u.transform.location
+            graph.node[u]['location'] = (location.x, location.y)
+        graph = nx.convert_node_labels_to_integers(graph)
+
+        nx.write_yaml(graph, "carla_map.yaml")
+
+        rate.sleep()
 
 def control(s, a, j, st, av):
         '''
