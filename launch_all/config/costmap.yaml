@@ -1,0 +1,15 @@
+global_frame: world # FRAME
+robot_base_frame: vehicle # ROBOT FRAME
+update_frequency: 10 # number
+publish_frequency: 10 # number
+static_map: false # true/false
+rolling_window: true # true/false
+always_send_full_costmap: true
+width: 5 # number
+height: 5 # number
+resolution: 0.1 # [meter/cell]
+footprint: [[-1.0, -0.5], [-1.0, 0.5], [2.5, 0.5], [2.5, -0.5]] # TODO:
+
+#plugins:
+#  -{name: NAME_OF_PLUGIN_1,     type: "TYPE_OF_PLUGIN_1"}
+#  -{name: NAME_OF_PLUGIN_2,     type: "TYPE_OF_PLUGIN_2"}

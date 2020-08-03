@@ -79,3 +79,4 @@ TebLocalPlannerROS:
  obstacle_keypoint_offset: 0.1
  obstacle_heading_threshold: 0.45
  visualize_hc_graph: False
+ 

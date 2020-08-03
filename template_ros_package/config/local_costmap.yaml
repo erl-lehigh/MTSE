@@ -10,3 +10,4 @@ local_costmap:
   plugins:
     -{name: NAME_OF_PLUGIN_1,     type: "TYPE_OF_PLUGIN_1"}
     -{name: NAME_OF_PLUGIN_2,     type: "TYPE_OF_PLUGIN_2"}
+    
