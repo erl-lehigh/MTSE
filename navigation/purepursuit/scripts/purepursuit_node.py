@@ -59,7 +59,11 @@ class PurePursuitNode(object):
 
     def __init__(self):
         '''
-        Constructs all the necessary attributes for the PurePursuitNode object.
+        Initializes the purepursuit_node object by passing input parameters
+        which subscribes to planned_path topic to recive a path and then
+        geometrically compute the goal point, vehicle speed and steering angle,
+        and then publishes to the ~/target using Pose msg and speed_command
+        topic using AckermannDrive msg so that the vehcile can track the path.
 
         '''
         self.node_name = rospy.get_name()
