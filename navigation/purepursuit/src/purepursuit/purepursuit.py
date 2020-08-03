@@ -38,7 +38,11 @@ class PurePursuit:
     def __init__(self, wheelbase, lookahead, speed=None, vehicle_pose=None,
                  path=None):
         '''
-        Constructs all the necessary attributes for the PurePursuit object.
+        Initializes the PurePursuit object by passing input parameters
+        (vehicle wheelbase, lookahead distance, speed, position, and path) and
+        does geometric computation and then outputs the goal point, speed, and
+        steering angle for the vehicle to stay on the path to be followed based
+        on the aforementioned inputs.
 
         Parameters
         ----------
