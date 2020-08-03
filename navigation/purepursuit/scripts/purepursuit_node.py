@@ -6,7 +6,7 @@ import tf.transformations as tr
 
 from nav_msgs.msg import Path
 from ackermann_msgs.msg import AckermannDrive
-from geometry_msgs.msg import Pose
+from geometry_msgs.msg import PoseStamped
 
 from shapely.geometry import LineString
 
@@ -33,12 +33,14 @@ class PurePursuitNode(object):
         path tracker object using the pure pursuit method
     command_pub : rospy.Publisher
         the speed command publisher
+    target_pub : rospy.Publisher
+        the pure pursuit (moving) target publisher
     path_sub : rospy.Subscriber
         the subscriber for the tracked path
     tf_buffer : tf2_ros.Buffer
-        ### not sure ???
+        the transform listener buffer
     tf_listener : tf2_ros.TransformListener
-        ### not sure ???
+        the listener for ROS transforms
     timer : rospy.Timer
         the control loop timer
 
@@ -77,21 +79,16 @@ class PurePursuitNode(object):
         # Create publishers
         self.command_pub = rospy.Publisher('speed_command', AckermannDrive,
                                            queue_size=1)
-        #declares that the node is publishing to the 'speed_command' topic
-        #using the message type AckermannDrive
 
-        self.target_pub = rospy.Publisher('~/target', Pose, queue_size=1)
+        self.target_pub = rospy.Publisher('~/target', PoseStamped, queue_size=1)
 
         # Create subscribers
         self.path_sub = rospy.Subscriber('planned_path', Path, self.set_path)
-        #declares that the node is subscribing to the 'planned_path'
-        #which is of Path.
-        #when new messages are received, self.set_path is invoked with the
-        #message as the first argument.
 
         # Create transform listener
         self.tf_buffer = tf2_ros.Buffer()
         self.ts_listener = tf2_ros.TransformListener(self.tf_buffer)
+
         # Create timers
         self.timer = rospy.Timer(rospy.Duration(1.0 / self.rate),
                                  self.control_loop)
@@ -108,7 +105,7 @@ class PurePursuitNode(object):
 
         Returns
         -------
-        Tuple # Is this correct???
+        tuple
             vehicle coordinates (x,y) and orientation (angle)
         '''
         try:
@@ -154,18 +151,20 @@ class PurePursuitNode(object):
         Parameters
         ----------
         event=None : rospy.TimerEvent
-            #
+            information about the event that generated this call
 
         Returns
         -------
         None
         '''
         msg = AckermannDrive()
-        pose_msg = Pose()
+        pose_msg = PoseStamped()
+        pose_msg.header.stamp = rospy.Time.now()
+        pose_msg.header.frame_id = self.parent_frame
         if self.purepursuit.path is not None:
             position = self.purepursuit.future_point()
-            pose_msg.position.x = position.x
-            pose_msg.position.y = position.y
+            pose_msg.pose.position.x = position.x
+            pose_msg.pose.position.y = position.y
             msg.speed = self.purepursuit.speed
             msg.steering_angle = self.purepursuit.compute_steering_angle()
         self.command_pub.publish(msg)
