@@ -1,5 +1,5 @@
-'''TODO: ?? # what to fill in here?? not sure 
-
+'''
+The purepursuit package.
 '''
 
 from purepursuit import PurePursuit
