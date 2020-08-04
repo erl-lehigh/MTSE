@@ -4142,7 +4142,7 @@ _adj: &id2072
   : {}
   ? &id2071 !!python/tuple [248.78277587890625, -129.9612274169922]
   : {}
-_node:
+_node: &id2074
   *id001: {}
   *id002: {}
   *id003: {}
@@ -8292,3 +8292,5 @@ adjlist_outer_dict_factory: *id2073
 edge_attr_dict_factory: *id2073
 graph: {}
 node_dict_factory: *id2073
+nodes: !!python/object:networkx.classes.reportviews.NodeView
+  _nodes: *id2074

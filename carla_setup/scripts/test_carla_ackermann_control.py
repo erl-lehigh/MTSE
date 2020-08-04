@@ -218,7 +218,7 @@ class VehicleControllerNode(object):
             location = u.transform.location
             graph.node[u]['location'] = (location.x, location.y)
         '''
-        nx.draw_networkx_nodes(graph,list3)
+        nx.draw_networkx(graph, pos=list3, arrows=True, node_size=10, font_size=1)
         plt.show()
 
         nx.write_yaml(graph,
