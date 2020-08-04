@@ -52,7 +52,7 @@ class RoutePlanner(object):
         Updates the map with the new route.
     
     '''
-
+    
     def __init__(self, address, distance, network_type):
         '''
         RoutePlanner Constructor
@@ -78,6 +78,26 @@ class RoutePlanner(object):
         # Gets all the roads a distance away on which can be driven
         self.g = ox.graph_from_address(self.address, distance=self.distance,
                                        network_type=self.network_type)
+    
+    def __init__(self, yaml_path):
+        '''
+        RoutePlanner Constructor
+
+        Parameters
+        ----------
+        yaml_path :  
+            uses the yaml file to create the map
+
+        Returns
+        -------
+        None
+        
+        '''
+        # Turns the yaml into a networkx graph
+        self.g = nx.read_yaml(yaml_path)
+        nx.draw_networkx(self.g,with_labels=False, node_size=20)
+        plt.show()
+        
 
     def get_route_coords(self, route):
         '''

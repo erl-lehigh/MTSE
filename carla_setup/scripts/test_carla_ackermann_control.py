@@ -8,6 +8,8 @@ import numpy as np
 import cv2
 import rospy
 import networkx as nx
+import tf_conversions
+import tf2_ros
 
 
 from cv_bridge import CvBridge
@@ -16,8 +18,9 @@ from ackermann_msgs.msg import AckermannDrive
 from carla_msgs.msg import CarlaEgoVehicleInfo 
 from sensor_msgs.msg import Image, NavSatFix
 from nav_msgs.msg import Odometry
-from geometry_msgs.msg import PoseWithCovariance, TwistWithCovariance
+from geometry_msgs.msg import PoseWithCovariance, TwistWithCovariance, TransformStamped
 from carla_ros_bridge.world_info import CarlaWorldInfo
+import matplotlib.pyplot as plt
 
 import carla
 
@@ -84,6 +87,8 @@ class VehicleControllerNode(object):
         # Map
         rospy.Subscriber("/carla/world_info", CarlaWorldInfo, 
             self.convert_to_2D_map)
+        # Commands
+        rospy.Subscriber("pure_commands", AckermannDrive, control)
 
     def process_img(self, image):
         '''
@@ -129,6 +134,7 @@ class VehicleControllerNode(object):
         -------
         None
         '''
+        handle_location(loc.pose.pose, "vehicle")
         rospy.loginfo('x: %f, y: %f, z: %f', loc.pose.pose.position.x ,
              loc.pose.pose.position.y, loc.pose.pose.position.z)
         rate.sleep()
@@ -146,27 +152,98 @@ class VehicleControllerNode(object):
         None
         '''
         
-        rospy.loginfo(map3D.opendrive)
+        #rospy.loginfo(map3D.opendrive)
 
         client = carla.Client('localhost', 2000)
         client.set_timeout(2)
         carla_world = client.get_world()
+        #carla_world = client.load_world('Town01')
         cmap = carla_world.get_map()
 
-        # The following is a list(tuple(carla.Waypoint,carla.Waypoint))
-        cmap_topology = cmap.get_topology()
+        ###Code Credit: YashBansod
+        # Invert the y axis since we follow UE4 coordinates
+        plt.gca().invert_yaxis()
+        plt.margins(x=0.7, y=0)
 
-        rospy.loginfo(cmap_topology[0][0].transform.location)
+        topology = cmap.get_topology()
+        road_list = []
+
+        for wp_pair in topology:
+            current_wp = wp_pair[0]
+            # Check if there is a road with no previus road, this can happen
+            # in opendrive. Then just continue.
+            if current_wp is None:
+                continue
+            # First waypoint on the road that goes from wp_pair[0] to wp_pair[1].
+            current_road_id = current_wp.road_id
+            wps_in_single_road = [current_wp]
+            # While current_wp has the same road_id (has not arrived to next road).
+            while current_wp.road_id == current_road_id:
+                # Check for next waypoints in aprox distance.
+                available_next_wps = current_wp.next(20.0)
+                # If there is next waypoint/s?
+                if available_next_wps:
+                    # We must take the first ([0]) element because next(dist) can
+                    # return multiple waypoints in intersections.
+                    current_wp = available_next_wps[0]
+                    wps_in_single_road.append(current_wp)
+                else: # If there is no more waypoints we can stop searching for more.
+                    break
+            road_list.append(wps_in_single_road)
+
+        # Plot each road (on a different color by default)
+        for road in road_list:
+            plt.plot(
+                [wp.transform.location.x for wp in road],
+                [wp.transform.location.y for wp in road])
+
+        plt.show()
+
         graph = nx.DiGraph()
-        graph.add_edges_from(cmap_topology)
+
+        list3 = {}
+        count = 0
+
+        for road in road_list:
+            list1 = [wp.transform.location.x for wp in road]
+            list2 = [wp.transform.location.y for wp in road]
+            tuples = [(list1[i], list2[i]) for i in range(0, len(list1))]
+            graph.add_nodes_from(tuples)
+            for point in range(0, len(list1)):
+                list3[(list1[point], list2[point])] = (list1[point], list2[point])
+                count += 1
+
+        '''
         for u in graph:
             location = u.transform.location
             graph.node[u]['location'] = (location.x, location.y)
-        graph = nx.convert_node_labels_to_integers(graph)
+        '''
+        nx.draw_networkx_nodes(graph,list3)
+        plt.show()
 
-        nx.write_yaml(graph, "carla_map.yaml")
+        nx.write_yaml(graph,
+         "/home/nathan/mtse_catkin/src/navigation/route_planner/scripts/carla_map.yaml")
 
         rate.sleep()
+
+def handle_location(msg, childframe):
+    br = tf2_ros.TransformBroadcaster()
+    t = TransformStamped()
+
+    t.header.stamp = rospy.Time.now()
+    t.header.frame_id = "world"
+    t.child_frame_id = childframe
+    t.transform.translation.x = msg.position.x
+    t.transform.translation.y = msg.position.y
+    t.transform.translation.z = 0.0
+    q = msg.orientation
+    t.transform.rotation.x = q.x
+    t.transform.rotation.y = q.y
+    t.transform.rotation.z = q.z
+    t.transform.rotation.w = q.w
+
+    br.sendTransform(t)
+
 
 def control(s, a, j, st, av):
         '''

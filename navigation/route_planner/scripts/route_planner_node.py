@@ -74,9 +74,12 @@ class RoutePlannerNode(object):
 
         self.period = rospy.Duration(1.0 / self.rate)
 
-        self.route_planner = RoutePlanner(self.address,
-                                          distance=self.network_range,
-                                          network_type=self.network_type)
+        #self.route_planner = RoutePlanner(self.address,
+        #                                  distance=self.network_range,
+        #                                  network_type=self.network_type)
+        self.route_planner = RoutePlanner(
+            '/home/nathan/mtse_catkin/src/navigation/route_planner/scripts/carla_map.yaml')
+
         # Plot graph
         self.route_planner.setup_plot()
 
