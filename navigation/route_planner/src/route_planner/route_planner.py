@@ -225,7 +225,9 @@ class RoutePlanner(object):
         '''
         # # Graphs the figure
         # fig, ax = ox.plot_graph_route(self.g, route, route_linewidth=6,
-        #                               node_size=0, bgcolor='k')
+        #                               node_size=0, bgcolor='k')\
+        if not route_coords:
+            return
         self.route_line.set_data(zip(*route_coords))
 
     def update_plot(self):

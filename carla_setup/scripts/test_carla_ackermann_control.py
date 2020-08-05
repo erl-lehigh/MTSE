@@ -84,9 +84,6 @@ class VehicleControllerNode(object):
         # Odometry
         rospy.Subscriber("/carla/ego_vehicle/odometry",Odometry, 
             self.print_odometry_location)
-        # Map
-        rospy.Subscriber("/carla/world_info", CarlaWorldInfo, 
-            self.convert_to_2D_map)
         # Commands
         rospy.Subscriber("speed_command", AckermannDrive, control)
 
@@ -137,123 +134,6 @@ class VehicleControllerNode(object):
         handle_location(loc.pose.pose, "vehicle")
         rospy.loginfo('x: %f, y: %f, z: %f', loc.pose.pose.position.x ,
              loc.pose.pose.position.y, loc.pose.pose.position.z)
-        rate.sleep()
-
-    def convert_to_2D_map(self, map3D):
-        '''
-        Converts the opendrive map msg into a 2D topological map.
-        Parameters
-        ----------
-        map3D : CarlaWorldInfo.msg
-            info about the CARLA world/level (e.g. OPEN Drive map)
-
-        Returns
-        -------
-        None
-        '''
-        
-        #rospy.loginfo(map3D.opendrive)
-
-        client = carla.Client('localhost', 2000)
-        client.set_timeout(2)
-        carla_world = client.get_world()
-        #carla_world = client.load_world('Town01')
-        cmap = carla_world.get_map()
-
-        ###Code Credit: YashBansod
-        # Invert the y axis since we follow UE4 coordinates
-        plt.gca().invert_yaxis()
-        plt.margins(x=0.7, y=0)
-
-        topology = cmap.get_topology()
-        road_list = []
-
-        for wp_pair in topology:
-            current_wp = wp_pair[0]
-            # Check if there is a road with no previus road, this can happen
-            # in opendrive. Then just continue.
-            if current_wp is None:
-                continue
-            # First waypoint on the road that goes from wp_pair[0] to wp_pair[1].
-            current_road_id = current_wp.road_id
-            wps_in_single_road = [current_wp]
-            # While current_wp has the same road_id (has not arrived to next road).
-            while current_wp.road_id == current_road_id:
-                # Check for next waypoints in aprox distance.
-                available_next_wps = current_wp.next(2.0)
-                # If there is next waypoint/s?
-                if available_next_wps:
-                    # We must take the first ([0]) element because next(dist) can
-                    # return multiple waypoints in intersections.
-                    current_wp = available_next_wps[0]
-                    wps_in_single_road.append(current_wp)
-                else: # If there is no more waypoints we can stop searching for more.
-                    break
-            road_list.append(wps_in_single_road)
-        '''
-        # Plot each road (on a different color by default)
-        for road in road_list:
-            plt.plot(
-                [wp.transform.location.x for wp in road],
-                [wp.transform.location.y for wp in road])
-
-        plt.show()
-        '''
-        # tempgraph = nx.DiGraph()
-
-        # list3 = {}
-        # count = 0
-        
-        intersection_nodes = {}
-        road_edges = []
-        for road in road_list:
-            start = (road[0].transform.location.x, road[0].transform.location.y)
-            stop = (road[-1].transform.location.x, road[-1].transform.location.y)
-            edge_data = {}
-
-            # Set nodes
-            intersection_nodes[start] = {'x': start[0], 'y': start[1]}
-            intersection_nodes[stop] = {'x': stop[0], 'y': stop[1]}
-
-            # edge_data['']
-
-            # list1 = [wp.transform.location.x for wp in road]
-            # list2 = [wp.transform.location.y for wp in road]
-            # tuples = [(list1[i], list2[i]) for i in range(0, len(list1))]
-            # tempgraph.add_nodes_from(tuples)
-            # for point in range(0, len(list1)):
-            #     list3[(list1[point], list2[point])] = (list1[point], list2[point])
-            #     count += 1
-        
-        graph = nx.MultiDiGraph()
-        # graph.add_nodes_from(tempgraph.nodes(data=True))
-        # graph.add_edges_from(tempgraph.edges(data=True))
-        graph.add_nodes_from(tempgraph.nodes(data=True))
-        graph.add_edges_from(tempgraph.edges(data=True))
-
-        '''
-        graph = nx.convert_node_labels_to_integers(graph)
-        nx.draw_networkx(graph, pos=list3, arrows=True, node_size=10, font_size=1)
-        plt.show()
-        '''
-        '''
-        for road in road_list:
-            list1 = [wp.transform.location.x for wp in road]
-            list2 = [wp.transform.location.y for wp in road]
-            tuples = [(list1[i], list2[i]) for i in range(0, len(list1))]
-            tempgraph.add_nodes_from(tuples)
-            for u in tempgraph:
-                tempgraph.node[u]['location'] = u
-        graph = nx.DiGraph()
-        graph.add_nodes_from(tempgraph.nodes(data=True))
-        graph.add_edges_from(tempgraph.edges(data=True))
-        graph = nx.convert_node_labels_to_integers(graph)
-        nx.draw_networkx(graph, arrows=True, node_size=10, font_size=1)
-        plt.show()
-        '''
-        nx.write_yaml(graph,
-         "/home/nathan/mtse_catkin/src/navigation/route_planner/scripts/carla_map.yaml")
-        
         rate.sleep()
 
 def handle_location(msg, childframe):
