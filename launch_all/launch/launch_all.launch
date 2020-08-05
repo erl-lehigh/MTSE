@@ -1,8 +1,8 @@
 <launch>
-    <arg name="carla_bridge" default="False"/>
+    <arg name="carla_bridge" default="True"/>
     <arg name="purepursuit" default="True"/>
-    <arg name="costmap" default="True"/>
-    <arg name="rrt" default="True"/>
+    <arg name="costmap" default="False"/>
+    <arg name="rrt" default="False"/>
     <arg name="route_planner" default="True"/>
     <arg name="rviz" default="False"/>
 

@@ -81,11 +81,11 @@ class RoutePlannerNode(object):
             '/home/nathan/mtse_catkin/src/navigation/route_planner/scripts/carla_map.yaml')
 
         # Plot graph
-        self.route_planner.setup_plot()
+        #self.route_planner.setup_plot()
 
         # Gets the destination from the user
-        destination = input("Address of Destination (in quotes) : ")
-
+        #destination = input("Address of Destination (in quotes) : ")
+        destination = 273
         # Converts the address given to latitude and longitude
         self.dest = self.route_planner.geocode(query=destination)
         
@@ -102,7 +102,7 @@ class RoutePlannerNode(object):
         # Publisher for route
         self.route_pub = rospy.Publisher('route', Path, queue_size=10)
         # Publisher for reference path
-        self.reference_path_pub = rospy.Publisher('reference_path', Path,
+        self.reference_path_pub = rospy.Publisher('planned_path', Path,
                                                   queue_size=10)
 
         # Create transform listener
@@ -113,6 +113,9 @@ class RoutePlannerNode(object):
         self.timer = rospy.Timer(self.period, self.control_loop)
 
         rospy.loginfo('[%s] Node started!', self.node_name)
+
+    def set_graph(self, themap):
+        self.graph = themap
 
     def get_vehicle_location(self):
         '''
@@ -207,5 +210,6 @@ if __name__ == '__main__':
     # rospy.spin()
     # Hack to update plot from the main thread due to TkInter issue
     while not rospy.is_shutdown():
-        route_planner_node.route_planner.update_plot()
-        rospy.sleep(route_planner_node.period)
+        #route_planner_node.route_planner.update_plot()
+        #rospy.sleep(route_planner_node.period)
+        route_planner_node.control_loop(event=True)

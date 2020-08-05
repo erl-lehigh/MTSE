@@ -95,8 +95,8 @@ class RoutePlanner(object):
         '''
         # Turns the yaml into a networkx graph
         self.g = nx.read_yaml(yaml_path)
-        nx.draw_networkx(self.g,with_labels=False, node_size=20)
-        plt.show()
+        #nx.draw_networkx(self.g,with_labels=False, node_size=20)
+        #plt.show()
         
 
     def get_route_coords(self, route):

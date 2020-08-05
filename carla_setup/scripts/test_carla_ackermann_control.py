@@ -88,7 +88,7 @@ class VehicleControllerNode(object):
         rospy.Subscriber("/carla/world_info", CarlaWorldInfo, 
             self.convert_to_2D_map)
         # Commands
-        rospy.Subscriber("pure_commands", AckermannDrive, control)
+        rospy.Subscriber("speed_command", AckermannDrive, control)
 
     def process_img(self, image):
         '''
@@ -180,7 +180,7 @@ class VehicleControllerNode(object):
             # While current_wp has the same road_id (has not arrived to next road).
             while current_wp.road_id == current_road_id:
                 # Check for next waypoints in aprox distance.
-                available_next_wps = current_wp.next(20.0)
+                available_next_wps = current_wp.next(2.0)
                 # If there is next waypoint/s?
                 if available_next_wps:
                     # We must take the first ([0]) element because next(dist) can
@@ -190,7 +190,7 @@ class VehicleControllerNode(object):
                 else: # If there is no more waypoints we can stop searching for more.
                     break
             road_list.append(wps_in_single_road)
-
+        '''
         # Plot each road (on a different color by default)
         for road in road_list:
             plt.plot(
@@ -198,32 +198,62 @@ class VehicleControllerNode(object):
                 [wp.transform.location.y for wp in road])
 
         plt.show()
+        '''
+        # tempgraph = nx.DiGraph()
 
-        graph = nx.DiGraph()
+        # list3 = {}
+        # count = 0
+        
+        intersection_nodes = {}
+        road_edges = []
+        for road in road_list:
+            start = (road[0].transform.location.x, road[0].transform.location.y)
+            stop = (road[-1].transform.location.x, road[-1].transform.location.y)
+            edge_data = {}
 
-        list3 = {}
-        count = 0
+            # Set nodes
+            intersection_nodes[start] = {'x': start[0], 'y': start[1]}
+            intersection_nodes[stop] = {'x': stop[0], 'y': stop[1]}
 
+            # edge_data['']
+
+            # list1 = [wp.transform.location.x for wp in road]
+            # list2 = [wp.transform.location.y for wp in road]
+            # tuples = [(list1[i], list2[i]) for i in range(0, len(list1))]
+            # tempgraph.add_nodes_from(tuples)
+            # for point in range(0, len(list1)):
+            #     list3[(list1[point], list2[point])] = (list1[point], list2[point])
+            #     count += 1
+        
+        graph = nx.MultiDiGraph()
+        # graph.add_nodes_from(tempgraph.nodes(data=True))
+        # graph.add_edges_from(tempgraph.edges(data=True))
+        graph.add_nodes_from(tempgraph.nodes(data=True))
+        graph.add_edges_from(tempgraph.edges(data=True))
+
+        '''
+        graph = nx.convert_node_labels_to_integers(graph)
+        nx.draw_networkx(graph, pos=list3, arrows=True, node_size=10, font_size=1)
+        plt.show()
+        '''
+        '''
         for road in road_list:
             list1 = [wp.transform.location.x for wp in road]
             list2 = [wp.transform.location.y for wp in road]
             tuples = [(list1[i], list2[i]) for i in range(0, len(list1))]
-            graph.add_nodes_from(tuples)
-            for point in range(0, len(list1)):
-                list3[(list1[point], list2[point])] = (list1[point], list2[point])
-                count += 1
-
-        '''
-        for u in graph:
-            location = u.transform.location
-            graph.node[u]['location'] = (location.x, location.y)
-        '''
-        nx.draw_networkx(graph, pos=list3, arrows=True, node_size=10, font_size=1)
+            tempgraph.add_nodes_from(tuples)
+            for u in tempgraph:
+                tempgraph.node[u]['location'] = u
+        graph = nx.DiGraph()
+        graph.add_nodes_from(tempgraph.nodes(data=True))
+        graph.add_edges_from(tempgraph.edges(data=True))
+        graph = nx.convert_node_labels_to_integers(graph)
+        nx.draw_networkx(graph, arrows=True, node_size=10, font_size=1)
         plt.show()
-
+        '''
         nx.write_yaml(graph,
          "/home/nathan/mtse_catkin/src/navigation/route_planner/scripts/carla_map.yaml")
-
+        
         rate.sleep()
 
 def handle_location(msg, childframe):
@@ -245,19 +275,19 @@ def handle_location(msg, childframe):
     br.sendTransform(t)
 
 
-def control(s, a, j, st, av):
+def control(cmd_msgs):
         '''
         Drives the vehicle based on given values
         Parameters
         ----------
         s : float
             desired speed (m/s)
+        st : float
+            desired steering angle (radians)
         a : float
             desired acceleration (m/s^2)
         j : float
             deseired change in acceleration (jerk) (m/s^3)
-        st : float
-            desired steering angle (radians)
         av : float
             desired steering angle velocity (radians/second)
 
@@ -265,10 +295,13 @@ def control(s, a, j, st, av):
         -------
         None
         '''
-        ackermann_msg.speed = s
+        a=1.0
+        j=0.1
+        av=1.0
+        ackermann_msg.speed = cmd_msgs.speed
         ackermann_msg.acceleration = a
         ackermann_msg.jerk = j
-        ackermann_msg.steering_angle =  st
+        ackermann_msg.steering_angle =  cmd_msgs.steering_angle
         ackermann_msg.steering_angle_velocity = av
         rospy.loginfo('Desired, s: %f, a: %f, j: %f, st: %f, av: %f', 
             ackermann_msg.speed, ackermann_msg.acceleration, ackermann_msg.jerk, ackermann_msg.steering_angle, ackermann_msg.steering_angle_velocity) # Prints text
@@ -303,9 +336,9 @@ if __name__ == '__main__':
             right = pi / 3.0
             left = pi / -3.0
 
-            control(5 ,1 ,0.3 ,straight ,0.2)
-            control(5 ,1 ,0.3 ,right, 0.2)
-            control(5 ,1 ,0.3 ,left, 0.2)
+            #control(5 ,straight ,1 ,0.3 ,0.2)
+            #control(5 ,right, 1 ,0.3 , 0.2)
+            #control(5 ,left, 1 ,0.3 , 0.2)
 
     except rospy.ROSInterruptException:
         pass
