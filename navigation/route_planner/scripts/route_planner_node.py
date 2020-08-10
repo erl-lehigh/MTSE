@@ -184,23 +184,26 @@ class RoutePlannerNode(object):
             rospy.logdebug('Vehicle position not available!')
             return
 
-        route = self.route_planner.get_route(orig, self.dest)
-        route_coords = self.route_planner.get_route_coords(route)
-        road_coords = self.route_planner.get_road_coords(route)
-        self.route_planner.plot_route(road_coords)
-        rospy.logwarn('[route planner] coords route:', road_coords)
+        self.route_planner.plot_route([(orig[0], orig[1]), (orig[0], orig[1])])
+        rospy.logwarn('[planner ] %s', orig)
 
-        # Publish route
-        self.route_msg.header.stamp = rospy.Time.now()  # Set the stamp
-        self.route_msg.poses = self.coordinates_to_poses(route_coords)
-        self.route_pub.publish(self.route_msg)
-        rospy.logdebug('Route message: %s', self.route_msg)
+        # route = self.route_planner.get_route(orig, self.dest)
+        # route_coords = self.route_planner.get_route_coords(route)
+        # road_coords = self.route_planner.get_road_coords(route)
+        # self.route_planner.plot_route(road_coords)
+        # rospy.logwarn('[route planner] coords route:', road_coords)
 
-        # Publish reference path associated with roads
-        self.path_msg.header.stamp = rospy.Time.now()  # Set the stamp
-        self.path_msg.poses = self.coordinates_to_poses(road_coords)
-        self.reference_path_pub.publish(self.path_msg)
-        rospy.logdebug('Reference path: %s', self.path_msg)
+        # # Publish route
+        # self.route_msg.header.stamp = rospy.Time.now()  # Set the stamp
+        # self.route_msg.poses = self.coordinates_to_poses(route_coords)
+        # self.route_pub.publish(self.route_msg)
+        # rospy.logdebug('Route message: %s', self.route_msg)
+
+        # # Publish reference path associated with roads
+        # self.path_msg.header.stamp = rospy.Time.now()  # Set the stamp
+        # self.path_msg.poses = self.coordinates_to_poses(road_coords)
+        # self.reference_path_pub.publish(self.path_msg)
+        # rospy.logdebug('Reference path: %s', self.path_msg)
 
 
 if __name__ == '__main__':
@@ -213,6 +216,6 @@ if __name__ == '__main__':
     # Hack to update plot from the main thread due to TkInter issue
     while not rospy.is_shutdown():
         pass
-        # route_planner_node.route_planner.update_plot()
+        route_planner_node.route_planner.update_plot()
         # rospy.sleep(route_planner_node.period)
         # route_planner_node.control_loop(event=True)
