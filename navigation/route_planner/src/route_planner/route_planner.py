@@ -94,10 +94,7 @@ class RoutePlanner(object):
         
         '''
         # Turns the yaml into a networkx graph
-        self.g = nx.read_yaml(yaml_path)
-        #nx.draw_networkx(self.g,with_labels=False, node_size=20)
-        #plt.show()
-        
+        self.g = nx.read_yaml(yaml_path)        
 
     def get_route_coords(self, route):
         '''
@@ -156,6 +153,7 @@ class RoutePlanner(object):
         # Find the nearest intersection to the destination point
         destination_node = ox.get_nearest_node(self.g, destination)
         # Get the shortest path from the current location to the destination
+        # return nx.shortest_path(self.g, 870, 869)
         return nx.shortest_path(self.g, origin_node, destination_node)
 
     def geocode(self, query):

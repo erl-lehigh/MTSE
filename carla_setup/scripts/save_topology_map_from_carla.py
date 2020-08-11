@@ -35,8 +35,9 @@ def convert_to_2D_map():
     cmap = carla_world.get_map()
 
     ###Code Credit: YashBansod
-    # Invert the y axis since we follow UE4 coordinates
-    plt.gca().invert_yaxis()
+    # Invert the x and y axes since we follow UE4 coordinates
+    # plt.gca().invert_yaxis()
+    # plt.gca().invert_xaxis()
     plt.margins(x=0.7, y=0)
     plt.axis('equal')
 
@@ -77,11 +78,12 @@ def convert_to_2D_map():
     
     intersection_nodes = {}
     road_edges = []
+    # Negative y values to account for UE4 integration shift
     for road in road_list:
-        start = (road[0].transform.location.x, road[0].transform.location.y)
-        stop = (road[-1].transform.location.x, road[-1].transform.location.y)
+        start = (road[0].transform.location.x, -road[0].transform.location.y)
+        stop = (road[-1].transform.location.x, -road[-1].transform.location.y)
         
-        xy = [(wp.transform.location.x, wp.transform.location.y) for wp in road]
+        xy = [(wp.transform.location.x, -wp.transform.location.y) for wp in road]
         edge_data = {'geometry': LineString(xy)}
 
         road_edges.append((start, stop, edge_data))
@@ -100,9 +102,8 @@ def convert_to_2D_map():
     positions = {node: (data['x'], data['y'])
                  for node, data in graph.nodes(data=True)}
     # nx.draw_networkx(graph, pos=positions, arrows=True,
-    #                     node_size=10, font_size=1)
+    #                     node_size=10, font_size=1)                     
     # plt.show()
-
    
     origin = (0, 0)
     origin_node = ox.get_nearest_node(graph, origin)
