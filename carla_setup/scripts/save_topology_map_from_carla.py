@@ -31,7 +31,7 @@ def convert_to_2D_map():
     client = carla.Client('localhost', 2000)
     client.set_timeout(2)
     carla_world = client.get_world()
-    #carla_world = client.load_world('Town01')
+    # carla_world = client.load_world('Town01')
     cmap = carla_world.get_map()
 
     ###Code Credit: YashBansod
@@ -96,6 +96,9 @@ def convert_to_2D_map():
     graph = nx.MultiDiGraph()
     graph.add_nodes_from(intersection_nodes.items())
     graph.add_edges_from(road_edges)
+    
+
+    # print(next(nx.strongly_connected_components(graph)))
 
     graph = nx.convert_node_labels_to_integers(graph)
     
@@ -104,7 +107,7 @@ def convert_to_2D_map():
     # nx.draw_networkx(graph, pos=positions, arrows=True,
     #                     node_size=10, font_size=1)                     
     # plt.show()
-   
+
     origin = (0, 0)
     origin_node = ox.get_nearest_node(graph, origin)
     print('origin:', origin_node)

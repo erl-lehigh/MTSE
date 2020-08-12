@@ -85,7 +85,7 @@ class RoutePlannerNode(object):
 
         # Gets the destination from the user
         #destination = input("Address of Destination (in quotes) : ")
-        destination = (220.0 , -8.0)
+        destination = (220.091 , -9.808)
         # Converts the address given to latitude and longitude
         #self.dest = self.route_planner.geocode(query=destination)
         self.dest = destination
@@ -184,26 +184,27 @@ class RoutePlannerNode(object):
             rospy.logdebug('Vehicle position not available!')
             return
 
-        self.route_planner.plot_route([(orig[0], orig[1]), (orig[0], orig[1])])
+        self.route_planner.plot_route(
+            [(orig[0], orig[1]), (self.dest[0], self.dest[1])])
         # rospy.logwarn('[planner ] %s', orig)
 
         route = self.route_planner.get_route(orig, self.dest)
         route_coords = self.route_planner.get_route_coords(route)
         road_coords = self.route_planner.get_road_coords(route)
         self.route_planner.plot_route(road_coords)
-        rospy.logwarn('[route planner] coords route:', road_coords)
+        # rospy.logwarn('[route planner] coords route:', road_coords)
 
         # Publish route
         self.route_msg.header.stamp = rospy.Time.now()  # Set the stamp
         self.route_msg.poses = self.coordinates_to_poses(route_coords)
         self.route_pub.publish(self.route_msg)
-        rospy.logdebug('Route message: %s', self.route_msg)
+        # rospy.logdebug('Route message: %s', self.route_msg)
 
         # Publish reference path associated with roads
         self.path_msg.header.stamp = rospy.Time.now()  # Set the stamp
         self.path_msg.poses = self.coordinates_to_poses(road_coords)
         self.reference_path_pub.publish(self.path_msg)
-        rospy.logdebug('Reference path: %s', self.path_msg)
+        # rospy.logdebug('Reference path: %s', self.path_msg)
 
 
 if __name__ == '__main__':

@@ -149,11 +149,15 @@ class RoutePlanner(object):
             the path connecting the origin and the destination
         '''
         # Find the nearest intersection to the current location
-        origin_node = ox.get_nearest_node(self.g, origin)
+        # Has to be inverted due to networkx using (y,x)
+        origin_inverted = (origin[1],origin[0])
+        destination_inverted = (destination[1],destination[0])
+        origin_node = ox.get_nearest_node(
+            self.g, origin_inverted, method='euclidean')
         # Find the nearest intersection to the destination point
-        destination_node = ox.get_nearest_node(self.g, destination)
+        destination_node = ox.get_nearest_node(
+            self.g, destination_inverted, method='euclidean')
         # Get the shortest path from the current location to the destination
-        # return nx.shortest_path(self.g, 870, 869)
         return nx.shortest_path(self.g, origin_node, destination_node)
 
     def geocode(self, query):
