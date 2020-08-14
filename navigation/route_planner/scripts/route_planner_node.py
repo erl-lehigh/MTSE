@@ -184,9 +184,8 @@ class RoutePlannerNode(object):
             rospy.logdebug('Vehicle position not available!')
             return
 
-        self.route_planner.plot_route(
-            [(orig[0], orig[1]), (self.dest[0], self.dest[1])])
-        # rospy.logwarn('[planner ] %s', orig)
+        # Shows a straight line between the current location and the destination
+        self.route_planner.plot_route([orig, self.dest])
 
         route = self.route_planner.get_route(orig, self.dest)
         route_coords = self.route_planner.get_route_coords(route)
