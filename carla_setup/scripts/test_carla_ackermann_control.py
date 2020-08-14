@@ -175,9 +175,9 @@ def control(cmd_msgs):
         -------
         None
         '''
-        a=1.0
-        j=0.1
-        av=1.0
+        a=0.1
+        j=0.01
+        av=0.1
         ackermann_msg.speed = cmd_msgs.speed
         ackermann_msg.acceleration = a
         ackermann_msg.jerk = j
@@ -200,7 +200,7 @@ if __name__ == '__main__':
         ackermann_msg = AckermannDrive()
         vehicle_info_msg = CarlaEgoVehicleInfo()
         # Sets how often the messages are sent
-        rate = rospy.Rate(0.2) # 0.2hz
+        rate = rospy.Rate(2) # 2hz
         # Initializes the vehicle type
         vehicle_info_msg.type = "prius"
              

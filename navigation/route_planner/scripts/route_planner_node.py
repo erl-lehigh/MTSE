@@ -113,10 +113,18 @@ class RoutePlannerNode(object):
         # Crate timers
         self.timer = rospy.Timer(self.period, self.control_loop)
 
+
+        # Subscribers
+        rospy.Subscriber("/target",PoseStamped, 
+            self.plot_target)
+
         rospy.loginfo('[%s] Node started!', self.node_name)
 
     def set_graph(self, themap):
         self.graph = themap
+
+    def plot_target(self, target_point):
+        self.route_planner.plot_route([(target_point.pose.position.x, target_point.pose.position.y), (target_point.pose.position.x, target_point.pose.position.y)])
 
     def get_vehicle_location(self):
         '''

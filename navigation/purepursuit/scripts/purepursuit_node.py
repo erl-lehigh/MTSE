@@ -70,7 +70,7 @@ class PurePursuitNode(object):
         self.child_frame = rospy.get_param('~child_frame', 'vehicle')
         lookahead = rospy.get_param('~lookahead', 4)
         wheelbase = rospy.get_param('~wheelbase', 1)
-        speed = rospy.get_param('~speed', 3)
+        speed = rospy.get_param('~speed', 1)
 
         self.period = rospy.Duration(1.0 / self.rate)
 

@@ -203,9 +203,9 @@ class RoutePlanner(object):
         -------
         None
         '''
-        self.figure, self.ax = ox.plot_graph(self.g, show=False, close=False, annotate=True)
+        self.figure, self.ax = ox.plot_graph(self.g, show=False, close=False)
         # Create route line
-        self.route_line, = plt.plot([], [], 'D-', color='red', linewidth=6)
+        self.route_line, = plt.plot([], [], 'D-', color='red', linewidth=2)
         plt.draw() # Draw canvas and mark as changed
         plt.pause(0.001) # Display changes
 

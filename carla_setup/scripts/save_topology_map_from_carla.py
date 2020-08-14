@@ -106,18 +106,34 @@ def convert_to_2D_map():
     #         'y': -waypoint.transform.location.y}
     
     # graph.add_nodes_from(intersection_nodes.items())
+    xy_topology = list()
+    for wp1, wp2 in topology:
+        xy_topology.append(((wp1.transform.location.x, -wp1.transform.location.y),(wp2.transform.location.x, -wp2.transform.location.y)))
+    print(xy_topology)
 
+    graph.add_edges_from(xy_topology)
+    for source, target in graph.edges():
+        graph[source][target][0]['geometry'] = LineString(
+            [(source[0], source[1]),
+             (target[0], target[1])])
+    for n1, n2 in list(graph.edges()):
+        graph.node[n1]['x'] = n1[0]
+        graph.node[n1]['y'] = n1[1]
+        graph.node[n2]['x'] = n2[0]
+        graph.node[n2]['y'] = n2[1]
+
+    '''
     graph.add_edges_from(topology)
     for source, target in graph.edges():
         graph[source][target][0]['geometry'] = LineString(
-            [(source.transform.location.x, source.transform.location.y),
-             (target.transform.location.x, target.transform.location.y)])
+            [(source.transform.location.x, -source.transform.location.y),
+             (target.transform.location.x, -target.transform.location.y)])
     for n1, n2 in list(graph.edges()):
         graph.node[n1]['x'] = n1.transform.location.x
-        graph.node[n1]['y'] = n1.transform.location.y
+        graph.node[n1]['y'] = -n1.transform.location.y
         graph.node[n2]['x'] = n2.transform.location.x
-        graph.node[n2]['y'] = n2.transform.location.y
-
+        graph.node[n2]['y'] = -n2.transform.location.y
+    '''
     # nx.set_edge_attributes(graph, edge_data)
     # print(graph.edges(data=True))
     # print(graph.nodes(data=True))
