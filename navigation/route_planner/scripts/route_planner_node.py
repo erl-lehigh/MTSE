@@ -85,7 +85,8 @@ class RoutePlannerNode(object):
 
         # Gets the destination from the user
         #destination = input("Address of Destination (in quotes) : ")
-        destination = (220.091 , -9.808)
+        # destination = (220.091 , -9.808)
+        destination = (230.155 , -50.589)
         # Converts the address given to latitude and longitude
         #self.dest = self.route_planner.geocode(query=destination)
         self.dest = destination
@@ -124,7 +125,8 @@ class RoutePlannerNode(object):
         self.graph = themap
 
     def plot_target(self, target_point):
-        self.route_planner.plot_route([(target_point.pose.position.x, target_point.pose.position.y), (target_point.pose.position.x, target_point.pose.position.y)])
+        self.route_planner.plot_route(
+            [(target_point.pose.position.x, target_point.pose.position.y), (target_point.pose.position.x, target_point.pose.position.y)],color='green')
 
     def get_vehicle_location(self):
         '''
@@ -140,14 +142,14 @@ class RoutePlannerNode(object):
             location of the vehicle
         '''
         try:
-            trans = self.tf_buffer.lookup_transform(self.child_frame,
-                                                    self.parent_frame,
+            trans = self.tf_buffer.lookup_transform(self.parent_frame,
+                                                    self.child_frame,
                                                     rospy.Time.now(),
                                                     self.period)
         except (tf2_ros.LookupException, tf2_ros.ConnectivityException,
                 tf2_ros.ExtrapolationException):
             return
-        return -trans.transform.translation.x, -trans.transform.translation.y
+        return trans.transform.translation.x, trans.transform.translation.y
 
     def coordinates_to_poses(self, coords):
         '''
@@ -188,12 +190,12 @@ class RoutePlannerNode(object):
         '''
         # Get the current location
         orig = self.get_vehicle_location()
+        # Plot the current location as a black diamond
+        self.route_planner.plot_route([orig, orig],'black')
+        rospy.loginfo('Current Location: (%f, %f)', orig[0], orig[1])
         if orig is None:
             rospy.logdebug('Vehicle position not available!')
             return
-
-        # Shows a straight line between the current location and the destination
-        self.route_planner.plot_route([orig, self.dest])
 
         route = self.route_planner.get_route(orig, self.dest)
         route_coords = self.route_planner.get_route_coords(route)

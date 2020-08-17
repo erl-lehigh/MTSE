@@ -191,13 +191,14 @@ class RoutePlanner(object):
             raise Exception('Nominatim geocoder returned no results for query "{}"'.format(query))
 
 
-    def setup_plot(self):
+    def setup_plot(self, color='red'):
         '''
         Displays the blank map.
 
         Parameters
         ----------
-        None
+        color : string
+            the color to plot in
 
         Returns
         -------
@@ -205,11 +206,11 @@ class RoutePlanner(object):
         '''
         self.figure, self.ax = ox.plot_graph(self.g, show=False, close=False)
         # Create route line
-        self.route_line, = plt.plot([], [], 'D-', color='red', linewidth=2)
+        self.route_line, = plt.plot([], [], 'D-', color=color, linewidth=2)
         plt.draw() # Draw canvas and mark as changed
         plt.pause(0.001) # Display changes
 
-    def plot_route(self, route_coords):
+    def plot_route(self, route_coords, color='red'):
         '''
         Plots the route onto the map.
 
@@ -217,7 +218,9 @@ class RoutePlanner(object):
         ----------
         route_coords : list
             the coordinates of each point along the route 
-
+        color : string
+            the color to plot in
+            
         Returns
         -------
         None
@@ -231,6 +234,7 @@ class RoutePlanner(object):
         if not route_coords:
             return
         self.route_line.set_data(zip(*route_coords))
+        self.route_line.set_color(color)
 
     def update_plot(self):
         '''

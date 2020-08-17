@@ -109,8 +109,8 @@ class PurePursuitNode(object):
             vehicle coordinates (x,y) and orientation (angle)
         '''
         try:
-            trans = self.tf_buffer.lookup_transform(self.child_frame,
-                                                    self.parent_frame,
+            trans = self.tf_buffer.lookup_transform(self.parent_frame,
+                                                    self.child_frame,
                                                     rospy.Time.now(),
                                                     self.period)
         except (tf2_ros.LookupException, tf2_ros.ConnectivityException,

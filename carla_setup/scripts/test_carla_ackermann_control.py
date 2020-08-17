@@ -116,12 +116,12 @@ class VehicleControllerNode(object):
         -------
         None
         '''
-        rospy.loginfo('lat: %f, lon: %f', nav.latitude, nav.longitude)
+        # rospy.loginfo('lat: %f, lon: %f', nav.latitude, nav.longitude)
         rate.sleep()
 
     def print_odometry_location(self, loc):
         '''
-        Converts the location msg into an (x,y,z) point.
+        Converts the location msg into an (x,y,z) point and sends it to the tf.
         Parameters
         ----------
         loc : nav_msgs.msg.Odometry
@@ -131,9 +131,9 @@ class VehicleControllerNode(object):
         -------
         None
         '''
-        handle_location(loc.pose.pose, "vehicle")
-        rospy.loginfo('x: %f, y: %f, z: %f', loc.pose.pose.position.x ,
-             loc.pose.pose.position.y, loc.pose.pose.position.z)
+        handle_location(loc.pose.pose, "ego_vehicle")
+        # rospy.loginfo('x: %f, y: %f, z: %f', loc.pose.pose.position.x ,
+            #  loc.pose.pose.position.y, loc.pose.pose.position.z)
         rate.sleep()
 
 def handle_location(msg, childframe):
@@ -141,7 +141,7 @@ def handle_location(msg, childframe):
     t = TransformStamped()
 
     t.header.stamp = rospy.Time.now()
-    t.header.frame_id = "world"
+    t.header.frame_id = "map"
     t.child_frame_id = childframe
     t.transform.translation.x = msg.position.x
     t.transform.translation.y = msg.position.y
@@ -151,7 +151,6 @@ def handle_location(msg, childframe):
     t.transform.rotation.y = q.y
     t.transform.rotation.z = q.z
     t.transform.rotation.w = q.w
-
     br.sendTransform(t)
 
 
@@ -175,16 +174,16 @@ def control(cmd_msgs):
         -------
         None
         '''
-        a=0.1
-        j=0.01
-        av=0.1
+        a=1.2
+        j=0.2
+        av=1.0
         ackermann_msg.speed = cmd_msgs.speed
         ackermann_msg.acceleration = a
         ackermann_msg.jerk = j
-        ackermann_msg.steering_angle =  cmd_msgs.steering_angle
+        ackermann_msg.steering_angle =  -cmd_msgs.steering_angle
         ackermann_msg.steering_angle_velocity = av
-        rospy.loginfo('Desired, s: %f, a: %f, j: %f, st: %f, av: %f', 
-            ackermann_msg.speed, ackermann_msg.acceleration, ackermann_msg.jerk, ackermann_msg.steering_angle, ackermann_msg.steering_angle_velocity) # Prints text
+        rospy.loginfo(
+            'Desired\n speed: %5.3f m/s\n acceleration: %5.3f m/s^2\n jerk: %5.3f m/s^3\n steering angle: %5.4f radians\n angular velocity: %5.4f radians/s', ackermann_msg.speed, ackermann_msg.acceleration, ackermann_msg.jerk, ackermann_msg.steering_angle, ackermann_msg.steering_angle_velocity) # Prints text
         # Broadcasts the message
         vehicle_node.ack_control_pub.publish(ackermann_msg) 
         rate.sleep() # Sleeps for time equal to the rate
@@ -200,7 +199,7 @@ if __name__ == '__main__':
         ackermann_msg = AckermannDrive()
         vehicle_info_msg = CarlaEgoVehicleInfo()
         # Sets how often the messages are sent
-        rate = rospy.Rate(2) # 2hz
+        rate = rospy.Rate(5) # hz
         # Initializes the vehicle type
         vehicle_info_msg.type = "prius"
              
@@ -213,8 +212,8 @@ if __name__ == '__main__':
         while not rospy.is_shutdown():
             pi = np.pi
             straight = 0.0
-            right = pi / 3.0
-            left = pi / -3.0
+            left = pi / 3.0
+            right = pi / -3.0
 
             #control(5 ,straight ,1 ,0.3 ,0.2)
             #control(5 ,right, 1 ,0.3 , 0.2)
