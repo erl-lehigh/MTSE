@@ -107,13 +107,16 @@ class RoutePlannerNode(object):
         # Publisher for reference path
         self.reference_path_pub = rospy.Publisher('planned_path', Path,
                                                   queue_size=10)
+        self.reference_path_viz_pub = rospy.Publisher('planned_path_viz', Path,
+                                                  queue_size=10)
+        self.pub_ref = False
 
         # Create transform listener
         self.tf_buffer = tf2_ros.Buffer()
         self.ts_listener = tf2_ros.TransformListener(self.tf_buffer)
 
         # Crate timers
-        self.timer = rospy.Timer(self.period, self.control_loop)
+        self.timer = rospy.Timer(self.period, self.control_loop)#, oneshot=True)
 
 
         # Subscribers
@@ -126,8 +129,9 @@ class RoutePlannerNode(object):
         self.graph = themap
 
     def plot_target(self, target_point):
-        self.route_planner.plot_route(
-            [(target_point.pose.position.x, target_point.pose.position.y), (target_point.pose.position.x, target_point.pose.position.y)],color='green')
+        print()
+        # self.route_planner.plot_route(
+        #     [(target_point.pose.position.x, target_point.pose.position.y), (target_point.pose.position.x, target_point.pose.position.y)],color='green')
 
     def get_vehicle_location(self):
         '''
@@ -190,9 +194,12 @@ class RoutePlannerNode(object):
         None
         '''
         # Get the current location
-        orig = self.get_vehicle_location()
+        if not self.pub_ref:
+            self.orig = self.get_vehicle_location()
+            self.pub_ref = True
+        orig = self.orig
         # Plot the current location as a black diamond
-        self.route_planner.plot_route([orig, orig],'black')
+        # self.route_planner.plot_route([orig, orig],'black')
         rospy.loginfo('Current Location: (%f, %f)', orig[0], orig[1])
         if orig is None:
             rospy.logdebug('Vehicle position not available!')
@@ -214,6 +221,7 @@ class RoutePlannerNode(object):
         self.path_msg.header.stamp = rospy.Time.now()  # Set the stamp
         self.path_msg.poses = self.coordinates_to_poses(road_coords)
         self.reference_path_pub.publish(self.path_msg)
+        self.reference_path_viz_pub.publish(self.path_msg)
         # rospy.logdebug('Reference path: %s', self.path_msg)
 
 
