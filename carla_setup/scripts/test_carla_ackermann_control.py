@@ -174,13 +174,13 @@ def control(cmd_msgs):
         -------
         None
         '''
-        a=1.2
+        a=1.0
         j=0.2
-        av=1.0
+        av=1.2
         ackermann_msg.speed = cmd_msgs.speed
         ackermann_msg.acceleration = a
         ackermann_msg.jerk = j
-        ackermann_msg.steering_angle =  -cmd_msgs.steering_angle
+        ackermann_msg.steering_angle = -cmd_msgs.steering_angle
         ackermann_msg.steering_angle_velocity = av
         rospy.loginfo(
             'Desired\n speed: %5.3f m/s\n acceleration: %5.3f m/s^2\n jerk: %5.3f m/s^3\n steering angle: %5.4f radians\n angular velocity: %5.4f radians/s', ackermann_msg.speed, ackermann_msg.acceleration, ackermann_msg.jerk, ackermann_msg.steering_angle, ackermann_msg.steering_angle_velocity) # Prints text
@@ -201,7 +201,7 @@ if __name__ == '__main__':
         # Sets how often the messages are sent
         rate = rospy.Rate(5) # hz
         # Initializes the vehicle type
-        vehicle_info_msg.type = "prius"
+        vehicle_info_msg.type = "model3"
              
         # Message publication
         rospy.loginfo('Set vehicle type to %s', vehicle_info_msg.type)
