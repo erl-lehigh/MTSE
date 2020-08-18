@@ -88,7 +88,8 @@ class RoutePlannerNode(object):
         # destination = (220.091 , -9.808) # works
         # destination = (230.155 , -50.589) # works
         # destination = (233.775 , -50.05) # works *new*
-        destination = (152.222 , 66.357) 
+        # destination = (152.222 , 66.357) # works *newer*
+        destination = (93.383 , 132.856)
         # Converts the address given to latitude and longitude
         #self.dest = self.route_planner.geocode(query=destination)
         self.dest = destination
