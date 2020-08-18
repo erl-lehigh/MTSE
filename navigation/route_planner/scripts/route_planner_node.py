@@ -86,8 +86,9 @@ class RoutePlannerNode(object):
         # Gets the destination from the user
         #destination = input("Address of Destination (in quotes) : ")
         # destination = (220.091 , -9.808) # works
-        destination = (230.155 , -50.589) # works
-        # destination = (104.646 , -59.041)
+        # destination = (230.155 , -50.589) # works
+        destination = (233.775 , -50.05) # works *new*
+        # destination = (152.222 , 66.357) 
         # Converts the address given to latitude and longitude
         #self.dest = self.route_planner.geocode(query=destination)
         self.dest = destination
@@ -129,9 +130,8 @@ class RoutePlannerNode(object):
         self.graph = themap
 
     def plot_target(self, target_point):
-        print()
-        # self.route_planner.plot_route(
-        #     [(target_point.pose.position.x, target_point.pose.position.y), (target_point.pose.position.x, target_point.pose.position.y)],color='green')
+        self.route_planner.plot_route(
+            [(target_point.pose.position.x, target_point.pose.position.y), (target_point.pose.position.x, target_point.pose.position.y)],color='green')
 
     def get_vehicle_location(self):
         '''
@@ -197,9 +197,9 @@ class RoutePlannerNode(object):
         if not self.pub_ref:
             self.orig = self.get_vehicle_location()
             self.pub_ref = True
-        orig = self.orig
+        orig = self.get_vehicle_location()
         # Plot the current location as a black diamond
-        # self.route_planner.plot_route([orig, orig],'black')
+        self.route_planner.plot_route([orig, orig],'black')
         rospy.loginfo('Current Location: (%f, %f)', orig[0], orig[1])
         if orig is None:
             rospy.logdebug('Vehicle position not available!')

@@ -10,6 +10,7 @@ import rospy
 import networkx as nx
 import tf_conversions
 import tf2_ros
+import math
 
 
 from cv_bridge import CvBridge
@@ -18,7 +19,7 @@ from ackermann_msgs.msg import AckermannDrive
 from carla_msgs.msg import CarlaEgoVehicleInfo 
 from sensor_msgs.msg import Image, NavSatFix
 from nav_msgs.msg import Odometry
-from geometry_msgs.msg import PoseWithCovariance, TwistWithCovariance, TransformStamped
+from geometry_msgs.msg import PoseWithCovariance, TwistWithCovariance, TransformStamped, PolygonStamped, Point32
 from carla_ros_bridge.world_info import CarlaWorldInfo
 import matplotlib.pyplot as plt
 
@@ -73,6 +74,9 @@ class VehicleControllerNode(object):
         # Node for setting the vehicle information
         self.vehicle_info_pub = rospy.Publisher(
             '/carla/ego_vehicle/vehicle_info', CarlaEgoVehicleInfo, queue_size=10)
+        # Node for polygon in rviz
+        self.vehicle_base_pub = rospy.Publisher(
+            '/vehicle_polygon_base', PolygonStamped, queue_size=10)
             
         #---Subscribers---#
         # Camera
@@ -132,6 +136,7 @@ class VehicleControllerNode(object):
         None
         '''
         handle_location(loc.pose.pose, "ego_vehicle")
+        # create_polygon(loc.pose.pose)
         # rospy.loginfo('x: %f, y: %f, z: %f', loc.pose.pose.position.x ,
             #  loc.pose.pose.position.y, loc.pose.pose.position.z)
         rate.sleep()
@@ -152,6 +157,26 @@ def handle_location(msg, childframe):
     t.transform.rotation.z = q.z
     t.transform.rotation.w = q.w
     br.sendTransform(t)
+
+def create_polygon(msg):
+        poly_msg = PolygonStamped()
+        poly_msg.header.stamp = rospy.Time.now()
+        poly_msg.header.frame_id = "map"
+        poly_msg.polygon.points.append(Point32())
+        poly_msg.polygon.points.append(Point32())
+        poly_msg.polygon.points.append(Point32())
+        poly_msg.polygon.points.append(Point32())
+        mult = 5
+        poly_msg.polygon.points[0].x = msg.position.x+mult*math.cos(math.atan2(msg.orientation.y, msg.orientation.x))
+        poly_msg.polygon.points[0].y = msg.position.y+mult*math.sin(math.atan2(msg.orientation.y, msg.orientation.x))
+        poly_msg.polygon.points[1].x = msg.position.x+mult*math.cos(math.atan2(msg.orientation.y, msg.orientation.x))
+        poly_msg.polygon.points[1].y = msg.position.y-mult*math.sin(math.atan2(msg.orientation.y, msg.orientation.x))
+        poly_msg.polygon.points[2].x = msg.position.x-mult*math.cos(math.atan2(msg.orientation.y, msg.orientation.x))
+        poly_msg.polygon.points[2].y = msg.position.y-mult*math.sin(math.atan2(msg.orientation.y, msg.orientation.x))
+        poly_msg.polygon.points[3].x = msg.position.x-mult*math.cos(math.atan2(msg.orientation.y, msg.orientation.x))
+        poly_msg.polygon.points[3].y = msg.position.y+mult*math.sin(math.atan2(msg.orientation.y, msg.orientation.x))
+        # Broadcasts the message
+        vehicle_node.vehicle_base_pub.publish(poly_msg)
 
 
 def control(cmd_msgs):
