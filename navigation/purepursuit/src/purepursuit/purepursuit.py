@@ -111,10 +111,10 @@ class PurePursuit:
         self.path.interpolate(dist_on_path) : shapely.geometry.Point
             computed future point
         '''
-        closest_dist = min(self.vehicle_position.distance(self.closest_point()),
-                           self.lookahead)
-        dist_on_path = (self.lookahead ** 2 - closest_dist ** 2) ** 0.5
-        return self.path.interpolate(closest_dist + self.lookahead)
+        # closest_dist = self.vehicle_position.distance(self.closest_point())
+        # dist_on_path = (self.lookahead ** 2 - closest_dist ** 2) ** 0.5
+        return self.path.interpolate(self.path.project(
+            self.vehicle_position) + self.lookahead)
 
     def compute_speed(self):
         '''

@@ -87,8 +87,8 @@ class RoutePlannerNode(object):
         #destination = input("Address of Destination (in quotes) : ")
         # destination = (220.091 , -9.808) # works
         # destination = (230.155 , -50.589) # works
-        destination = (233.775 , -50.05) # works *new*
-        # destination = (152.222 , 66.357) 
+        # destination = (233.775 , -50.05) # works *new*
+        destination = (152.222 , 66.357) 
         # Converts the address given to latitude and longitude
         #self.dest = self.route_planner.geocode(query=destination)
         self.dest = destination
@@ -205,10 +205,10 @@ class RoutePlannerNode(object):
             rospy.logdebug('Vehicle position not available!')
             return
 
-        route = self.route_planner.get_route(orig, self.dest)
+        route = self.route_planner.get_route(self.orig, self.dest)
         route_coords = self.route_planner.get_route_coords(route)
         road_coords = self.route_planner.get_road_coords(route)
-        self.route_planner.plot_route(road_coords)
+        # self.route_planner.plot_route(road_coords)
         # rospy.logwarn('[route planner] coords route:', road_coords)
 
         # Publish route
