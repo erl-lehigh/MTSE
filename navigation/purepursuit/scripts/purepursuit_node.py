@@ -16,7 +16,6 @@ from purepursuit import PurePursuit
 class PurePursuitNode(object):
     '''
     A class to represent a pure pursuit node in ROS
-
     Attributes
     ----------
     node_name : str
@@ -43,7 +42,6 @@ class PurePursuitNode(object):
         the listener for ROS transforms
     timer : rospy.Timer
         the control loop timer
-
     Methods
     -------
     set_path(msg):
@@ -54,13 +52,11 @@ class PurePursuitNode(object):
         and steering angle
     get_vehicle_pose():
         returns the vehicle coordinates (position) for purepursuit computation
-
     '''
 
     def __init__(self):
         '''
         Constructs all the necessary attributes for the PurePursuitNode object.
-
         '''
         self.node_name = rospy.get_name()
 
@@ -98,11 +94,9 @@ class PurePursuitNode(object):
     def get_vehicle_pose(self):
         '''
         Returns the vehicle coordinates (position) for purepursuit computation.
-
         Parameters
         ----------
         None
-
         Returns
         -------
         tuple
@@ -126,12 +120,10 @@ class PurePursuitNode(object):
         '''
         Generates a path LineString (to be tracked) from a set of position
         coordinates (pose).
-
         Parameters
         ----------
         msg :  nav_msgs.msg.Path
             ROS navigation path message
-
         Returns
         -------
         None
@@ -147,12 +139,10 @@ class PurePursuitNode(object):
         '''
         Publishes AckermannDrive msg consisting of the computed vehicle speed
         and steering angle if a path is passed.
-
         Parameters
         ----------
         event=None : rospy.TimerEvent
             information about the event that generated this call
-
         Returns
         -------
         None

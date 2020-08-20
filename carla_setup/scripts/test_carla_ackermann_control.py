@@ -19,7 +19,7 @@ from ackermann_msgs.msg import AckermannDrive
 from carla_msgs.msg import CarlaEgoVehicleInfo 
 from sensor_msgs.msg import Image, NavSatFix
 from nav_msgs.msg import Odometry
-from geometry_msgs.msg import PoseWithCovariance, TwistWithCovariance, TransformStamped, PolygonStamped, Point32
+from geometry_msgs.msg import PoseWithCovariance, TwistWithCovariance, TransformStamped
 from carla_ros_bridge.world_info import CarlaWorldInfo
 import matplotlib.pyplot as plt
 
@@ -57,6 +57,7 @@ class VehicleControllerNode(object):
     def __init__(self):
         '''
         VehicleControllerNode Constructor
+
         Parameters
         ----------
         None
@@ -66,7 +67,17 @@ class VehicleControllerNode(object):
         None
         '''
 
-        #---Publishers---#
+        # Set the node's name
+        self.node_name = rospy.get_name()
+
+        # Gets any parameters on the node
+        self.rate = rospy.get_param('~rate', 5)
+        self.vehicle_type = rospy.get_param('~vehicle_type', 'model3')
+
+        # Sets a default current position to check against later
+        self.current_pos = None
+
+        #Publishers:
         # Node to broadcast driving commands
         self.ack_control_pub = rospy.Publisher(
             '/carla/ego_vehicle/ackermann_cmd', AckermannDrive,
@@ -74,11 +85,8 @@ class VehicleControllerNode(object):
         # Node for setting the vehicle information
         self.vehicle_info_pub = rospy.Publisher(
             '/carla/ego_vehicle/vehicle_info', CarlaEgoVehicleInfo, queue_size=10)
-        # Node for polygon in rviz
-        self.vehicle_base_pub = rospy.Publisher(
-            '/vehicle_polygon_base', PolygonStamped, queue_size=10)
             
-        #---Subscribers---#
+        #Subscribers:
         # Camera
         rospy.Subscriber("/carla/ego_vehicle/camera/rgb/front/image_color",
             Image, self.process_img)
@@ -94,6 +102,7 @@ class VehicleControllerNode(object):
     def process_img(self, image):
         '''
         Processes the RGB-sensor image into a viewable version.
+
         Parameters
         ----------
         image : sensor_msgs.msg.Image
@@ -103,7 +112,10 @@ class VehicleControllerNode(object):
         -------
         None
         '''
+        # Sets up a CV Bridge
         bridge = CvBridge()
+
+        # Converts the image and displays it
         img = bridge.imgmsg_to_cv2(image, "bgr8")
         cv2.imshow("", img)
         cv2.waitKey(1)
@@ -111,6 +123,7 @@ class VehicleControllerNode(object):
     def print_GNSS_location(self, nav):
         '''
         Converts the navigation msg into latitude and longitude.
+
         Parameters
         ----------
         nav : sensor_msgs.msg.NavSatFix
@@ -120,12 +133,14 @@ class VehicleControllerNode(object):
         -------
         None
         '''
+        # Here GNSS data can be used
         # rospy.loginfo('lat: %f, lon: %f', nav.latitude, nav.longitude)
         rate.sleep()
 
     def print_odometry_location(self, loc):
         '''
         Converts the location msg into an (x,y,z) point and sends it to the tf.
+
         Parameters
         ----------
         loc : nav_msgs.msg.Odometry
@@ -135,80 +150,91 @@ class VehicleControllerNode(object):
         -------
         None
         '''
-        handle_location(loc.pose.pose, "ego_vehicle")
-        # create_polygon(loc.pose.pose)
-        # rospy.loginfo('x: %f, y: %f, z: %f', loc.pose.pose.position.x ,
-            #  loc.pose.pose.position.y, loc.pose.pose.position.z)
+        # Simplify the message information
+        pose = loc.pose.pose
+
+        # Initialize current position
+        if(self.current_pos == None):
+            self.current_pos = pose
+
+        # Calculate displacements
+        xdisp = pose.position.x - self.current_pos.position.x
+        ydisp = pose.position.y - self.current_pos.position.y
+
+        # Broadcast the location only if the movement is realistic
+        # This eliminates noise
+        tolerance = 1.5
+        if(abs(xdisp)<tolerance and abs(ydisp)<tolerance):
+            self.current_pos = pose
+            handle_location(pose, "ego_vehicle")
+        else:
+            handle_location(self.current_pos, "ego_vehicle")
         rate.sleep()
 
 def handle_location(msg, childframe):
+    '''
+    Uses a tf to broadcast the location data
+
+    Parameters
+    ----------
+    msg : Pose
+        the pose that needs to be broadcast.
+    childframe : string
+        the name of the child frame.
+
+    Returns
+    -------
+    None
+    '''
+    # Set up the transforms
     br = tf2_ros.TransformBroadcaster()
     t = TransformStamped()
 
+    # Set the header information
     t.header.stamp = rospy.Time.now()
     t.header.frame_id = "map"
     t.child_frame_id = childframe
+
+    # Set (x,y,z)
     t.transform.translation.x = msg.position.x
     t.transform.translation.y = msg.position.y
     t.transform.translation.z = 0.0
+
+    # Set Rotation
     q = msg.orientation
     t.transform.rotation.x = q.x
     t.transform.rotation.y = q.y
     t.transform.rotation.z = q.z
     t.transform.rotation.w = q.w
-    br.sendTransform(t)
 
-def create_polygon(msg):
-        poly_msg = PolygonStamped()
-        poly_msg.header.stamp = rospy.Time.now()
-        poly_msg.header.frame_id = "map"
-        poly_msg.polygon.points.append(Point32())
-        poly_msg.polygon.points.append(Point32())
-        poly_msg.polygon.points.append(Point32())
-        poly_msg.polygon.points.append(Point32())
-        mult = 5
-        poly_msg.polygon.points[0].x = msg.position.x+mult*math.cos(math.atan2(msg.orientation.y, msg.orientation.x))
-        poly_msg.polygon.points[0].y = msg.position.y+mult*math.sin(math.atan2(msg.orientation.y, msg.orientation.x))
-        poly_msg.polygon.points[1].x = msg.position.x+mult*math.cos(math.atan2(msg.orientation.y, msg.orientation.x))
-        poly_msg.polygon.points[1].y = msg.position.y-mult*math.sin(math.atan2(msg.orientation.y, msg.orientation.x))
-        poly_msg.polygon.points[2].x = msg.position.x-mult*math.cos(math.atan2(msg.orientation.y, msg.orientation.x))
-        poly_msg.polygon.points[2].y = msg.position.y-mult*math.sin(math.atan2(msg.orientation.y, msg.orientation.x))
-        poly_msg.polygon.points[3].x = msg.position.x-mult*math.cos(math.atan2(msg.orientation.y, msg.orientation.x))
-        poly_msg.polygon.points[3].y = msg.position.y+mult*math.sin(math.atan2(msg.orientation.y, msg.orientation.x))
-        # Broadcasts the message
-        vehicle_node.vehicle_base_pub.publish(poly_msg)
+    # Broadcast the information
+    br.sendTransform(t)
 
 
 def control(cmd_msgs):
         '''
         Drives the vehicle based on given values
+
         Parameters
         ----------
-        s : float
-            desired speed (m/s)
-        st : float
-            desired steering angle (radians)
-        a : float
-            desired acceleration (m/s^2)
-        j : float
-            deseired change in acceleration (jerk) (m/s^3)
-        av : float
-            desired steering angle velocity (radians/second)
+        cmd_msgs : ackermann_msgs.msg.AckermannDrive
+            Ackermann Drive message containing the speed (m/s), acceleration (m/s^2), jerk (m/s^3), steering angle (radians), and steering angle velocity (radians/s).
 
         Returns
         -------
         None
         '''
-        a=0
-        j=0
-        av=0
+        # Store all of the values into a new message
         ackermann_msg.speed = cmd_msgs.speed
-        ackermann_msg.acceleration = a
-        ackermann_msg.jerk = j
+        ackermann_msg.acceleration = cmd_msgs.acceleration
+        ackermann_msg.jerk = cmd_msgs.jerk
         ackermann_msg.steering_angle = cmd_msgs.steering_angle
-        ackermann_msg.steering_angle_velocity = av
+        ackermann_msg.steering_angle_velocity = cmd_msgs.steering_angle_velocity
+
+        # Debug information
         rospy.loginfo(
-            'Desired\n speed: %5.3f m/s\n acceleration: %5.3f m/s^2\n jerk: %5.3f m/s^3\n steering angle: %5.4f radians\n angular velocity: %5.4f radians/s', ackermann_msg.speed, ackermann_msg.acceleration, ackermann_msg.jerk, ackermann_msg.steering_angle, ackermann_msg.steering_angle_velocity) # Prints text
+            'Desired\n speed: %5.3f m/s\n acceleration: %5.3f m/s^2\n jerk: %5.3f m/s^3\n steering angle: %5.4f radians\n angular velocity: %5.4f radians/s', ackermann_msg.speed, ackermann_msg.acceleration, ackermann_msg.jerk, ackermann_msg.steering_angle, ackermann_msg.steering_angle_velocity)
+
         # Broadcasts the message
         vehicle_node.ack_control_pub.publish(ackermann_msg) 
         rate.sleep() # Sleeps for time equal to the rate
@@ -220,29 +246,21 @@ if __name__ == '__main__':
 
         # Create the node object
         vehicle_node = VehicleControllerNode()
+
         # Initializes the msgs
         ackermann_msg = AckermannDrive()
         vehicle_info_msg = CarlaEgoVehicleInfo()
-        # Sets how often the messages are sent
-        rate = rospy.Rate(5) # hz
+
+        # Sets how often the messages are sent (hz)
+        rate = rospy.Rate(vehicle_node.rate)
+
         # Initializes the vehicle type
-        vehicle_info_msg.type = "model3"
-             
-        # Message publication
+        vehicle_info_msg.type = vehicle_node.vehicle_type
         rospy.loginfo('Set vehicle type to %s', vehicle_info_msg.type)
-        # Broadcasts the message
-        vehicle_node.vehicle_info_pub.publish(vehicle_info_msg) 
+        vehicle_node.vehicle_info_pub.publish(vehicle_info_msg)
 
-        # Control Loop
-        while not rospy.is_shutdown():
-            pi = np.pi
-            straight = 0.0
-            left = pi / 3.0
-            right = pi / -3.0
-
-            #control(5 ,straight ,1 ,0.3 ,0.2)
-            #control(5 ,right, 1 ,0.3 , 0.2)
-            #control(5 ,left, 1 ,0.3 , 0.2)
+        # Keeps the node alive
+        rospy.spin() 
 
     except rospy.ROSInterruptException:
         pass

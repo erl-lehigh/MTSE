@@ -46,18 +46,14 @@ class RoutePlannerNode(object):
         control_loop(self, event):
             Updates the route based on changing location.
             Then publishes both the route and its reference path.
-
-
     '''
 
     def __init__(self):
         '''
         RoutePlannerNode Constructor
-
         Parameters
         ----------
         None
-
         Returns
         -------
         None
@@ -71,28 +67,25 @@ class RoutePlannerNode(object):
         self.address = rospy.get_param('~address')
         self.network_range = rospy.get_param('~network_range', 1500)
         self.network_type = rospy.get_param('~network_type', 'drive')
+        self.destination_type = rospy.get_param('~destination_type', 'auto')
 
         self.period = rospy.Duration(1.0 / self.rate)
 
-        #self.route_planner = RoutePlanner(self.address,
-        #                                  distance=self.network_range,
-        #                                  network_type=self.network_type)
-        self.route_planner = RoutePlanner(
-            '/home/nathan/mtse_catkin/src/navigation/route_planner/scripts/carla_map.yaml')
+        if(self.destination_type == 'manual'):
+            # Gets the destination from the user
+            destination = input("Address of Destination (in quotes) : ")
+            # Converts the address given to latitude and longitude
+            self.dest = self.route_planner.geocode(query=destination)
+            self.route_planner = RoutePlanner(self.address,
+                                         distance=self.network_range,
+                                         network_type=self.network_type)
+        else:
+            self.dest = (93.383 , 132.856)
+            self.route_planner = RoutePlanner(
+                '/home/nathan/mtse_catkin/src/navigation/route_planner/scripts/carla_map.yaml')
 
         # Plot graph
         self.route_planner.setup_plot()
-
-        # Gets the destination from the user
-        #destination = input("Address of Destination (in quotes) : ")
-        # destination = (220.091 , -9.808) # works
-        # destination = (230.155 , -50.589) # works
-        # destination = (233.775 , -50.05) # works *new*
-        # destination = (152.222 , 66.357) # works *newer*
-        destination = (93.383 , 132.856)
-        # Converts the address given to latitude and longitude
-        #self.dest = self.route_planner.geocode(query=destination)
-        self.dest = destination
         
         # Common header for all
         self.header = Header(frame_id=self.parent_frame)
@@ -118,7 +111,7 @@ class RoutePlannerNode(object):
         self.ts_listener = tf2_ros.TransformListener(self.tf_buffer)
 
         # Crate timers
-        self.timer = rospy.Timer(self.period, self.control_loop)#, oneshot=True)
+        self.timer = rospy.Timer(self.period, self.control_loop)
 
 
         # Subscribers
@@ -137,11 +130,9 @@ class RoutePlannerNode(object):
     def get_vehicle_location(self):
         '''
         Uses a tf buffer to get the location of the vehicle and return its coordinates
-
         Parameters
         ----------
         None
-
         Returns
         -------
         (x,y) point
@@ -160,12 +151,10 @@ class RoutePlannerNode(object):
     def coordinates_to_poses(self, coords):
         '''
         Iterates through the coordinates to create a pose for each.
-
         Parameters
         ----------
         coords : list of coordinates
             the coordinates to be converted into poses
-
         Returns
         -------
         list of poses
@@ -184,12 +173,10 @@ class RoutePlannerNode(object):
         '''
         Updates the route based on changing location.
         Then publishes both the route and its reference path.
-
         Parameters
         ----------
         event : event
             the current event state
-
         Returns
         -------
         None

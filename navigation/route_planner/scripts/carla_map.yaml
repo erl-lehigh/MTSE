@@ -5670,7 +5670,7 @@ _adj:
     628: *id800
     633: *id801
     635: *id802
-_node: &id804
+_node:
   0: {x: -157.43186950683594, y: 3.4268550872802734}
   1: {x: -147.2484130859375, y: 3.374492645263672}
   2: {x: -149.06019592285156, y: -99.6991195678711}
@@ -6383,5 +6383,3 @@ edge_attr_dict_factory: *id803
 edge_key_dict_factory: *id803
 graph: {crs: null, name: Carla Town}
 node_dict_factory: *id803
-nodes: !!python/object:networkx.classes.reportviews.NodeView
-  _nodes: *id804
