@@ -126,7 +126,8 @@ class PurePursuit:
         closest_dist = min(self.vehicle_position.distance(self.closest_point()),
                            self.lookahead)
         dist_on_path = (self.lookahead ** 2 - closest_dist ** 2) ** 0.5
-        return self.path.interpolate(dist_on_path)
+        arc_dist = self.path.project(self.vehicle_position)
+        return self.path.interpolate(arc_dist + dist_on_path)
 
     def compute_speed(self):
         '''

@@ -8,6 +8,8 @@ from nav_msgs.msg import Path
 from ackermann_msgs.msg import AckermannDrive
 from geometry_msgs.msg import Pose
 
+from geometry_msgs.msg import PoseStamped ###
+
 from shapely.geometry import LineString
 
 from purepursuit import PurePursuit
@@ -84,7 +86,10 @@ class PurePursuitNode(object):
         #declares that the node is publishing to the 'speed_command' topic
         #using the message type AckermannDrive
 
-        self.target_pub = rospy.Publisher('~/target', Pose, queue_size=1)
+        #self.target_pub = rospy.Publisher('~/target', Pose, queue_size=1)
+
+        self.target_pub = rospy.Publisher('target', PoseStamped,
+        queue_size=1)
 
         # Create subscribers
         self.path_sub = rospy.Subscriber('planned_path', Path, self.set_path)
@@ -165,15 +170,27 @@ class PurePursuitNode(object):
         None
         '''
         msg = AckermannDrive()
-        pose_msg = Pose()
+        pose_msg = PoseStamped()
+        pose_msg.header.stamp = rospy.Time.now()
+        pose_msg.header.frame_id = self.parent_frame
         if self.purepursuit.path is not None:
             position = self.purepursuit.future_point()
-            pose_msg.position.x = position.x
-            pose_msg.position.y = position.y
+            pose_msg.pose.position.x = position.x
+            pose_msg.pose.position.y = position.y
             msg.speed = self.purepursuit.speed
             msg.steering_angle = self.purepursuit.compute_steering_angle()
         self.command_pub.publish(msg)
         self.target_pub.publish(pose_msg)
+
+    # def target_pt(self, enent=None):
+    #     pose = PoseStamped()
+    #     pose.header.stamp = rospy.Time.now()
+    #     pose.header.frame_id = "world"
+    #     if self.purepursuit.path is not None:
+    #         position = self.purepursuit.future_point()
+    #         pose.pose.position.x = position.x
+    #         pose.pose.position.y = position.y
+    #     self.target_pt_pub.publish(pose)
 
 
 if __name__ == "__main__":
