@@ -1,6 +1,6 @@
 rate: 5.0 # control loop frequency [Hz]
 parent_frame: map # Parent Reference frame (map)
-child_frame: ego_vehicle # Child Reference frame (ego_vehicle)
+child_frame: ego_vehicle_filtered # Child Reference frame (ego_vehicle)
 lookahead: 5 # distance to goal point [m]
 wheelbase: 2 # distance between vehicle's front and rear axles [m]
 speed: 5 # vehicle's forward speed [m/s]

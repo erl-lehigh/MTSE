@@ -6,6 +6,7 @@ Route Planner Node that communicates with ROS
 
 import rospy
 import tf2_ros
+import time
 
 from std_msgs.msg import Header
 from nav_msgs.msg import Path
@@ -105,6 +106,8 @@ class RoutePlannerNode(object):
         self.reference_path_viz_pub = rospy.Publisher('planned_path_viz', Path,
                                                   queue_size=10)
         self.pub_ref = False
+
+        time.sleep(4)
 
         # Create transform listener
         self.tf_buffer = tf2_ros.Buffer()

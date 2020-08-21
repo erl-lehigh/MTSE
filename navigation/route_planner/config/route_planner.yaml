@@ -1,6 +1,6 @@
 rate: 5.0 # control loop frequency [Hz]
 parent_frame: map # The parent reference frame (often map)
-child_frame: ego_vehicle # The child reference frame (often ego_vehicle)
+child_frame: ego_vehicle_filtered # The child reference frame (often ego_vehicle)
 address: 'Lehigh University' # Address of the network's center
 network_range: 1500 # Distance aroud the network's center [m]
 network_type: 'drive' # Type of links/roads to populate the network

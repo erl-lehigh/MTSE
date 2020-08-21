@@ -163,13 +163,12 @@ class VehicleControllerNode(object):
 
         # Broadcast the location only if the movement is realistic
         # This eliminates noise
-        tolerance = 1.5
+        tolerance = 15
         if(abs(xdisp)<tolerance and abs(ydisp)<tolerance):
             self.current_pos = pose
-            handle_location(pose, "ego_vehicle")
+            handle_location(pose, "ego_vehicle_filtered")
         else:
-            handle_location(self.current_pos, "ego_vehicle")
-        rate.sleep()
+            handle_location(self.current_pos, "ego_vehicle_filtered")
 
 def handle_location(msg, childframe):
     '''
