@@ -38,6 +38,12 @@ class VehicleControllerNode(object):
             ackermann control publisher.
         vehicle_info_pub : rospy.Publisher
             vehicle information publisher.
+        node_name : string
+            the name of the node.
+        rate : integer
+            how many times per second the node updates.
+        vehicle_type : string
+            the type of vehicle to set the car to.
                      
     Methods
     -------
