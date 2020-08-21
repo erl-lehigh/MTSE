@@ -31,18 +31,18 @@ class VehicleControllerNode(object):
     Attributes
     ----------
         IM_WIDTH : integer
-            the width, in pixels, of the display window
+            the width, in pixels, of the display window.
         IM_HEIGHT : integer
-            the height, in pixels, of the display window
+            the height, in pixels, of the display window.
         ack_control_pub : rospy.Publisher
-            ackermann control publisher
+            ackermann control publisher.
         vehicle_info_pub : rospy.Publisher
-            vehicle information publisher
+            vehicle information publisher.
                      
     Methods
     -------
         process_img(self, image):
-            Uses the cv-bridge to convert the rgb-camera's image for viewing
+            Uses the cv-bridge to convert the rgb-camera's image for viewing.
         print_GNSS_location(self, nav):
             Prints and broadcasts the navigation information as latitude and
             longitude.
@@ -56,7 +56,7 @@ class VehicleControllerNode(object):
 
     def __init__(self):
         '''
-        VehicleControllerNode Constructor
+        VehicleControllerNode Constructor.
 
         Parameters
         ----------
@@ -106,7 +106,7 @@ class VehicleControllerNode(object):
         Parameters
         ----------
         image : sensor_msgs.msg.Image
-            the image from the rgb-sensor
+            the image from the rgb-sensor.
 
         Returns
         -------
@@ -127,7 +127,7 @@ class VehicleControllerNode(object):
         Parameters
         ----------
         nav : sensor_msgs.msg.NavSatFix
-            the navigation information from a GNSS sensor
+            the navigation information from a GNSS sensor.
 
         Returns
         -------
@@ -144,7 +144,7 @@ class VehicleControllerNode(object):
         Parameters
         ----------
         loc : nav_msgs.msg.Odometry
-            the odometry information from the vehicle's onboard odometry
+            the odometry information from the vehicle's onboard odometry.
 
         Returns
         -------
@@ -172,7 +172,7 @@ class VehicleControllerNode(object):
 
 def handle_location(msg, childframe):
     '''
-    Uses a tf to broadcast the location data
+    Uses a tf to broadcast the location data.
 
     Parameters
     ----------
@@ -212,7 +212,7 @@ def handle_location(msg, childframe):
 
 def control(cmd_msgs):
         '''
-        Drives the vehicle based on given values
+        Drives the vehicle based on given values.
 
         Parameters
         ----------

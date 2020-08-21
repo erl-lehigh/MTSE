@@ -7,6 +7,7 @@ Route Planner Node that communicates with ROS
 import rospy
 import tf2_ros
 import time
+import os
 
 from std_msgs.msg import Header
 from nav_msgs.msg import Path
@@ -17,31 +18,39 @@ from route_planner import RoutePlanner
 
 class RoutePlannerNode(object):
     '''
+    Route Planner Node that communicates the route planner through ROS nodes.
+
     Attributes
     ----------
         node_name : string
-            the name of the node
+            the name of the node.
         rate : integer
-            how many times per second the node updates
+            how many times per second the node updates.
         parent_frame : string
-            the parent reference frame (often world)
+            the parent reference frame (often world).
         child_frame : string
-            the child reference frame (often the vehicle)
+            the child reference frame (often the vehicle).
         address : string
-            the central address of the map
+            the central address of the map.
         network_range : integer
-            radius away from the center of the map to generate
+            radius away from the center of the map to generate.
         network_type : string
-            what type of street network to get 
+            what type of street network to get.
+        destination_type : string
+            'auto' or 'manual', the method of generating a destination.
         period : float
-            the inverse of the rate
+            the inverse of the rate.
         route_planner : RoutePlanner()
-            the object that does all of the route planning
+            the object that does all of the route planning.
+        dest : tuple
+            the location of the destination.
             
     Methods
     -------
+        plot_target(self, target_point):
+            Plots the target point on the map (in green).
         get_vehicle_location(self):
-            Uses a tf buffer to get the location of the vehicle and return its coordinates
+            Uses a tf buffer to get the location of the vehicle and return its coordinates.
         coordinates_to_poses(self, coords):
             Iterates through the coordinates to create a pose for each.
         control_loop(self, event):
@@ -51,10 +60,12 @@ class RoutePlannerNode(object):
 
     def __init__(self):
         '''
-        RoutePlannerNode Constructor
+        RoutePlannerNode Constructor.
+
         Parameters
         ----------
         None
+
         Returns
         -------
         None
@@ -81,9 +92,13 @@ class RoutePlannerNode(object):
                                          distance=self.network_range,
                                          network_type=self.network_type)
         else:
+            # An automatic destination on the carla map
             self.dest = (93.383 , 132.856)
+            # Initializes the RoutePlanner with the map in route_planner/scripts
             self.route_planner = RoutePlanner(
-                '/home/nathan/mtse_catkin/src/navigation/route_planner/scripts/carla_map.yaml')
+                os.path.abspath(os.path.join(
+                    os.path.dirname(os.path.abspath(__file__)),
+                        '..', 'scripts', 'carla_map.yaml')))
 
         # Plot graph
         self.route_planner.setup_plot()
@@ -103,10 +118,12 @@ class RoutePlannerNode(object):
         # Publisher for reference path
         self.reference_path_pub = rospy.Publisher('planned_path', Path,
                                                   queue_size=10)
+        # Publisher for rViz reference path
         self.reference_path_viz_pub = rospy.Publisher('planned_path_viz', Path,
                                                   queue_size=10)
         self.pub_ref = False
 
+        # Gives the tf time to start before plotting
         time.sleep(4)
 
         # Create transform listener
@@ -123,23 +140,36 @@ class RoutePlannerNode(object):
 
         rospy.loginfo('[%s] Node started!', self.node_name)
 
-    def set_graph(self, themap):
-        self.graph = themap
-
     def plot_target(self, target_point):
+        '''
+        Plots the target point on the map (in green).
+        
+        Parameters
+        ----------
+        target_point : tuple
+            the point that will be plotted.
+
+        Returns
+        -------
+        None
+        '''
+
+        # Uses plot_route to plot a route containing 1 point
         self.route_planner.plot_route(
             [(target_point.pose.position.x, target_point.pose.position.y), (target_point.pose.position.x, target_point.pose.position.y)],color='green')
 
     def get_vehicle_location(self):
         '''
-        Uses a tf buffer to get the location of the vehicle and return its coordinates
+        Uses a tf buffer to get the location of the vehicle and return its coordinates.
+
         Parameters
         ----------
         None
+
         Returns
         -------
         (x,y) point
-            location of the vehicle
+            location of the vehicle.
         '''
         try:
             trans = self.tf_buffer.lookup_transform(self.parent_frame,
@@ -154,14 +184,16 @@ class RoutePlannerNode(object):
     def coordinates_to_poses(self, coords):
         '''
         Iterates through the coordinates to create a pose for each.
+
         Parameters
         ----------
         coords : list of coordinates
-            the coordinates to be converted into poses
+            the coordinates to be converted into poses.
+
         Returns
         -------
         list of poses
-            the pose equivalent of the inputted coordinates
+            the pose equivalent of the inputted coordinates.
         '''
         poses = []
         self.header.stamp = rospy.Time.now()
@@ -176,10 +208,12 @@ class RoutePlannerNode(object):
         '''
         Updates the route based on changing location.
         Then publishes both the route and its reference path.
+
         Parameters
         ----------
         event : event
             the current event state
+
         Returns
         -------
         None
@@ -189,9 +223,11 @@ class RoutePlannerNode(object):
             self.orig = self.get_vehicle_location()
             self.pub_ref = True
         orig = self.get_vehicle_location()
+
         # Plot the current location as a black diamond
         self.route_planner.plot_route([orig, orig],'black')
         rospy.loginfo('Current Location: (%f, %f)', orig[0], orig[1])
+
         if orig is None:
             rospy.logdebug('Vehicle position not available!')
             return
@@ -199,33 +235,29 @@ class RoutePlannerNode(object):
         route = self.route_planner.get_route(self.orig, self.dest)
         route_coords = self.route_planner.get_route_coords(route)
         road_coords = self.route_planner.get_road_coords(route)
+
+        # Shows the route on the map
         # self.route_planner.plot_route(road_coords)
-        # rospy.logwarn('[route planner] coords route:', road_coords)
 
         # Publish route
         self.route_msg.header.stamp = rospy.Time.now()  # Set the stamp
         self.route_msg.poses = self.coordinates_to_poses(route_coords)
         self.route_pub.publish(self.route_msg)
-        # rospy.logdebug('Route message: %s', self.route_msg)
 
         # Publish reference path associated with roads
         self.path_msg.header.stamp = rospy.Time.now()  # Set the stamp
         self.path_msg.poses = self.coordinates_to_poses(road_coords)
         self.reference_path_pub.publish(self.path_msg)
         self.reference_path_viz_pub.publish(self.path_msg)
-        # rospy.logdebug('Reference path: %s', self.path_msg)
 
 
 if __name__ == '__main__':
     # Initialize node with rospy
     rospy.init_node('route_planner', anonymous=True)
+
     # Create the node object
     route_planner_node = RoutePlannerNode()
-    # Keep the node alive
-    # rospy.spin()
-    # Hack to update plot from the main thread due to TkInter issue
+
     while not rospy.is_shutdown():
         pass
         route_planner_node.route_planner.update_plot()
-        # rospy.sleep(route_planner_node.period)
-        # route_planner_node.control_loop(event=True)
