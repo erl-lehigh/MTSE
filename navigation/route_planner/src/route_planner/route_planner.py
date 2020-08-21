@@ -19,27 +19,27 @@ class RoutePlanner(object):
     Attributes
     ----------
     address :  string
-        the address to geocode and use as the central point around which to construct the graph
+        the address to geocode and use as the central point around which to construct the graph.
     distance : int
-        retain only those nodes within this many meters of the center of the graph  
+        retain only those nodes within this many meters of the center of the graph.
     network_type : string
-        what type of street network to get
+        what type of street network to get.
     g : networkx multidigraph or tuple
-        multidigraph or optionally (multidigraph, tuple)
+        multidigraph or optionally (multidigraph, tuple).
     figure : tuple
-        figure information
+        figure information.
     ax : tuple
-        axis information
+        axis information.
     route_line : MatPlotLib plot
-        The lines representing the route
+        The lines representing the route.
 
     Methods
     -------
     get_route_coords(self, route):
-        Takes each node along the route and returns their corresponding coordinates
+        Takes each node along the route and returns their corresponding coordinates.
     get_road_coords(self, route):
         Takes each edge and breaks it into nodes with linear connections and
-        returns the nodes' coordinates
+        returns the nodes' coordinates.
     get_route(self, origin, destination):
         Uses Dijkstra's algorithm to compute the shortest distance between
         the vehicles current location (origin) and a given destination.
@@ -135,7 +135,7 @@ class RoutePlanner(object):
     def get_route(self, origin, destination):
         '''
         Uses Dijkstra's algorithm to compute the shortest distance between
-        the vehicles current location (origin) and a given destination.
+        the vehicle's current location (origin) and a given destination.
 
         Parameters
         ----------
