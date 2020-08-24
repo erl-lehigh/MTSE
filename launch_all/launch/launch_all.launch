@@ -1,10 +1,10 @@
 <launch>
-    <arg name="carla_bridge" default="False"/>
-    <arg name="purepursuit" default="True"/>
+    <arg name="carla_bridge" default="True"/>
+    <arg name="purepursuit" default="False"/>
     <arg name="costmap" default="True"/>
-    <arg name="rrt" default="True"/>
-    <arg name="route_planner" default="True"/>
-    <arg name="rviz" default="False"/>
+    <arg name="rrt" default="False"/>
+    <arg name="route_planner" default="False"/>
+    <arg name="rviz" default="true"/>
 
     <!-- include file="$(find template_ros_package)/launch/launch_file.launch"/ -->
 
@@ -29,4 +29,7 @@
         <include file="$(find route_planner)/launch/route_planner.launch"/>
     </group>
 
+    <group if="$(arg rviz)">
+        <node type="rviz" name="rviz" pkg="rviz" args="-d $(find launch_all)/rviz/rviz_config.rviz"/>
+    </group>
 </launch>
