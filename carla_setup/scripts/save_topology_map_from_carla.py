@@ -53,7 +53,10 @@ def convert_to_2D_map():
     # Y is negative due to a flip in UE4
     xy_topology = list()
     for wp1, wp2 in topology:
-        xy_topology.append(((wp1.transform.location.x, -wp1.transform.location.y),(wp2.transform.location.x, -wp2.transform.location.y)))
+        xy_topology.append(((wp1.transform.location.x, 
+                            -wp1.transform.location.y),
+                            (wp2.transform.location.x, 
+                            -wp2.transform.location.y)))
 
     # Extract the edge information from the topology into the graph
     graph.add_edges_from(xy_topology)

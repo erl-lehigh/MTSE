@@ -50,7 +50,8 @@ class RoutePlannerNode(object):
         plot_target(self, target_point):
             Plots the target point on the map (in green).
         get_vehicle_location(self):
-            Uses a tf buffer to get the location of the vehicle and return its coordinates.
+            Uses a tf buffer to get the location of the vehicle and return its 
+            coordinates.
         coordinates_to_poses(self, coords):
             Iterates through the coordinates to create a pose for each.
         control_loop(self, event):
@@ -156,11 +157,14 @@ class RoutePlannerNode(object):
 
         # Uses plot_route to plot a route containing 1 point
         self.route_planner.plot_route(
-            [(target_point.pose.position.x, target_point.pose.position.y), (target_point.pose.position.x, target_point.pose.position.y)],color='green')
+            [(target_point.pose.position.x, target_point.pose.position.y),
+            (target_point.pose.position.x, target_point.pose.position.y)],
+            color='green')
 
     def get_vehicle_location(self):
         '''
-        Uses a tf buffer to get the location of the vehicle and return its coordinates.
+        Uses a tf buffer to get the location of the vehicle and return its
+         coordinates.
 
         Parameters
         ----------

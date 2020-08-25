@@ -19,7 +19,8 @@ from ackermann_msgs.msg import AckermannDrive
 from carla_msgs.msg import CarlaEgoVehicleInfo 
 from sensor_msgs.msg import Image, NavSatFix
 from nav_msgs.msg import Odometry
-from geometry_msgs.msg import PoseWithCovariance, TwistWithCovariance, TransformStamped
+from geometry_msgs.msg import PoseWithCovariance, TwistWithCovariance 
+from geometry_msgs.msg import TransformStamped
 from carla_ros_bridge.world_info import CarlaWorldInfo
 import matplotlib.pyplot as plt
 
@@ -90,7 +91,8 @@ class VehicleControllerNode(object):
             queue_size=10)
         # Node for setting the vehicle information
         self.vehicle_info_pub = rospy.Publisher(
-            '/carla/ego_vehicle/vehicle_info', CarlaEgoVehicleInfo, queue_size=10)
+            '/carla/ego_vehicle/vehicle_info', \
+                CarlaEgoVehicleInfo, queue_size=10)
             
         #Subscribers:
         # Camera
@@ -223,7 +225,9 @@ def control(cmd_msgs):
         Parameters
         ----------
         cmd_msgs : ackermann_msgs.msg.AckermannDrive
-            Ackermann Drive message containing the speed (m/s), acceleration (m/s^2), jerk (m/s^3), steering angle (radians), and steering angle velocity (radians/s).
+            Ackermann Drive message containing the speed (m/s), acceleration 
+            (m/s^2), jerk (m/s^3), steering angle (radians), and steering angle
+            velocity (radians/s).
 
         Returns
         -------
@@ -237,8 +241,15 @@ def control(cmd_msgs):
         ackermann_msg.steering_angle_velocity = cmd_msgs.steering_angle_velocity
 
         # Debug information
-        rospy.loginfo(
-            'Desired\n speed: %5.3f m/s\n acceleration: %5.3f m/s^2\n jerk: %5.3f m/s^3\n steering angle: %5.4f radians\n angular velocity: %5.4f radians/s', ackermann_msg.speed, ackermann_msg.acceleration, ackermann_msg.jerk, ackermann_msg.steering_angle, ackermann_msg.steering_angle_velocity)
+        rospy.loginfo('\n'.join(['Desired',
+                                 'speed: %5.3f m/s',
+                                 'acceleration: %5.3f m/s^2',
+                                 'jerk: %5.3f m/s^3',
+                                 'steering angle: %5.4f radians',
+                                 'angular velocity: %5.4f radians/s']),
+                      ackermann_msg.speed, ackermann_msg.acceleration,
+                      ackermann_msg.jerk, ackermann_msg.steering_angle,
+                      ackermann_msg.steering_angle_velocity)
 
         # Broadcasts the message
         vehicle_node.ack_control_pub.publish(ackermann_msg) 

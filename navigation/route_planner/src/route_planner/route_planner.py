@@ -19,9 +19,11 @@ class RoutePlanner(object):
     Attributes
     ----------
     address :  string
-        the address to geocode and use as the central point around which to construct the graph.
+        the address to geocode and use as the central point around which to 
+        construct the graph.
     distance : int
-        retain only those nodes within this many meters of the center of the graph.
+        retain only those nodes within this many meters of the center of the 
+        graph.
     network_type : string
         what type of street network to get.
     g : networkx multidigraph or tuple
@@ -36,7 +38,8 @@ class RoutePlanner(object):
     Methods
     -------
     get_route_coords(self, route):
-        Takes each node along the route and returns their corresponding coordinates.
+        Takes each node along the route and returns their corresponding 
+        coordinates.
     get_road_coords(self, route):
         Takes each edge and breaks it into nodes with linear connections and
         returns the nodes' coordinates.
@@ -61,9 +64,11 @@ class RoutePlanner(object):
         Parameters
         ----------
         address :  string
-            the address to geocode and use as the central point around which to construct the graph.
+            the address to geocode and use as the central point around which to 
+            construct the graph.
         distance : int
-            retain only those nodes within this many meters of the center of the graph.
+            retain only those nodes within this many meters of the center of 
+            the graph.
         network_type : string
             what type of street network to get.
 
@@ -99,7 +104,8 @@ class RoutePlanner(object):
 
     def get_route_coords(self, route):
         '''
-        Takes each node along the route and returns their corresponding coordinates.
+        Takes each node along the route and returns their corresponding
+         coordinates.
 
         Parameters
         ----------
@@ -126,7 +132,8 @@ class RoutePlanner(object):
         Returns
         -------
         list
-            the coordinates of each point along the route that has only a straight line connecting them.
+            the coordinates of each point along the route that has only a 
+            straight line connecting them.
         '''
         # Concatenate all road geometries
         return list(it.chain(*[self.g.get_edge_data(u, v)[0]['geometry'].coords
@@ -179,7 +186,8 @@ class RoutePlanner(object):
         '''
         # Copied From OSMNx
         # send the query to the nominatim geocoder and parse the json response
-        url_template = 'https://nominatim.openstreetmap.org/search?format=json&limit=1&q={}'
+        url_template = ('https://nominatim.openstreetmap.org/search?format=json'
+            '&limit=1&q={}')
         url = url_template.format(query)
         response = requests.get(url, timeout=60)
         results = response.json()
@@ -191,7 +199,8 @@ class RoutePlanner(object):
             point = (lat, lon)
             return point
         else:
-            raise Exception('Nominatim geocoder returned no results for query "{}"'.format(query))
+            raise Exception(('Nominatim geocoder returned no results for query' 
+                '"{}"').format(query))
 
 
     def setup_plot(self, color='red'):
