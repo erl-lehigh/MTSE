@@ -4,7 +4,7 @@
     <arg name="costmap" default="True"/>
     <arg name="rrt" default="False"/>
     <arg name="route_planner" default="False"/>
-    <arg name="rviz" default="true"/>
+    <arg name="rviz" default="True"/>
 
     <!-- include file="$(find template_ros_package)/launch/launch_file.launch"/ -->
 
