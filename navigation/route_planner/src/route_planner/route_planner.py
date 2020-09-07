@@ -18,24 +18,28 @@ class RoutePlanner(object):
     Attributes
     ----------
     address :  string
-        the address to geocode and use as the central point around which to construct the graph
+        the address to geocode and use as the central point around which to
+        construct the graph
     distance : int
-        retain only those nodes within this many meters of the center of the graph  
+        retain only those nodes within this many meters of the center of the
+        graph
     network_type : string
         what type of street network to get
     g : networkx multidigraph or tuple
-        multidigraph or optionally (multidigraph, tuple)
+        multidigraph or optionally (multidigraph, tuple) representing the road
+        network
     figure : tuple
         figure information
     ax : tuple
         axis information
-    route_line : MatPlotLib plot
+    route_line : MatPlotLib line artist
         The lines representing the route
 
     Methods
     -------
     get_route_coords(self, route):
-        Takes each node along the route and returns their corresponding coordinates
+        Takes each node along the route and returns their corresponding
+        coordinates
     get_road_coords(self, route):
         Takes each edge and breaks it into nodes with linear connections and
         returns the nodes' coordinates
@@ -47,29 +51,31 @@ class RoutePlanner(object):
     setup_plot(self):
         Displays the blank map.
     plot_route(self, route_coords):
-        Plots the route onto the map.    
+        Plots the route onto the map.
     update_plot(self):
         Updates the map with the new route.
-    
+
     '''
 
     def __init__(self, address, distance, network_type):
         '''
-        RoutePlanner Constructor
+        RoutePlanner Constructor.
 
         Parameters
         ----------
         address :  string
-            the address to geocode and use as the central point around which to construct the graph
+            the address to geocode and use as the central point around which to
+            construct the graph
         distance : int
-            retain only those nodes within this many meters of the center of the graph  
+            retain only those nodes within this many meters of the center of the
+            graph
         network_type : string
-            what type of street network to get 
+            what type of street network to get
 
         Returns
         -------
         None
-        
+
         '''
         self.address = address
         self.distance = distance
@@ -81,7 +87,8 @@ class RoutePlanner(object):
 
     def get_route_coords(self, route):
         '''
-        Takes each node along the route and returns their corresponding coordinates
+        Takes each node along the route and returns their corresponding
+        coordinates.
 
         Parameters
         ----------
@@ -98,7 +105,7 @@ class RoutePlanner(object):
     def get_road_coords(self, route):
         '''
         Takes each edge and breaks it into nodes with linear connections and
-        returns the nodes' coordinates
+        returns the nodes' coordinates.
 
         Parameters
         ----------
@@ -108,7 +115,8 @@ class RoutePlanner(object):
         Returns
         -------
         list
-            the coordinates of each point along the route that has only a straight line connecting them
+            the coordinates of each point along the route that has only a
+            straight line connecting them
         '''
         # Concatenate all road geometries
         return list(it.chain(*[self.g.get_edge_data(u, v)[0]['geometry'].coords
@@ -154,7 +162,8 @@ class RoutePlanner(object):
         """
 
         # send the query to the nominatim geocoder and parse the json response
-        url_template = 'https://nominatim.openstreetmap.org/search?format=json&limit=1&q={}'
+        url_template = ('https://nominatim.openstreetmap.org/'
+                        'search?format=json&limit=1&q={}')
         url = url_template.format(query)
         response = requests.get(url, timeout=60)
         results = response.json()
@@ -166,7 +175,8 @@ class RoutePlanner(object):
             point = (lat, lon)
             return point
         else:
-            raise Exception('Nominatim geocoder returned no results for query "{}"'.format(query))
+            raise Exception('Nominatim geocoder returned no'
+                            ' results for query "{}"'.format(query))
 
 
     def setup_plot(self):
@@ -194,7 +204,7 @@ class RoutePlanner(object):
         Parameters
         ----------
         route_coords : list
-            the coordinates of each point along the route 
+            the coordinates of each point along the route
 
         Returns
         -------

@@ -31,21 +31,22 @@ class RoutePlannerNode(object):
         network_range : integer
             radius away from the center of the map to generate
         network_type : string
-            what type of street network to get 
+            what type of street network to get
         period : float
             the inverse of the rate
         route_planner : RoutePlanner()
             the object that does all of the route planning
-            
+
     Methods
     -------
         get_vehicle_location(self):
-            Uses a tf buffer to get the location of the vehicle and return its coordinates
+            Uses a tf buffer to get the location of the vehicle and return its
+            coordinates
         coordinates_to_poses(self, coords):
             Iterates through the coordinates to create a pose for each.
         control_loop(self, event):
-            Updates the route based on changing location.
-            Then publishes both the route and its reference path.
+            Updates the route based on changing location. Then publishes both
+            the route and its reference path.
 
 
     '''
@@ -85,7 +86,7 @@ class RoutePlannerNode(object):
 
         # Converts the address given to latitude and longitude
         self.dest = self.route_planner.geocode(query=destination)
-        
+
         # Common header for all
         self.header = Header(frame_id=self.parent_frame)
 
@@ -113,7 +114,8 @@ class RoutePlannerNode(object):
 
     def get_vehicle_location(self):
         '''
-        Uses a tf buffer to get the location of the vehicle and return its coordinates
+        Uses a tf buffer to get the location of the vehicle and return its
+        coordinates.
 
         Parameters
         ----------
@@ -159,8 +161,8 @@ class RoutePlannerNode(object):
 
     def control_loop(self, event):
         '''
-        Updates the route based on changing location.
-        Then publishes both the route and its reference path.
+        Updates the route based on changing location. Then publishes both the
+        route and its reference path.
 
         Parameters
         ----------
