@@ -39,17 +39,17 @@ class RoutePlanner(object):
     -------
     get_route_coords(self, route):
         Takes each node along the route and returns their corresponding
-        coordinates
+        coordinates.
     get_road_coords(self, route):
         Takes each edge and breaks it into nodes with linear connections and
-        returns the nodes' coordinates
+        returns the nodes' coordinates.
     get_route(self, origin, destination):
-        Uses Dijkstra's algorithm to compute the shortest distance between
+        Uses Dijkstra's algorithm to compute the shortest route between
         the vehicles current location (origin) and a given destination.
     get_point_of_interest(self, destination, distance):
-        Gets the coordinates of a point of interest (address)
+        Gets the coordinates of a point of interest (address).
     setup_plot(self):
-        Displays the blank map.
+        Displays the static map.
     plot_route(self, route_coords):
         Plots the route onto the map.
     update_plot(self):
@@ -115,8 +115,7 @@ class RoutePlanner(object):
         Returns
         -------
         list
-            the coordinates of each point along the route that has only a
-            straight line connecting them
+            the coordinates of all the roads along the route
         '''
         # Concatenate all road geometries
         return list(it.chain(*[self.g.get_edge_data(u, v)[0]['geometry'].coords
@@ -124,7 +123,7 @@ class RoutePlanner(object):
 
     def get_route(self, origin, destination):
         '''
-        Uses Dijkstra's algorithm to compute the shortest distance between
+        Uses Dijkstra's algorithm to compute the shortest route between
         the vehicles current location (origin) and a given destination.
 
         Parameters
@@ -136,8 +135,8 @@ class RoutePlanner(object):
 
         Returns
         -------
-        path
-            the path connecting the origin and the destination
+        route
+            the route connecting the origin and the destination
         '''
         # Find the nearest intersection to the current location
         origin_node = ox.get_nearest_node(self.g, origin)
@@ -148,7 +147,7 @@ class RoutePlanner(object):
 
     def geocode(self, query):
         """
-        Geocode a query string to (lat, lon) with the Nominatim geocoder.
+        Returns the geographical coordinates from an address.
 
         Parameters
         ----------
@@ -178,10 +177,9 @@ class RoutePlanner(object):
             raise Exception('Nominatim geocoder returned no'
                             ' results for query "{}"'.format(query))
 
-
     def setup_plot(self):
         '''
-        Displays the blank map.
+        Displays the static road map.
 
         Parameters
         ----------

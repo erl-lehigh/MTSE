@@ -166,7 +166,7 @@ class RoutePlannerNode(object):
 
         Parameters
         ----------
-        event : event
+        event : rospy.timer.TimerEvent
             the current event state
 
         Returns
