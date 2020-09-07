@@ -40,15 +40,13 @@ class RoutePlannerNode(object):
     Methods
     -------
         get_vehicle_location(self):
-            Uses a tf buffer to get the location of the vehicle and return its
-            coordinates
+            Returns the location of the vehicle based on the transform between
+            the parent and child frames using a tf2 listener.
         coordinates_to_poses(self, coords):
             Iterates through the coordinates to create a pose for each.
         control_loop(self, event):
             Updates the route based on changing location. Then publishes both
             the route and its reference path.
-
-
     '''
 
     def __init__(self):
@@ -114,8 +112,8 @@ class RoutePlannerNode(object):
 
     def get_vehicle_location(self):
         '''
-        Uses a tf buffer to get the location of the vehicle and return its
-        coordinates.
+        Returns the location of the vehicle based on the transform between the
+        parent and child frames using a tf2 listener.
 
         Parameters
         ----------
