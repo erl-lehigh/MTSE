@@ -123,8 +123,8 @@ class PurePursuit:
         self.path.interpolate(dist_on_path) : Point
             computed future point
         '''
-        closest_dist = min(self.vehicle_position.distance(self.closest_point()),
-                           self.lookahead)
+        #print(type(self.vehicle_position))
+        closest_dist = min(self.vehicle_position.distance(self.closest_point()),self.lookahead)
         dist_on_path = (self.lookahead ** 2 - closest_dist ** 2) ** 0.5
         arc_dist = self.path.project(self.vehicle_position)
         return self.path.interpolate(arc_dist + dist_on_path)

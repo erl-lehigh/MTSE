@@ -66,6 +66,7 @@ class TestPurePursuitNode(object):
         path.header.stamp = rospy.Time.now()
         path.header.frame_id = "world"
 
+
         path_coords = [(-1, -1), (2, 1), (4, 0)]
         for x, y in path_coords:
             pose = PoseStamped()
@@ -78,6 +79,7 @@ class TestPurePursuitNode(object):
             path.poses.append(pose)
 
         self.path_pub.publish(path)
+        print('I got here!')
 
 
 if __name__ == "__main__":

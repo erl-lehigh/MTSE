@@ -20,6 +20,10 @@
           name="vehicle_broadcaster"
           args="1 1 0 0 0 0 1 world vehicle"/>
 
+    <node pkg="rostopic" type="rostopic" name="static_reference_speed"
+    args="pub /reference_speed std_msgs/Float64 3" />
+
+
     <!-- TODO: write test code and add it here as a test. -->
     <!-- test test-name="test" pkg="purepursuit" type="test_code.py"/ -->
 </launch>

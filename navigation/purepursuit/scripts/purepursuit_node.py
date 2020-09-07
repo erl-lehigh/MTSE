@@ -7,6 +7,8 @@ import tf.transformations as tr
 from nav_msgs.msg import Path
 from ackermann_msgs.msg import AckermannDrive
 from geometry_msgs.msg import Pose
+from std_msgs.msg import Float64
+
 
 from geometry_msgs.msg import PoseStamped ###
 
@@ -74,11 +76,11 @@ class PurePursuitNode(object):
         self.child_frame = rospy.get_param('~child_frame', 'vehicle')
         lookahead = rospy.get_param('~lookahead', 4)
         wheelbase = rospy.get_param('~wheelbase', 1)
-        speed = rospy.get_param('~speed', 3)
+
 
         self.period = rospy.Duration(1.0 / self.rate)
 
-        self.purepursuit = PurePursuit(wheelbase, lookahead, speed)
+        self.purepursuit = PurePursuit(wheelbase, lookahead, speed=0)
 
         # Create publishers
         self.command_pub = rospy.Publisher('speed_command', AckermannDrive,
@@ -93,6 +95,9 @@ class PurePursuitNode(object):
 
         # Create subscribers
         self.path_sub = rospy.Subscriber('planned_path', Path, self.set_path)
+
+        self.speed_sub = rospy.Subscriber('reference_speed', Float64,
+        self.set_speed)
         #declares that the node is subscribing to the 'planned_path'
         #which is of Path.
         #when new messages are received, self.set_path is invoked with the
@@ -154,6 +159,10 @@ class PurePursuitNode(object):
         pose_list = [(pose.pose.position.x, pose.pose.position.y)
                      for pose in msg.poses]
         self.purepursuit.path = LineString(pose_list)
+
+
+    def set_speed(self, msg):
+        self.purepursuit.speed = msg.data
 
     def control_loop(self, event=None):
         '''
