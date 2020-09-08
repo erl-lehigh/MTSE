@@ -39,20 +39,6 @@
 
     <include file="$(find carla_ackermann_control)/launch/carla_ackermann_control.launch"/>
 
-    <!--
-    arg name="config" default="default" doc="Specify a config"/>
-
-    <arg name="output" default="screen" doc="Output display"/>
-    <arg name="param_file_name" default="default" doc="Specify a param file"/>
-    <arg name="req" default="true"/>
-
-    <arg name="pkg_name" value="template_ros_package" doc="name of the package"/>
-    <arg name="node_name" default="sample_node_name" doc="name of the node"/>
-    <arg name="node_type" default="sample_node.py" doc="name of the type"/>
-
-    <node pkg="$(arg pkg_name)" type="$(arg node_type)" name="$(arg node_name)" output="$(arg output)"></node
-    -->
-
     <!-- We start the rviz config-->
     <group if="$(arg rviz)">
         <node type="rviz" name="rviz" pkg="rviz"
