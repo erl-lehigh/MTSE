@@ -3,6 +3,7 @@
     <arg name="purepursuit" default="False"/>
     <arg name="costmap" default="False"/>
     <arg name="amcl" default="True"/>
+    <arg name="gmapping" default="True"/>
     <arg name="rrt" default="False"/>
     <arg name="route_planner" default="False"/>
     <arg name="rviz" default="true"/>
@@ -23,6 +24,10 @@
 
     <group if="$(arg amcl)">
         <include file="$(find launch_all)/launch/nodes_launch/amcl/amcl.launch"/>
+    </group>
+
+    <group if="$(arg gmapping)">
+        <include file="$(find launch_all)/launch/nodes_launch/amcl/gmapping.launch"/>
     </group>
 
     <group if="$(arg rrt)">
