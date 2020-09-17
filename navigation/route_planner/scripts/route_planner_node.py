@@ -44,6 +44,22 @@ class RoutePlannerNode(object):
             the object that does all of the route planning.
         dest : tuple
             the location of the destination.
+        header : std_msgs.msg.Header
+            common header for all pose messages.
+        route_msg : nav_msgs.msg.Path
+            path message for route publishing.
+        path_msg : nav_msgs.msg.Path
+            path message for reference path publishing.
+        route_pub : rospy.Publisher
+            route publisher.
+        reference_path_pub : rospy.Publisher
+            reference path publisher.
+        tf_buffer : tf2_ros.Buffer
+            buffer for transforms associated with the listener.
+        ts_listener : tf2_ros.TransformListener
+            buffered transform listener.
+        timer : rospy.Timer
+            control loop fixed rate timer.
             
     Methods
     -------
@@ -163,8 +179,8 @@ class RoutePlannerNode(object):
 
     def get_vehicle_location(self):
         '''
-        Uses a tf buffer to get the location of the vehicle and return its
-         coordinates.
+        Returns the location of the vehicle based on the transform between the 
+        parent and child frames using a tf2 listener.
 
         Parameters
         ----------
@@ -172,7 +188,7 @@ class RoutePlannerNode(object):
 
         Returns
         -------
-        (x,y) point
+        tuple : (x, y)
             location of the vehicle.
         '''
         try:

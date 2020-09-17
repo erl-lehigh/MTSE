@@ -10,8 +10,6 @@ import matplotlib.pyplot as plt
 import requests
 
 
-
-
 class RoutePlanner(object):
     '''
     Route planner from a given position to a destination on a map.
@@ -141,7 +139,7 @@ class RoutePlanner(object):
 
     def get_route(self, origin, destination):
         '''
-        Uses Dijkstra's algorithm to compute the shortest distance between
+        Uses Dijkstra's algorithm to compute the shortest route between
         the vehicle's current location (origin) and a given destination.
 
         Parameters
@@ -153,7 +151,7 @@ class RoutePlanner(object):
 
         Returns
         -------
-        path
+        route
             the path connecting the origin and the destination.
         '''
         # Find the nearest intersection to the current location
@@ -172,6 +170,7 @@ class RoutePlanner(object):
 
     def geocode(self, query):
         '''
+        Returns the geographical coordinates from an address.
         Geocode a query string to (lat, lon) with the Nominatim geocoder.
 
         Parameters
@@ -202,10 +201,9 @@ class RoutePlanner(object):
             raise Exception(('Nominatim geocoder returned no results for query' 
                 '"{}"').format(query))
 
-
     def setup_plot(self, color='red'):
         '''
-        Displays the blank map.
+        Displays the roads of a map with no route.
 
         Parameters
         ----------
