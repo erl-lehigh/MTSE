@@ -120,12 +120,6 @@ class RoutePlannerNode(object):
         # Plot graph
         self.route_planner.setup_plot()
 
-        # Gets the destination from the user
-        destination = input("Address of Destination (in quotes) : ")
-
-        # Converts the address given to latitude and longitude
-        self.dest = self.route_planner.geocode(query=destination)
-
         # Common header for all
         self.header = Header(frame_id=self.parent_frame)
 

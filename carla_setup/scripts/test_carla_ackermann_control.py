@@ -161,7 +161,7 @@ class VehicleControllerNode(object):
         '''
         # Here GNSS data can be used
         # rospy.loginfo('lat: %f, lon: %f', nav.latitude, nav.longitude)
-        rate.sleep()
+        self.rate.sleep()
 
     def print_odometry_location(self, loc):
         '''
@@ -270,7 +270,7 @@ class VehicleControllerNode(object):
 
         self.rate.sleep()
 
-        def control(self, cmd_msgs):
+    def control(self, cmd_msgs):
         '''
         Drives the vehicle based on given values.
 
