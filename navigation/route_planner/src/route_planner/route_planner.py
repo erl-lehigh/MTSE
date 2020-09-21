@@ -17,15 +17,16 @@ class RoutePlanner(object):
     Attributes
     ----------
     address :  string
-        the address to geocode and use as the central point around which to 
+        the address to geocode and use as the central point around which to
         construct the graph.
     distance : int
-        retain only those nodes within this many meters of the center of the 
+        retain only those nodes within this many meters of the center of the
         graph.
     network_type : string
         what type of street network to get.
     g : networkx multidigraph or tuple
-        multidigraph or optionally (multidigraph, tuple).
+        multidigraph or optionally (multidigraph, tuple) representing the road
+        network.
     figure : tuple
         figure information.
     ax : tuple
@@ -36,25 +37,25 @@ class RoutePlanner(object):
     Methods
     -------
     get_route_coords(self, route):
-        Takes each node along the route and returns their corresponding 
+        Takes each node along the route and returns their corresponding
         coordinates.
     get_road_coords(self, route):
         Takes each edge and breaks it into nodes with linear connections and
         returns the nodes' coordinates.
     get_route(self, origin, destination):
-        Uses Dijkstra's algorithm to compute the shortest distance between
+        Uses Dijkstra's algorithm to compute the shortest route between
         the vehicles current location (origin) and a given destination.
-    geocode(self, query):
-        Geocode a query string to (lat, lon) with the Nominatim geocoder.
+    get_point_of_interest(self, destination, distance):
+        Gets the coordinates of a point of interest (address).
     setup_plot(self):
-        Displays the blank map.
+        Displays the roads of a map with no route.
     plot_route(self, route_coords):
-        Plots the route onto the map.    
+        Plots the route onto the map.
     update_plot(self):
         Updates the map with the new route.
-    
+
     '''
-    
+
     def __init__(self, address, distance, network_type):
         '''
         RoutePlanner Constructor.
@@ -62,10 +63,10 @@ class RoutePlanner(object):
         Parameters
         ----------
         address :  string
-            the address to geocode and use as the central point around which to 
+            the address to geocode and use as the central point around which to
             construct the graph.
         distance : int
-            retain only those nodes within this many meters of the center of 
+            retain only those nodes within this many meters of the center of
             the graph.
         network_type : string
             what type of street network to get.
@@ -73,7 +74,7 @@ class RoutePlanner(object):
         Returns
         -------
         None
-        
+
         '''
         self.address = address
         self.distance = distance
@@ -82,28 +83,28 @@ class RoutePlanner(object):
         # Gets all the roads a distance away on which can be driven
         self.g = ox.graph_from_address(self.address, distance=self.distance,
                                        network_type=self.network_type)
-    
+
     def __init__(self, yaml_path):
         '''
         RoutePlanner Constructor.
 
         Parameters
         ----------
-        yaml_path :  
+        yaml_path :
             uses the yaml file to create the map.
 
         Returns
         -------
         None
-        
+
         '''
         # Turns the yaml into a networkx graph
-        self.g = nx.read_yaml(yaml_path)        
+        self.g = nx.read_yaml(yaml_path)
 
     def get_route_coords(self, route):
         '''
         Takes each node along the route and returns their corresponding
-         coordinates.
+        coordinates.
 
         Parameters
         ----------
@@ -130,8 +131,7 @@ class RoutePlanner(object):
         Returns
         -------
         list
-            the coordinates of each point along the route that has only a 
-            straight line connecting them.
+            the coordinates of all the roads along the route.
         '''
         # Concatenate all road geometries
         return list(it.chain(*[self.g.get_edge_data(u, v)[0]['geometry'].coords
@@ -152,7 +152,7 @@ class RoutePlanner(object):
         Returns
         -------
         route
-            the path connecting the origin and the destination.
+            the route connecting the origin and the destination.
         '''
         # Find the nearest intersection to the current location
         # Has to be inverted due to networkx using (y,x)
@@ -185,8 +185,8 @@ class RoutePlanner(object):
         '''
         # Copied From OSMNx
         # send the query to the nominatim geocoder and parse the json response
-        url_template = ('https://nominatim.openstreetmap.org/search?format=json'
-            '&limit=1&q={}')
+        url_template = ('https://nominatim.openstreetmap.org/'
+                        'search?format=json&limit=1&q={}')
         url = url_template.format(query)
         response = requests.get(url, timeout=60)
         results = response.json()
@@ -198,7 +198,7 @@ class RoutePlanner(object):
             point = (lat, lon)
             return point
         else:
-            raise Exception(('Nominatim geocoder returned no results for query' 
+            raise Exception(('Nominatim geocoder returned no results for query'
                 '"{}"').format(query))
 
     def setup_plot(self, color='red'):
@@ -230,7 +230,7 @@ class RoutePlanner(object):
             the coordinates of each point along the route.
         color : string
             the color to plot in.
-            
+
         Returns
         -------
         None

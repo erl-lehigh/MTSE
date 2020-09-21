@@ -60,19 +60,19 @@ class RoutePlannerNode(object):
             buffered transform listener.
         timer : rospy.Timer
             control loop fixed rate timer.
-            
+
     Methods
     -------
         plot_target(self, target_point):
             Plots the target point on the map (in green).
         get_vehicle_location(self):
-            Uses a tf buffer to get the location of the vehicle and return its 
-            coordinates.
+            Returns the location of the vehicle based on the transform between
+            the parent and child frames using a tf2 listener.
         coordinates_to_poses(self, coords):
-            Iterates through the coordinates to create a pose for each.
+            Transforms list of coordinates to a list of ros geometry poses.
         control_loop(self, event):
-            Updates the route based on changing location.
-            Then publishes both the route and its reference path.
+            Updates the route based on changing location. Then publishes both
+            the route and its reference path.
     '''
 
     def __init__(self):
@@ -119,7 +119,13 @@ class RoutePlannerNode(object):
 
         # Plot graph
         self.route_planner.setup_plot()
-        
+
+        # Gets the destination from the user
+        destination = input("Address of Destination (in quotes) : ")
+
+        # Converts the address given to latitude and longitude
+        self.dest = self.route_planner.geocode(query=destination)
+
         # Common header for all
         self.header = Header(frame_id=self.parent_frame)
 
@@ -152,15 +158,14 @@ class RoutePlannerNode(object):
 
 
         # Subscribers
-        rospy.Subscriber("/target",PoseStamped, 
-            self.plot_target)
+        rospy.Subscriber("/target",PoseStamped, self.plot_target)
 
         rospy.loginfo('[%s] Node started!', self.node_name)
 
     def plot_target(self, target_point):
         '''
         Plots the target point on the map (in green).
-        
+
         Parameters
         ----------
         target_point : tuple
@@ -179,7 +184,7 @@ class RoutePlannerNode(object):
 
     def get_vehicle_location(self):
         '''
-        Returns the location of the vehicle based on the transform between the 
+        Returns the location of the vehicle based on the transform between the
         parent and child frames using a tf2 listener.
 
         Parameters
@@ -203,17 +208,17 @@ class RoutePlannerNode(object):
 
     def coordinates_to_poses(self, coords):
         '''
-        Iterates through the coordinates to create a pose for each.
+        Transforms list of coordinates to a list of ros geometry poses.
 
         Parameters
         ----------
-        coords : list of coordinates
-            the coordinates to be converted into poses.
+        coords : list of tuples
+            the coordinates to be converted into poses
 
         Returns
         -------
-        list of poses
-            the pose equivalent of the inputted coordinates.
+        list of geometry_msgs.msg.PoseStamped
+            the pose equivalent of the inputted coordinates
         '''
         poses = []
         self.header.stamp = rospy.Time.now()
@@ -226,12 +231,12 @@ class RoutePlannerNode(object):
 
     def control_loop(self, event):
         '''
-        Updates the route based on changing location.
-        Then publishes both the route and its reference path.
+        Updates the route based on changing location. Then publishes both the
+        route and its reference path.
 
         Parameters
         ----------
-        event : event
+        event : rospy.timer.TimerEvent
             the current event state
 
         Returns
@@ -279,5 +284,4 @@ if __name__ == '__main__':
     route_planner_node = RoutePlannerNode()
 
     while not rospy.is_shutdown():
-        pass
         route_planner_node.route_planner.update_plot()
