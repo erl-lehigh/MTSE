@@ -136,16 +136,16 @@ class RoutePlannerNode(object):
 
     def coordinates_to_poses(self, coords):
         '''
-        Iterates through the coordinates to create a pose for each.
+        Transforms list of coordinates to a list of ros geometry poses.
 
         Parameters
         ----------
-        coords : list of coordinates
+        coords : list of tuples
             the coordinates to be converted into poses
 
         Returns
         -------
-        list of poses
+        list of geometry_msgs.msg.PoseStamped
             the pose equivalent of the inputted coordinates
         '''
         poses = []
