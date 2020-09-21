@@ -163,6 +163,10 @@ class PurePursuitNode(object):
 
     def set_speed(self, msg):
         self.purepursuit.speed = msg.data
+        #speed = msg.data
+        self.purepursuit.update_lookahead(msg.data) # [different function in 
+        #purepursuit class]
+        # have lower and upper bound for lookahead based on the speed
 
     def control_loop(self, event=None):
         '''

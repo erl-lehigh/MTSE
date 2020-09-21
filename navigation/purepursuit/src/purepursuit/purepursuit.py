@@ -129,6 +129,20 @@ class PurePursuit:
         arc_dist = self.path.project(self.vehicle_position)
         return self.path.interpolate(arc_dist + dist_on_path)
 
+
+    def update_lookahead(self, v_cmd):
+        lookahead_min = 3
+        lookahead_max = 12
+        lower_threshold_v = 1.34
+        upper_threshold_v = 5.36
+        if (v_cmd < lower_threshold_v):
+            self.lookahead = lookahead_min
+        elif (lower_threshold_v <= v_cmd and v_cmd < upper_threshold_v):
+            self.lookahead = 2.24*v_cmd
+        else:
+            self.lookahead = lookahead_max
+
+
     def compute_speed(self):
         '''
         Returns the computed speed of the vehicle.
