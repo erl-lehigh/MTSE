@@ -4,6 +4,7 @@ project(purepursuit)
 find_package(catkin REQUIRED COMPONENTS
   rospy
   ackermann_msgs
+  geometry_msgs
   nav_msgs
 )
 
@@ -13,6 +14,7 @@ catkin_package(
   CATKIN_DEPENDS
   rospy
   ackermann_msgs
+  geometry_msgs
   nav_msgs
 )
 

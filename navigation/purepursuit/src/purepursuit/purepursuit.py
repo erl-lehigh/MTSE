@@ -10,6 +10,7 @@ from shapely.geometry import Point
 class PurePursuit:
     '''
     A class to represent a PurePursuit path tracker.
+
     Attributes
     ----------
     wheelbase : float
@@ -24,12 +25,14 @@ class PurePursuit:
         position of vehicle
     vehicle_orientation : float
         orientation of vehicle
+
     Methods
     -------
-    set_path(msg):
+    set_path(msg)
         generates a path LineString (to be tracked) from a set of position
         coordinates (pose)
-    control_loop(event=None):
+    control_loop(event=None)
+        computes the speed and steering angle at each iteration
     '''
 
     # constructor
@@ -41,6 +44,7 @@ class PurePursuit:
         does geometric computation and then outputs the goal point, speed, and
         steering angle for the vehicle to stay on the path to be followed based
         on the aforementioned inputs.
+
         Parameters
         ----------
         wheelbase : float
@@ -67,12 +71,14 @@ class PurePursuit:
 
     def set_vehicle_pose(self, vehicle_pose):
         '''
-        Sets the vehicle position and the orientation if vehicle_pose is not
-        None.
+        Sets the vehicle position and the orientation if `vehicle_pose` is not
+        `None`.
+
         Parameters
         ----------
         vehicle_pose : tuple
             pose of the vehicle as a 3-tuple (x, y, yaw)
+
         Returns
         -------
         None
@@ -88,12 +94,14 @@ class PurePursuit:
         '''
         Returns the computed closest point on the path from the midpoint of the
         rear axle of the vehicle.
+
         Parameters
         ----------
         None
+
         Returns
         -------
-        self.path.interpolate(path_length) : shapely.geometry.Point
+        shapely.geometry.Point
             computed closest point
         '''
         path_length = self.path.project(self.vehicle_position)
@@ -103,12 +111,14 @@ class PurePursuit:
         '''
         Returns the computed future point on the path for the vehicle to keep
         track of.
+
         Parameters
         ----------
         None
+
         Returns
         -------
-        self.path.interpolate(dist_on_path) : shapely.geometry.Point
+        shapely.geometry.Point
             computed future point
         '''
         closest_dist = min(self.vehicle_position.distance(self.closest_point()),
@@ -120,12 +130,14 @@ class PurePursuit:
     def compute_speed(self):
         '''
         Returns the computed speed of the vehicle.
+
         Parameters
         ----------
         None
+
         Returns
         -------
-        vehicle speed : float
+        float
             vehicle speed
         '''
         return self.speed
@@ -133,12 +145,14 @@ class PurePursuit:
     def vehicle_front_point(self):
         '''
         Returns the computed front axle midpoint of vehicle.
+
         Parameters
         ----------
         None
+
         Returns
         -------
-        vehicle front point : shapely.geometry.Point
+        shapely.geometry.Point
             vehicle front axle midpoint
         '''
         direction = np.array((np.cos(self.vehicle_orientation),
@@ -149,12 +163,14 @@ class PurePursuit:
         '''
         Returns the computed steering angle of the vehicle based on where the
         vehicle is in relation to the path that it is following.
+
         Parameters
         ----------
         None
+
         Returns
         -------
-        steering angle : float
+        float
             computed steering angle
         '''
         lookahead_point = np.array(self.future_point()) - self.vehicle_position
@@ -165,12 +181,14 @@ class PurePursuit:
     def compute_angular_speed(self):
         '''
         Returns the computed angular speed of the vehicle.
+
         Parameters
         ----------
         None
+
         Returns
         -------
-        angular speed : float
+        float
             computed speed
         '''
         return self.speed * tan(self.compute_steering_angle()) / self.wheelbase
@@ -178,12 +196,14 @@ class PurePursuit:
     def compute_curvature(self):
         '''
         Returns the computed curvature.
+
         Parameters
         ----------
         None
+
         Returns
         -------
-        curvature : float
+        float
             computed curvature
         '''
         lookahead_point = np.array(self.future_point()) - self.vehicle_position
@@ -193,13 +213,15 @@ class PurePursuit:
 
     def compute_turning_radius(self):
         '''
-        Returns the computed r (radius).
+        Returns the computed turning radius.
+
         Parameters
         ----------
         None
+
         Returns
         -------
-        turning radius : float
+        float
             computed turning radius
         '''
         return 1.0 / self.compute_curvature()

@@ -6,12 +6,9 @@
 
 	<maintainer email="user@todo.todo">user</maintainer>
 
-
 	<license>TODO</license>
 
-
 	<buildtool_depend>catkin</buildtool_depend>
-
 
 	<depend>rospy</depend>
 	<depend>std_msgs</depend>
@@ -20,6 +17,8 @@
 	<depend>sensor_msgs</depend>
 	<depend>nav_msgs</depend>
 	<depend>geometry_msgs</depend>
+	<depend>carla_ros_bridge</depend>
+
 
 	<exec_depend>python-numpy</exec_depend>
 	<exec_depend>python-opencv</exec_depend>
