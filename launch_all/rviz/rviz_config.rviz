@@ -5,11 +5,8 @@ Panels:
     Property Tree Widget:
       Expanded:
         - /TF1/Tree1
-<<<<<<< HEAD
-=======
         - /Map1
         - /LaserScan1
->>>>>>> af570fca485e6424199e4c9c7d1c823882d1db3e
       Splitter Ratio: 0.5
     Tree Height: 375
   - Class: rviz/Selection
