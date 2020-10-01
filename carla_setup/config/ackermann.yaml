@@ -8,4 +8,4 @@ synchronous_mode: '' # sets synchronous_mode
 synchronous_mode_wait-for_vehicle_control_command: ''
 fixed_delta_seconds: '' # sets fixed_delta_seconds
 rate: 5 # sets the frequency (hz)
-vehicle_type: 'prius' # sets the vehicle
+vehicle_type: 'model3' # sets the vehicle

@@ -81,7 +81,7 @@ class VehicleControllerNode(object):
 
         # Gets any parameters on the node
         rate = rospy.get_param('~rate', 5)
-        self.vehicle_type = rospy.get_param('~vehicle_type', 'prius')
+        self.vehicle_type = rospy.get_param('~vehicle_type', 'model3')
 
         # Sets a default current position to check against later
         self.current_pos = None
