@@ -19,7 +19,7 @@
     <!-- node pkg="tf2_ros" type="static_transform_publisher"
           name="vehicle_broadcaster"
           args="1 1 0 0 0 0 1 map base_link"/ -->
-
+    
     <!-- <node pkg="pointcloud_to_laserscan" type="pointcloud_to_laserscan_node" name="pointcloud_to_laserscan">
         <remap from="cloud_in" to="/carla/ego_vehicle/lidar/lidar1/point_cloud"/>
         <rosparam>
