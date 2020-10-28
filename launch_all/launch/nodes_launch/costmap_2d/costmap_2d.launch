@@ -15,7 +15,7 @@
           output="$(arg output)" required="$(arg req)">
         <rosparam command="load" file="$(arg config)" ns="costmap" />
     </node>
-    <node name="pointcloud_to_laserscan_node" pkg="launch_all" type="pointcloud_to_laserscan_node.py" respawn="false" output="screen"/>
+    <node name="pointcloud_to_laserscan_node" pkg="launch_all" type="pointcloud_to_laserscan_node" respawn="false" output="screen"/>
     <!-- launch dummy static vehicle transform w.r.t. world frame -->
     <!-- node pkg="tf2_ros" type="static_transform_publisher"
           name="vehicle_broadcaster"
@@ -25,17 +25,17 @@
 
         <remap from="cloud_in" to="/carla/ego_vehicle/lidar/lidar1/point_cloud"/>
         <rosparam>
-            target_frame: <ego_vehicle/lidar/lidar1> 
+            target_frame: ego_vehicle/lidar/front
             transform_tolerance: 0.01
             min_height: 0.0
             max_height: 1.0
 
-            angle_min: -3.14 # -M_PI
-            angle_max: 3.14 # M_PI
-            angle_increment: 0.0087 # M_PI/360.0
+            angle_min: -3.14
+            angle_max: 3.14
+            angle_increment: 0.0087 
             scan_time: 0.3333
             range_min: 0.45
-            range_max: 10.0
+            range_max: 4.0
             use_inf: true
 
             # Concurrency level, affects number of pointclouds queued for processing and number of threads used

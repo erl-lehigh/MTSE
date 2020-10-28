@@ -2,7 +2,7 @@ global_frame: map
 robot_base_frame: ego_vehicle
 update_frequency: 5
 publish_frequency: 5
-static_map: false 
+static_map: false
 rolling_window: true 
 width: 20
 height: 20
@@ -10,7 +10,6 @@ resolution: 1
 # footprint: [[-0.325, -0.325], [-0.325, 0.325], [0.325, 0.325], [0.46, 0.0], [0.325, -0.325]]
 
 plugins: 
-  # - {name: static_map,       type: "costmap_2d::StaticLayer"}
   - {name: obstacle_layer,        type: "costmap_2d::ObstacleLayer"}
   - {name: inflation_layer,       type: "costmap_2d::InflationLayer"}
 
