@@ -10,7 +10,9 @@ import matplotlib.pyplot as plt
 import requests
 import math
 import shapely
+import sys
 
+from shapely.geometry import Point
 
 
 
@@ -73,64 +75,42 @@ class GoalPlanner(object):
         
         '''
         ref_path = list(route.coords)
-        try:
-            node1 = ref_path[0]
-            node2 = ref_path[1]
-        except (IndexError):
-            print("Out of bounds!!")
-            node1 = (1.0,1.0)
-            node2 = (2.0,1.0)
+        index = 0
+        min_index = 0
+        min_dist = sys.maxint
+        # Locates the closest node to the current location on the path
+        for pt in ref_path:
+            if(self.dist_to_point(pt,current_location)<min_dist):
+                min_dist = self.dist_to_point(pt,current_location)
+                min_index = index
+            index = index + 1
         
-        cn_x = node1[0]
-        cn_y = node1[1]
-        # Determines the difference between the current location and nearest x,y
-        try:
-            current_location[0]
-            current_location[1]
-        except (IndexError, TypeError):
-            print("Out of bounds!!")
-            current_location = tuple([0.0,0.0])
-
-        dx = cn_x - current_location[0]
-        dy = cn_y - current_location[1]
+        dx = ref_path[min_index][0] - current_location.x
+        dy = ref_path[min_index][1] - current_location.y
         # Calculates the angle, in radians, to the nearest node
-        needed_orientaion = math.atan2(dy,dx)
-        # Converts from radians to w
-        w = (math.pi - needed_orientaion)/math.pi
-        print(w)
-        # If the nearest node is in front, its the goal, else, its the next node
-        if (orientation - w < 1.0 and orientation - w > -1.0):
-            self.goal_node = node1
+        needed_orientation = math.atan2(dy,dx)
+
+        # Make both orientations positive
+        if(needed_orientation < 0):
+            needed_orientation = needed_orientation + 2 * math.pi
+        if(orientation < 0):
+            orientation = orientation + 2 * math.pi
+
+        # If the point is in front of the vehicle, it is the goal point
+        # Otherwise, the next point is the goal point    
+        if(needed_orientation - orientation < 2 and
+                 needed_orientation - orientation > -2):
+            self.goal_node = Point(ref_path[min_index][0],
+                ref_path[min_index][1])
         else:
-            self.goal_node = node2
+            self.goal_node = Point(ref_path[min_index+1][0],
+                ref_path[min_index+1][1])
+            
 
-
-        '''
-        # Gets the two neighbors of the nearest node
-        pn = graph.neighbors(ox.get_nearest_node(graph, current_location))
-        # Sets the previous and next nodes to the nearest node
-        self.previous_node = pn[0]
-        self.next_node = pn[1]
-        # Gets the closest node
-        self.closest_node = ox.get_nearest_node(graph, current_location)
-        # Converts the node to x,y
-        cn_x = self.graph.node[self.closest_node]['x']
-        cn_y = self.graph.node[self.closest_node]['y']
-        # Determines the difference between the current location and nearest x,y
-        dx = cn_x - current_location.x
-        dy = cn_y - current_location.y
-        # Calculates the angle, in radians, to the nearest node
-        needed_orientaion = math.atan2(dy,dx)
-        # Converts from radians to w
-        w = (math.pi - needed_orientaion)/math.pi
-        # If the nearest node is in front, its the goal, else, its the next node
-        if (orientation - w < 1.0 and orientation - w > -1.0):
-            self.goal_node = self.closest_node
-        else:
-            self.goal_node = self.next_node
-        '''
-
-
+    def dist_to_point(self, pt, current_location):
+        return math.sqrt(math.pow((pt[0]-current_location.x),2)+
+            math.pow((pt[1]-current_location.y),2))
+        
 
     def get_goal_node(self):
         return self.goal_node
