@@ -45,4 +45,3 @@ if __name__ == '__main__':
          instance_of_GoalPlanner.get_goal_node().y,'og')
 
     plt.show()
-
