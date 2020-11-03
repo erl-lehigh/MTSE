@@ -20,7 +20,7 @@ if __name__ == '__main__':
     ax1 = fig.add_subplot(1,1,1)
 
     path = LineString([(1, 1), (4, 4), (10, 5), (11, 2)]) # given line path
-    vehicle_cords = Point(5,3)   # initial vehicle coordinates
+    vehicle_cords = Point(8,4)   # initial vehicle coordinates
     theta = 0  # rad
 
     instance_of_GoalPlanner = GoalPlanner(vehicle_cords, theta, path)
