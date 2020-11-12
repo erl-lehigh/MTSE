@@ -2,7 +2,7 @@
     <arg name="carla_bridge" default="True"/>
     <arg name="purepursuit" default="False"/>
     <arg name="costmap" default="True"/>
-    <arg name="rrt" default="False"/>
+    <arg name="rrt" default="True"/>
     <arg name="route_planner" default="False"/>
     <arg name="rviz" default="True"/>
 
