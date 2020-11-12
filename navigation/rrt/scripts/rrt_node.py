@@ -60,7 +60,7 @@ class RRTNode(object):
         # Create subscribers
         self.costmap_sub = rospy.Subscriber('costmap', OccupancyGrid,
                                             self.set_costmap)
-        self.goal_sub = rospy.Subscriber('goal', PoseStamped, self.set_goal)
+        self.goal_sub = rospy.Subscriber('goal_point', PoseStamped, self.set_goal)
         # Create transform listener
         self.tf_buffer = tf2_ros.Buffer()
         self.ts_listener = tf2_ros.TransformListener(self.tf_buffer)

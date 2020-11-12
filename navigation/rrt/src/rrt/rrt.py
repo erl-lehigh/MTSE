@@ -247,7 +247,7 @@ class RRTPlanner(object):
 
 
 def main():
-    print("start " + __file__)
+    # print("start " + __file__)
 
     np.random.seed(1) # set random number generator seed to get repeatability
 
@@ -264,7 +264,7 @@ def main():
     path = rrt.plan(DubinsState(x=29.988612382203414, y=-4.3868679359233935,
                                 yaw=0.082673490883941936,
                                 v=10.0, omega=0.082673490883941936))
-    print(path)
+    # print(path)
 
 if __name__ == '__main__':
     main()

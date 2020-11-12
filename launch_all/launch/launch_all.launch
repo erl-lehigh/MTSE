@@ -1,9 +1,10 @@
 <launch>
     <arg name="carla_bridge" default="True"/>
-    <arg name="purepursuit" default="False"/>
+    <arg name="purepursuit" default="True"/>
     <arg name="costmap" default="True"/>
     <arg name="rrt" default="True"/>
-    <arg name="route_planner" default="False"/>
+    <arg name="route_planner" default="True"/>
+    <arg name="goal_planner" default="True"/>
     <arg name="rviz" default="True"/>
 
     <!-- include file="$(find template_ros_package)/launch/launch_file.launch"/ -->
@@ -18,17 +19,21 @@
         <include file="$(find purepursuit)/launch/purepursuit.launch"/>
     </group>
 
-    <group if="$(arg costmap)">
+    <group if="$(arg route_planner)">
+        <include file="$(find route_planner)/launch/route_planner.launch"/>
+    </group>
+
+    <group if="$(arg goal_planner)">
+        <include file="$(find goal_planner)/launch/goal_planner.launch"/>
+    </group>
+
+        <group if="$(arg costmap)">
         <include file="$(find launch_all)/launch/nodes_launch/costmap_2d/costmap_2d.launch"/>
     </group>
 
     <group if="$(arg rrt)">
         <remap from="costmap" to="costmap/costmap"/>
         <include file="$(find rrt)/launch/rrt.launch"/>
-    </group>
-
-    <group if="$(arg route_planner)">
-        <include file="$(find route_planner)/launch/route_planner.launch"/>
     </group>
 
     <group if="$(arg rviz)">

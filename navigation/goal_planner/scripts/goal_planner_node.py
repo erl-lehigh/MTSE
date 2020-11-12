@@ -63,8 +63,8 @@ class GoalPlannerNode(object):
         self.node_name = rospy.get_name()
         # Gets any parameters on the node
         self.rate = rospy.get_param('~rate', 1)
-        self.parent_frame = rospy.get_param('~parent_frame', 'world')
-        self.child_frame = rospy.get_param('~child_frame', 'vehicle')
+        self.parent_frame = rospy.get_param('~parent_frame', 'map')
+        self.child_frame = rospy.get_param('~child_frame', 'ego_vehicle')
 
         # Create transform listener
         self.tf_buffer = tf2_ros.Buffer()
@@ -91,7 +91,7 @@ class GoalPlannerNode(object):
             queue_size=10)
 
         #Creates a subscriber
-        rospy.Subscriber("reference_path", Path, self.set_path)
+        rospy.Subscriber("route_planner_planned_path", Path, self.set_path)
 
         # Create transform listener
         self.tf_buffer = tf2_ros.Buffer()
@@ -223,5 +223,6 @@ if __name__ == '__main__':
     # rospy.spin()
     # Hack to update plot from the main thread due to TkInter issue
     while not rospy.is_shutdown():
-        goal_planner_node.goal_planner.update_plot()
-        rospy.sleep(goal_planner_node.period)
+        # goal_planner_node.goal_planner.update_plot()
+        # rospy.sleep(goal_planner_node.period)
+        rospy.sleep(1.0)
