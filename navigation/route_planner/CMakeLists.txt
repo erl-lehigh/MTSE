@@ -6,7 +6,6 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
   nav_msgs
   geometry_msgs
-  message_generation
 )
 
 catkin_python_setup()
@@ -14,6 +13,9 @@ catkin_python_setup()
 catkin_package(
       CATKIN_DEPENDS
       rospy
+      std_msgs
+      nav_msgs
+      geometry_msgs
 )
 
 if(CATKIN_ENABLE_TESTING)

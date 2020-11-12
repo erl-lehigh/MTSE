@@ -45,13 +45,13 @@ class TestPurePursuitNode(object):
 
         # Create publishers
         self.path_pub  = rospy.Publisher('planned_path', Path, queue_size=1)
-        self.timer = rospy.Timer(rospy.Duration(1), self.publish_path,
-                                 oneshot=True)
+        self.timer = rospy.Timer(rospy.Duration(0.5), self.publish_path,
+                                 oneshot=False)
         rospy.loginfo('[%s] Node started!', self.node_name)
 
     def publish_path(self, event=None):
         '''
-        Publishes the path coordinates for the vehcile to track/follow
+        Publishes the path coordinates for the vehcile to track/follow.
 
         Parameters
         ----------

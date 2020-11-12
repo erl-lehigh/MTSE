@@ -16,6 +16,7 @@ from shapely.geometry import Point
 
 
 
+
 class GoalPlanner(object):
     '''
     Route planner from a given position to a destination on a map
