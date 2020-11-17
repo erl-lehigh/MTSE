@@ -133,8 +133,8 @@ class RoutePlannerNode(object):
         # Publisher for route
         self.route_pub = rospy.Publisher('route', Path, queue_size=10)
         # Publisher for reference path
-        self.reference_path_pub = rospy.Publisher('route_planner_planned_path', Path,
-                                                  queue_size=10)
+        self.reference_path_pub = rospy.Publisher('route_planner_planned_path', 
+                                                Path, queue_size=10)
         # Publisher for rViz reference path
         self.reference_path_viz_pub = rospy.Publisher('planned_path_viz', Path,
                                                   queue_size=10)

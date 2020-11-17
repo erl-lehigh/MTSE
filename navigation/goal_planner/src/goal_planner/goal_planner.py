@@ -76,36 +76,39 @@ class GoalPlanner(object):
         
         '''
         ref_path = list(route.coords)
-        index = 0
-        min_index = 0
-        min_dist = sys.maxint
-        # Locates the closest node to the current location on the path
-        for pt in ref_path:
-            if(self.dist_to_point(pt,current_location)<min_dist):
-                min_dist = self.dist_to_point(pt,current_location)
-                min_index = index
-            index = index + 1
-        
-        dx = ref_path[min_index][0] - current_location.x
-        dy = ref_path[min_index][1] - current_location.y
-        # Calculates the angle, in radians, to the nearest node
-        needed_orientation = math.atan2(dy,dx)
+        try:
+            index = 0
+            min_index = 0
+            min_dist = sys.maxint
+            # Locates the closest node to the current location on the path
+            for pt in ref_path:
+                if(self.dist_to_point(pt,current_location)<min_dist):
+                    min_dist = self.dist_to_point(pt,current_location)
+                    min_index = index
+                index = index + 1
+            
+            dx = ref_path[min_index][0] - current_location.x
+            dy = ref_path[min_index][1] - current_location.y
+            # Calculates the angle, in radians, to the nearest node
+            needed_orientation = math.atan2(dy,dx)
 
-        # Make both orientations positive
-        if(needed_orientation < 0):
-            needed_orientation = needed_orientation + 2 * math.pi
-        if(orientation < 0):
-            orientation = orientation + 2 * math.pi
+            # Make both orientations positive
+            if(needed_orientation < 0):
+                needed_orientation = needed_orientation + 2 * math.pi
+            if(orientation < 0):
+                orientation = orientation + 2 * math.pi
 
-        # If the point is in front of the vehicle, it is the goal point
-        # Otherwise, the next point is the goal point    
-        if(needed_orientation - orientation < 2 and
-                 needed_orientation - orientation > -2):
-            self.goal_node = Point(ref_path[min_index][0],
-                ref_path[min_index][1])
-        else:
-            self.goal_node = Point(ref_path[min_index+1][0],
-                ref_path[min_index+1][1])
+            # If the point is in front of the vehicle, it is the goal point
+            # Otherwise, the next point is the goal point    
+            if(needed_orientation - orientation < 2 and
+                    needed_orientation - orientation > -2):
+                self.goal_node = Point(ref_path[min_index][0],
+                    ref_path[min_index][1])
+            else:
+                self.goal_node = Point(ref_path[min_index+1][0],
+                    ref_path[min_index+1][1])
+        except(IndexError):
+            print("Index out of bounds!")
             
 
     def dist_to_point(self, pt, current_location):

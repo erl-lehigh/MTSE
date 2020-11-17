@@ -10,7 +10,7 @@ import tf2_ros
 from std_msgs.msg import Header
 from nav_msgs.msg import Path
 from geometry_msgs.msg import PoseStamped
-from shapely.geometry import LineString
+from shapely.geometry import LineString, Point
 
 from goal_planner import GoalPlanner
 
@@ -163,26 +163,25 @@ class GoalPlannerNode(object):
         _, _, orientation = tr.euler_from_quaternion(quaternion)
         return orientation
 
-    def coordinates_to_poses(self, coords):
+    def point_to_pose(self, pt):
         '''
-        Iterates through the coordinates to create a pose for each.
+        Converts a shapely point into a pose.
         Parameters
         ----------
-        coords : list of coordinates
-            the coordinates to be converted into poses
+        pt : shapely.geometry.point
+            the point to be converted into a pose
         Returns
         -------
-        list of poses
-            the pose equivalent of the inputted coordinates
+        pose
+            the pose equivalent of the inputted point
         '''
-        poses = []
         self.header.stamp = rospy.Time.now()
-        for x, y in coords:  # Add poses (stamped)
-            pose = PoseStamped(header=self.header)
-            pose.pose.position.x = x
-            pose.pose.position.y = y
-            poses.append(pose)
-        return poses
+
+        pose = PoseStamped(header=self.header)
+        pose.pose.position.x = pt.x
+        pose.pose.position.y = pt.y
+
+        return pose
 
     def control_loop(self, event):
         '''
@@ -202,12 +201,12 @@ class GoalPlannerNode(object):
             rospy.logdebug('Vehicle position not available!')
             return
 
-        route = self.goal_planner.get_route(orig, self.dest)
+        # route = self.goal_planner.get_route(orig, self.dest)
         goal_node = self.goal_planner.get_goal_node()
 
         # Publish route
         self.goal_point_msg.header.stamp = rospy.Time.now()  # Set the stamp
-        self.goal_point_msg.poses = self.coordinates_to_poses(goal_node)
+        self.goal_point_msg.poses = self.point_to_pose(goal_node)
         self.goal_point_pub.publish(self.goal_point_msg)
         rospy.logdebug('Goal Point: %s', self.goal_point_msg)
 
@@ -220,9 +219,9 @@ if __name__ == '__main__':
     # Create the node object
     goal_planner_node = GoalPlannerNode()
     # Keep the node alive
-    # rospy.spin()
+    rospy.spin()
     # Hack to update plot from the main thread due to TkInter issue
-    while not rospy.is_shutdown():
+    # while not rospy.is_shutdown():
         # goal_planner_node.goal_planner.update_plot()
         # rospy.sleep(goal_planner_node.period)
-        rospy.sleep(1.0)
+        # rospy.sleep(1.0)
