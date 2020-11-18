@@ -11,6 +11,7 @@ from std_msgs.msg import Header
 from nav_msgs.msg import Path
 from geometry_msgs.msg import PoseStamped
 from shapely.geometry import LineString, Point
+from tf.transformations import euler_from_quaternion
 
 from goal_planner import GoalPlanner
 
@@ -72,10 +73,8 @@ class GoalPlannerNode(object):
 
         self.period = rospy.Duration(1.0 / self.rate)
 
-        self.path = LineString()
-
         self.goal_planner = GoalPlanner(self.get_vehicle_location(), 
-            self.get_vehicle_orientation, self.path)
+            self.get_vehicle_orientation)
 
         # Common header for all
         self.header = Header(frame_id=self.parent_frame)
@@ -116,7 +115,7 @@ class GoalPlannerNode(object):
         '''
         pose_list = [(pose.pose.position.x, pose.pose.position.y)
                      for pose in msg.poses]
-        self.path = LineString(pose_list)
+        self.goal_planner.route = LineString(pose_list)
 
     def get_vehicle_location(self):
         '''
@@ -160,7 +159,7 @@ class GoalPlannerNode(object):
             return
         quaternion = trans.transform.rotation
         quaternion = (quaternion.x, quaternion.y, quaternion.z, quaternion.w)
-        _, _, orientation = tr.euler_from_quaternion(quaternion)
+        _, _, orientation = euler_from_quaternion(quaternion)
         return orientation
 
     def point_to_pose(self, pt):
@@ -200,13 +199,18 @@ class GoalPlannerNode(object):
         if orig is None:
             rospy.logdebug('Vehicle position not available!')
             return
-
+        orient = self.get_vehicle_orientation()
+        if orient is None:
+            rospy.logdebug('Vehicle orientation not available!')
+            return
+        self.goal_planner.set_current_location(orig)
+        self.goal_planner.set_orientation(orient)
         # route = self.goal_planner.get_route(orig, self.dest)
         goal_node = self.goal_planner.get_goal_node()
 
         # Publish route
         self.goal_point_msg.header.stamp = rospy.Time.now()  # Set the stamp
-        self.goal_point_msg.poses = self.point_to_pose(goal_node)
+        self.goal_point_msg = self.point_to_pose(goal_node)
         self.goal_point_pub.publish(self.goal_point_msg)
         rospy.logdebug('Goal Point: %s', self.goal_point_msg)
 

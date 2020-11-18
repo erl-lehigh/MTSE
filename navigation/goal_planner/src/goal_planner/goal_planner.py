@@ -12,7 +12,7 @@ import math
 import shapely
 import sys
 
-from shapely.geometry import Point
+from shapely.geometry import LineString, Point
 
 
 
@@ -36,6 +36,8 @@ class GoalPlanner(object):
         axis information
     route_line : MatPlotLib plot
         The lines representing the route
+    route :  tuple
+        the route being traversed
     Methods
     -------
     get_route_coords(self, route):
@@ -57,7 +59,7 @@ class GoalPlanner(object):
     
     '''
 
-    def __init__(self, current_location, orientation, route):
+    def __init__(self, current_location, orientation):
         '''
         RoutePlanner Constructor
         Parameters
@@ -68,40 +70,59 @@ class GoalPlanner(object):
             the direction of the vehicle (-1 is 360deg, 1 is 0deg, 0 is 180deg)
         graph : networkx multidigraph or tuple
             multidigraph or optionally (multidigraph, tuple)
-         route :  tuple
-        the route being traversed
         Returns
         -------
         None
         
         '''
-        ref_path = list(route.coords)
+        self.route = LineString()
+        self.current_location = current_location
+        self.orientation = orientation
+        
+        self.get_goal_node()
+
+            
+
+    def dist_to_point(self, pt, current_location):
+        return math.sqrt(math.pow((pt[0]-current_location[0]),2)+
+            math.pow((pt[1]-current_location[1]),2))
+        
+    def set_current_location(self, cl):
+        self.current_location = cl
+
+    def set_orientation(self, o):
+        self.orientation = o
+
+    def get_goal_node(self):
+        ref_path = list(self.route.coords)
+        self.goal_node = Point(0,0)
+
         try:
             index = 0
             min_index = 0
             min_dist = sys.maxint
             # Locates the closest node to the current location on the path
             for pt in ref_path:
-                if(self.dist_to_point(pt,current_location)<min_dist):
-                    min_dist = self.dist_to_point(pt,current_location)
+                if(self.dist_to_point(pt,self.current_location)<min_dist):
+                    min_dist = self.dist_to_point(pt,self.current_location)
                     min_index = index
                 index = index + 1
             
-            dx = ref_path[min_index][0] - current_location.x
-            dy = ref_path[min_index][1] - current_location.y
+            dx = ref_path[min_index][0] - self.current_location[0]
+            dy = ref_path[min_index][1] - self.current_location[1]
             # Calculates the angle, in radians, to the nearest node
             needed_orientation = math.atan2(dy,dx)
 
             # Make both orientations positive
             if(needed_orientation < 0):
                 needed_orientation = needed_orientation + 2 * math.pi
-            if(orientation < 0):
-                orientation = orientation + 2 * math.pi
+            if(self.orientation < 0):
+                self.orientation = self.orientation + 2 * math.pi
 
             # If the point is in front of the vehicle, it is the goal point
             # Otherwise, the next point is the goal point    
-            if(needed_orientation - orientation < 2 and
-                    needed_orientation - orientation > -2):
+            if(needed_orientation - self.orientation < 2 and
+                    needed_orientation - self.orientation > -2):
                 self.goal_node = Point(ref_path[min_index][0],
                     ref_path[min_index][1])
             else:
@@ -109,14 +130,7 @@ class GoalPlanner(object):
                     ref_path[min_index+1][1])
         except(IndexError):
             print("Index out of bounds!")
-            
 
-    def dist_to_point(self, pt, current_location):
-        return math.sqrt(math.pow((pt[0]-current_location.x),2)+
-            math.pow((pt[1]-current_location.y),2))
-        
-
-    def get_goal_node(self):
         return self.goal_node
 
     def get_route_coords(self, graph, route):

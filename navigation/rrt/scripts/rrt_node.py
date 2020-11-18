@@ -91,7 +91,7 @@ class RRTNode(object):
     def set_costmap(self, msg):
         '''TODO: docstring
         '''
-        assert self.header.frame_id == self.parent_frame
+        assert msg.header.frame_id == self.parent_frame
         self.costmap = msg
 
     def get_vehicle_pose(self):
