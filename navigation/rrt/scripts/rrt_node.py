@@ -58,8 +58,8 @@ class RRTNode(object):
         self.path_pub  = rospy.Publisher('planned_path', Path,
                                          queue_size=1)
         # Create subscribers
-        self.costmap_sub = rospy.Subscriber('costmap', OccupancyGrid,
-                                            self.set_costmap)
+        self.costmap_sub = rospy.Subscriber('/costmap/costmap/costmap',
+                         OccupancyGrid, self.set_costmap)
         self.goal_sub = rospy.Subscriber('goal_point', PoseStamped, self.set_goal)
         # Create transform listener
         self.tf_buffer = tf2_ros.Buffer()
@@ -136,13 +136,15 @@ class RRTNode(object):
         grid = np.asarray(ogm.data).reshape((height, width))
         positionX = ogm.info.origin.position.x
         positionY = ogm.info.origin.position.y
+        # print(str(positionX) + " and " + str(positionY))
         resolution = ogm.info.resolution
         for dubinsState in path:
             px = dubinsState.x
             py = dubinsState.y
+            # print(str(px)+ " and, " + str(py))
             x = (px - positionX)/resolution
             y = (py - positionY)/resolution
-            if(0 <= x <= width or 0 <= y <= height):
+            if(0 <= x <= width and 0 <= y <= height):
                 if(grid[int(x),int(y)] >= 100):
                     return False
                 elif(0 <= grid[int(x),int(y)] < 100):
@@ -200,7 +202,11 @@ class RRTNode(object):
             pose = PoseStamped(header=self.header)
             pose.pose.position.x = x
             pose.pose.position.y = y
-            pose.pose.orientation = tr.quaternion_from_euler(0, 0, yaw)
+            q = tr.quaternion_from_euler(0, 0, yaw)
+            pose.pose.orientation.x = q[0]
+            pose.pose.orientation.y = q[1]
+            pose.pose.orientation.z = q[2]
+            pose.pose.orientation.w = q[3]
             self.best_path.poses.append(pose)
         self.path_pub.publish(self.best_path)
 
