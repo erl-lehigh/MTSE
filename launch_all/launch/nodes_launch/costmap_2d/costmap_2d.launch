@@ -1,6 +1,6 @@
 <launch>
     <arg name="rviz" default="False"/>
-    <arg name="config" default="$(find launch_all)/config/costmap.yaml"
+    <arg name="config" default="$(find launch_all)/config/global_costmap_params.yaml"
          doc="Specify a config"/>
 
     <arg name="output" default="screen" doc="Output display"/>
@@ -13,6 +13,24 @@
 
     <node pkg="$(arg pkg_name)" type="$(arg node_type)" name="$(arg node_name)"
           output="$(arg output)" required="$(arg req)">
-        <rosparam command="load" file="$(arg config)"/>
+        <rosparam command="load" file="$(arg config)" ns="costmap" />
     </node>
+    <!-- launch dummy static vehicle transform w.r.t. world frame -->
+    <!-- node pkg="tf2_ros" type="static_transform_publisher"
+          name="vehicle_broadcaster"
+          args="1 1 0 0 0 0 1 map base_link"/ -->
+    
+    <!-- <node pkg="pointcloud_to_laserscan" type="pointcloud_to_laserscan_node" name="pointcloud_to_laserscan">
+        <param name="min_height" value="0.2"/>
+        <param name="max_height" value="4.0"/>
+        
+        <param name="range_min" value="0.2"/>
+        <param name="range_max" value="4.0"/>
+
+        <param name="target_frame" value="camera_link"/>
+
+        <remap from="cloud_in" to="/carla/ego_vehicle/lidar/lidar1/point_cloud"/>
+        <remap from="scan" to="/scan"/>
+    </node> -->
+
 </launch>
