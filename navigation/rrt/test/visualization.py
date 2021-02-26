@@ -12,6 +12,7 @@ import rospy
 from visualization_msgs.msg import Marker
 from geometry_msgs.msg import Point
 
+# TODO: import needs to match package name, e.g., "rrt"
 from TODO.msg import TreeStamped
 
 
