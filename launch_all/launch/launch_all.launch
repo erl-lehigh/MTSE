@@ -1,9 +1,10 @@
 <launch>
     <arg name="carla_bridge" default="True"/>
-    <arg name="purepursuit" default="True"/>
+    <arg name="purepursuit" default="false"/>
     <arg name="costmap" default="True"/>
     <arg name="rrt" default="False"/>
-    <arg name="route_planner" default="True"/>
+    <arg name="spawn" default="false"/>
+    <arg name="route_planner" default="true"/>
     <arg name="rviz" default="true"/>
 
     <!-- include file="$(find template_ros_package)/launch/launch_file.launch"/ -->
@@ -26,6 +27,10 @@
         <remap from="costmap" to="costmap/costmap"/>
         <include file="$(find rrt)/launch/rrt.launch"/>
     </group>
+    
+    <group if="$(arg spawn)">
+        <include file="$(find carla_spawn_objects)/launch/carla_spawn_objects.launch"/>
+    </group>
 
     <group if="$(arg route_planner)">
         <include file="$(find route_planner)/launch/route_planner.launch"/>
@@ -34,4 +39,5 @@
     <group if="$(arg rviz)">
         <node type="rviz" name="rviz" pkg="rviz" args="-d $(find launch_all)/rviz/rviz_config.rviz"/>
     </group>
+
 </launch>
