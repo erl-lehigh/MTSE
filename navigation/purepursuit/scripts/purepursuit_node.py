@@ -10,6 +10,7 @@ from ackermann_msgs.msg import AckermannDrive
 
 from geometry_msgs.msg import PoseStamped
 
+from std_msgs.msg import Float64
 
 from shapely.geometry import LineString
 
@@ -89,6 +90,8 @@ class PurePursuitNode(object):
         # Create subscribers
         self.path_sub = rospy.Subscriber('planned_path', Path, self.set_path)
 
+	self.speed_sub = rospy.Subscriber('reference_speed', Float64, self.set_speed) #this will hold Vcmd in .data public attribute
+
         # Create transform listener
         self.tf_buffer = tf2_ros.Buffer()
         self.ts_listener = tf2_ros.TransformListener(self.tf_buffer)
@@ -148,7 +151,7 @@ class PurePursuitNode(object):
         self.purepursuit.path = LineString(pose_list)
 
 
-    def set_speed(self, msg):
+    def set_speed(self, msg):	#Float64 is the msg that is passed
         self.purepursuit.speed = msg.data
         #speed = msg.data
         self.purepursuit.update_lookahead(msg.data) # [different function in 
