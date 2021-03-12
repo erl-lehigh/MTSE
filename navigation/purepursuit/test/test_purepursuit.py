@@ -1,9 +1,12 @@
 #! /usr/bin/env python
 
+import rostest
+import unittest
 from math import pi
 import matplotlib.pyplot as plt
 from shapely.geometry import Point, LineString
 from purepursuit import PurePursuit
+
 
 if __name__ == '__main__':
     fig = plt.figure()
@@ -15,9 +18,11 @@ if __name__ == '__main__':
     speed = 3   # given vehicle speed
     vehicle_cords = Point(2,3)   # initial vehicle coordinates
     theta = 0  # rad
+    wheelbase = 1.0   #specifies the distance between the midpoint of the read and front axle
 
-    instance_of_PurePursuit = PurePursuit(path, speed,vehicle_cords, theta)
-
+    #instance_of_PurePursuit = PurePursuit(path, speed,vehicle_cords, theta)	#should be  (wheelbase, lookahead, speed=None, vehicle_pose=None, path=None):
+    instance_of_PurePursuit = PurePursuit(wheelbase, lookahead, speed=speed, 
+						vehicle_pose=(vehicle_cords.x, vehicle_cords.y, theta), path=path)
     print('vehicle coords: '+ str(vehicle_cords.x) + ',' + str(vehicle_cords.y))
 
     x,y = instance_of_PurePursuit.construct_path()
@@ -36,12 +41,14 @@ if __name__ == '__main__':
 
     print('closest pt: ' + str(closest_pt.x) + ',' + str(closest_pt.y))
 
+    ### Print the path in dashed pink
+    c, d = path.xy
+    ax1.plot(c, d, '--p')
+
     #############
     #draw the vehicle orientation
     #a line connecting the rear and front axle
-
-
-    front_pt = instance_of_PurePursuit.vehicle_front_pt()
+    front_pt = instance_of_PurePursuit.vehicle_front_point()
     ax1.plot(front_pt.x, front_pt.y, 'or')
     vehicle_line = LineString([(vehicle_cords.x, vehicle_cords.y), (front_pt.x, front_pt.y)])
     a, b = vehicle_line.xy
@@ -67,17 +74,18 @@ if __name__ == '__main__':
 
     #############
 
-    r = instance_of_PurePursuit.compute_r()
+    r = instance_of_PurePursuit.compute_turning_radius()
     curv = instance_of_PurePursuit.compute_curvature()
-    front_pt = instance_of_PurePursuit.vehicle_front_pt()
-    delta = instance_of_PurePursuit.compute_delta()
-    omega = instance_of_PurePursuit.compute_omega()
+    front_pt = instance_of_PurePursuit.vehicle_front_point()
+    delta = instance_of_PurePursuit.compute_steering_angle()
+    omega = instance_of_PurePursuit.compute_angular_speed()
 
     print('front vehicle pt: ' + str(front_pt))
-    print('r: ' + str(r))
+    print('radius: ' + str(r))
     print('curvature: ' + str(curv))
     print('speed: ' + str(speed))
-    print('delta (rad): ' + str(delta))
-    print('omega (rad/s): ' + str(omega))
+    print('steering angle (rad): ' + str(delta))
+    print('angular speed (rad/s): ' + str(omega))
 
     plt.show()
+    pass
