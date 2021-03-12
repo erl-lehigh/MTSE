@@ -26,5 +26,5 @@
 
     <!-- TODO: write test code and add it here as a test. -->
     <test test-name="code" pkg="purepursuit" type="test_code.py"/>
-    <test test-name="pp" pkg="purepursuit" type="test_purepursuit.py" />
+    
 </launch>

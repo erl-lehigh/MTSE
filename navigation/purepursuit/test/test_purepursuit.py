@@ -8,11 +8,11 @@ from shapely.geometry import Point, LineString
 from purepursuit import PurePursuit
 
 
-if __name__ == '__main__':
+def dpp():
     fig = plt.figure()
     ax1 = fig.add_subplot(1,1,1)
 
-    lookahead =4
+    lookahead = 4
     # input data
     path = LineString([(1, 1), (8, 4)]) # given line path
     speed = 3   # given vehicle speed
@@ -32,7 +32,6 @@ if __name__ == '__main__':
 
     ax1.set_ylim(ymin=0, ymax=10)
     ax1.set_xlim(xmin=0, xmax=10)
-
     # plot vehicle coordinate and its base point with color blue
     ax1.arrow(vehicle_cords.x,vehicle_cords.y,dx=1,dy=1)
     ax1.plot(vehicle_cords.x,vehicle_cords.y,'ob')
@@ -55,7 +54,6 @@ if __name__ == '__main__':
     ax1.plot(a, b)
 
     #############
-
     ax1.plot(closest_pt.x, closest_pt.y, 'og')
     ax1.axis('equal')
 
@@ -74,6 +72,11 @@ if __name__ == '__main__':
 
     #############
 
+    instance_of_PurePursuit.update_lookahead(speed)
+    lookahead = instance_of_PurePursuit.get_lookahead()
+
+    ###########
+
     r = instance_of_PurePursuit.compute_turning_radius()
     curv = instance_of_PurePursuit.compute_curvature()
     front_pt = instance_of_PurePursuit.vehicle_front_point()
@@ -84,8 +87,12 @@ if __name__ == '__main__':
     print('radius: ' + str(r))
     print('curvature: ' + str(curv))
     print('speed: ' + str(speed))
+    print('lookahead: ' + str(lookahead))
     print('steering angle (rad): ' + str(delta))
     print('angular speed (rad/s): ' + str(omega))
-
+    
     plt.show()
-    pass
+    return front_pt.x, front_pt.y, r, curv, speed, delta, omega, lookahead
+
+if __name__ == '__main__':
+    print(dpp())
