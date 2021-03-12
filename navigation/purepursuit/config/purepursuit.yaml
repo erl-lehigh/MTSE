@@ -1,5 +1,5 @@
 rate: 1.0 # control loop frequency [Hz]
-parent_frame: world # Parent Reference frame (world) TODO: set correct value
-child_frame: vehicle # Child Reference frame (vehicle) TODO: set correct value
+parent_frame: world # Parent Reference frame (world)
+child_frame: vehicle # Child Reference frame (vehicle)
 lookahead: 4 # distance to goal point [m]
 wheelbase: 1 # distance between vehicle's front and reat axles [m]
