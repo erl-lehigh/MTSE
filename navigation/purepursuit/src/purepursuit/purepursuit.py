@@ -231,3 +231,14 @@ class PurePursuit:
             computed turning radius
         '''
         return 1.0 / self.compute_curvature()
+
+    def construct_path(self):
+	'''
+	This is just a smaller version at the purepursuit test can be run.
+	Uses LineString as the way to store the path in the test.
+	'''
+	if self.path is None:
+	    return [], []
+	else:
+	    listOfPoints = self.path.coords
+            return listOfPoints[0], listOfPoints[1]
