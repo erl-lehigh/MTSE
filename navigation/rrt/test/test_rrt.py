@@ -1,11 +1,12 @@
 import matplotlib.pyplot as plt
 import sys
-sys.path.insert(1, '/home/zoeyxiao/MTSE/navigation/rrt/src/rrt')
+sys.path.append('/home/zoob/SDC/MTSE/navigation/rrt/src/rrt')
 from rrt import RRTPlanner
 from dubins import DubinsState
 from dubins import dubins_isclose, position_distance as distance
 from dubins import dubins_path_planning as vehicle_path
 from dubins import DynamicDubinsVehicle
+import numpy as np
 
 if __name__ == '__main__':
     np.random.seed(1) # set random number generator seed to get repeatability
