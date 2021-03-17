@@ -191,6 +191,7 @@ class RRTNode(object):
         self.rrt_planner.vehicle.current_state = DubinsState(x, y, yaw, 0, 0)
         # Plan path from current state to goal
         path = self.rrt_planner.plan(self.goal)
+        #print(self.goal)
 
         # Publish returned path
         self.best_path.header.stamp = rospy.Time.now()
@@ -200,7 +201,16 @@ class RRTNode(object):
             pose = PoseStamped(header=self.header)
             pose.pose.position.x = x
             pose.pose.position.y = y
-            pose.pose.orientation = tr.quaternion_from_euler(0, 0, yaw)
+           #pose.pose.orientation = tr.quaternion_from_euler(0, 0, yaw)
+
+            #TESTING
+            quanternion = tr.quaternion_from_euler(0, 0, yaw)
+            pose.pose.orientation.x = quanternion[0]
+            pose.pose.orientation.y = quanternion[1]
+            pose.pose.orientation.z = quanternion[2]
+            pose.pose.orientation.w = quanternion[3]
+            #print(pose.pose.orientation)
+
             self.best_path.poses.append(pose)
         self.path_pub.publish(self.best_path)
 
