@@ -20,6 +20,10 @@
     <exec_depend>python-shapely</exec_depend>
     <exec_depend>python-networkx</exec_depend>
 
+    <!--For Custom Messages-->
+    <build_depend>message_generation</build_depend>
+    <exec_depend>message_runtime</exec_depend>
+
   <export>
     <!-- Other tools can request additional information be placed here -->
   </export>
