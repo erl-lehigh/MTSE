@@ -75,7 +75,11 @@ class PurePursuitNode(object):
         self.child_frame = rospy.get_param('~child_frame', 'vehicle')
         lookahead = rospy.get_param('~lookahead', 4)
         wheelbase = rospy.get_param('~wheelbase', 1)
-
+	lookahead_min = rospy.get_param('~lookahead_min', 3)
+	lookahead_max = rospy.get_param('~lookahead_max', 12)
+	lower_threshold_v = rospy.get_param('~lower_threshold_v', 1.34)
+	upper_threshold_v = rospy.get_param('~upper_threshold_v', 5.36)
+	lookahead_gain = rospy.get_param('~lookahead_gain', 2.24)
 
         self.period = rospy.Duration(1.0 / self.rate)
 

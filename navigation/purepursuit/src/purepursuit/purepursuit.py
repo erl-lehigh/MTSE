@@ -28,7 +28,7 @@ class PurePursuit:
     '''
 
     # constructor
-    def __init__(self, wheelbase, lookahead, speed=None, vehicle_pose=None,
+    def __init__(self, wheelbase, lookahead, lookahead_min, lookahead_max, lower_threshold_v, upper_threshold_v, lookahead_gain, speed=None, vehicle_pose=None,
                  path=None):
         '''
         Initializes the PurePursuit object by passing input parameters
@@ -44,7 +44,17 @@ class PurePursuit:
             axle
         lookahead : float
             specifies the lookahead distance to the path
-        path : Path
+        lookahead_min : float
+	    the minimum the lookahead can be (set in configs)
+        lookahead_max : float
+	    the maximum the lookahead can be (set in configs)
+        lower_threshold_v : float
+	    the lower bound speed, under this speed uses the minimum lookahead_min distance
+        upper_threshold_v : float
+	    the upper bound speed, above this speed uses the maximum lookahead_max distance
+	lookahead_gain : float
+	    the scalar to multiply to get lookahead by multiplying with v_cmd when the lookahead is not outside the max or min.
+	path : Path
             path to be tracked for the vehicle
         speed : float
             specifies the speed of the vehicle
@@ -56,7 +66,11 @@ class PurePursuit:
         self.wheelbase = wheelbase
         # look ahead distance to the
         self.lookahead = lookahead
-
+	self.lookahead_min = lookahead_min
+	self.lookahead_max = lookahead_max
+	self.lower_threshold_v = lower_threshold_v
+	self.upper_threshold_v = upper_threshold_v
+	self.lookahead_gain = lookahead_gain
         self.path = path
         self.speed = speed
         self.set_vehicle_pose(vehicle_pose)
@@ -120,18 +134,49 @@ class PurePursuit:
         return self.path.interpolate(arc_dist + dist_on_path)
 
 
-    def update_lookahead(self, v_cmd):
-        lookahead_min = 3
-        lookahead_max = 12
-        lower_threshold_v = 1.34
-        upper_threshold_v = 5.36
-        if (v_cmd < lower_threshold_v):
+    def update_lookahead(self, v_cmd, lookahead_min, lookahead_max, lower_threshold_v, upper_threshold_v, lookahead_gain):
+        '''
+	Updates the lookahead based on the most recent commanded speed
+
+	Parameters
+	----------
+	float
+	    v_cmd - the commanded speed of the vehicle/path
+	float
+	    lookahead_min - the minimum the lookahead can be (set in configs)
+	float
+	    lookahead_max - the maximum the lookahead can be (set in configs)
+	float
+	    lower_threshold_v - the lower bound speed, under this speed uses the minimum lookahead_min distance
+	float
+	    upper_threshold_v - the upper bound speed, above this speed uses the maximum lookahead_max distance
+	float
+	    lookahead_gain - the scalar multiplied by v_cmd to get the lookahead when the value is not set to max or min
+	Return
+	------
+	none
+	'''
+	if (v_cmd < lower_threshold_v):
             self.lookahead = lookahead_min
         elif (lower_threshold_v <= v_cmd and v_cmd < upper_threshold_v):
-            self.lookahead = 2.24*v_cmd
+            self.lookahead = lookahead_gain*v_cmd
         else:
             self.lookahead = lookahead_max
 
+    def get_lookahead(self):
+	'''
+	Returns the most up-to-date lookahead distance
+
+	Parameters
+	----------
+	None
+
+	Return
+	------
+	float
+	    lookahead distance
+	'''
+	return self.lookahead
 
     def compute_speed(self):
         '''
@@ -197,7 +242,7 @@ class PurePursuit:
         float
             computed speed
         '''
-        return self.speed * tan(self.compute_steering_angle()) / self.wheelbase
+        return self.speed * np.tan(self.compute_steering_angle()) / self.wheelbase
 
     def compute_curvature(self):
         '''
@@ -240,5 +285,4 @@ class PurePursuit:
 	if self.path is None:
 	    return [], []
 	else:
-	    listOfPoints = self.path.coords
-            return listOfPoints[0], listOfPoints[1]
+	    return self.path.xy
