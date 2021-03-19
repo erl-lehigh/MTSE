@@ -86,15 +86,23 @@ class PurePursuitNode(object):
         self.purepursuit = PurePursuit(wheelbase, lookahead, lookahead_min, lookahead_max, lower_threshold_v, upper_threshold_v, lookahead_gain, speed=0)
 
         # Create publishers
-        self.command_pub = rospy.Publisher('speed_command', AckermannDrive,
+        self.command_pub = rospy.Publisher('speed_command', 
+					    AckermannDrive,
                                            queue_size=1)
 
         self.target_pub = rospy.Publisher('~/target', PoseStamped, queue_size=1)
 
         # Create subscribers
-        self.path_sub = rospy.Subscriber('planned_path', Path, self.set_path)
-
-	self.speed_sub = rospy.Subscriber('reference_speed', Float64, self.set_speed) #this will hold Vcmd in .data public attribute
+	### ? the 3rd parameter might need callback= before it
+        rospy.loginfo('path about to be set')
+	self.path_sub = rospy.Subscriber('planned_path', 
+					Path, 
+					self.set_path)
+	rospy.loginfo('speed about to be set')
+	self.speed_sub = rospy.Subscriber('reference_speed', 
+						Float64, 
+						self.set_speed) 
+				#this will hold Vcmd in .data public attribute
 
         # Create transform listener
         self.tf_buffer = tf2_ros.Buffer()
@@ -119,6 +127,8 @@ class PurePursuitNode(object):
         tuple
             vehicle coordinates (x,y) and orientation (angle)
         '''
+	rospy.loginfo('getting pose')
+
         try:
             trans = self.tf_buffer.lookup_transform(self.child_frame,
                                                     self.parent_frame,
@@ -147,7 +157,7 @@ class PurePursuitNode(object):
         -------
         None
         '''
-
+	rospy.loginfo('path is being set')
         vehicle_pose = self.get_vehicle_pose()
         self.purepursuit.set_vehicle_pose(vehicle_pose)
         pose_list = [(pose.pose.position.x, pose.pose.position.y)
@@ -156,9 +166,22 @@ class PurePursuitNode(object):
 
 
     def set_speed(self, msg):	#Float64 is the msg that is passed
+	'''
+	This method changes the speed based on the speed commanded. It also changes the lookahead distance too.
+
+	Parameters
+	----------
+	msgs : Float64
+	    the speed commanded
+
+	Return
+	------
+	none
+	'''
         self.purepursuit.speed = msg.data
         #speed = msg.data
-        self.purepursuit.update_lookahead(msg.data) # [different function in 
+        self.purepursuit.update_lookahead(msg.data, self.purepursuit.lookahead_min, self.purepursuit.lookahead_max, self.purepursuit.lower_threshold_v, self.purepursuit.upper_threshold_v, self.purepursuit.lookahead_gain) # [different function in 
+	rospy.loginfo('speed changed to %5.2f m/s', msg.data)
         #purepursuit class]
         # have lower and upper bound for lookahead based on the speed
 
@@ -176,11 +199,13 @@ class PurePursuitNode(object):
         -------
         None
         '''
-        msg = AckermannDrive()
+        #rospy.loginfo('In control_loop')
+	msg = AckermannDrive(1.0, 0, 0, 0, 0)
         pose_msg = PoseStamped()
         pose_msg.header.stamp = rospy.Time.now()
         pose_msg.header.frame_id = self.parent_frame
         if self.purepursuit.path is not None:
+	    rospy.loginfo('there is a path')
             position = self.purepursuit.future_point()
             pose_msg.pose.position.x = position.x
             pose_msg.pose.position.y = position.y
@@ -196,4 +221,6 @@ if __name__ == "__main__":
     # Create the node object
     _ = PurePursuitNode()
     # Keep the node alive
+    print('About to run spin')
     rospy.spin()
+    
