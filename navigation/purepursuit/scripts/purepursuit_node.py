@@ -93,7 +93,7 @@ class PurePursuitNode(object):
         self.target_pub = rospy.Publisher('~/target', PoseStamped, queue_size=1)
 
         # Create subscribers
-	### ? the 3rd parameter might need callback= before it
+
         rospy.loginfo('path about to be set')
 	self.path_sub = rospy.Subscriber('planned_path', 
 					Path, 
