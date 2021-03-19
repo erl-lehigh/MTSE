@@ -83,7 +83,7 @@ class PurePursuitNode(object):
 
         self.period = rospy.Duration(1.0 / self.rate)
 
-        self.purepursuit = PurePursuit(wheelbase, lookahead, speed=0)
+        self.purepursuit = PurePursuit(wheelbase, lookahead, lookahead_min, lookahead_max, lower_threshold_v, upper_threshold_v, lookahead_gain, speed=0)
 
         # Create publishers
         self.command_pub = rospy.Publisher('speed_command', AckermannDrive,
