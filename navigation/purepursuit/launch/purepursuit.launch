@@ -1,5 +1,5 @@
 <launch>
-    <arg name="rviz" default="False"/>
+    <arg name="rviz" default="true"/>
     <arg name="config" default="$(find purepursuit)/config/purepursuit.yaml"
          doc="Specify a config"/>
 
@@ -11,8 +11,24 @@
     <arg name="node_name" default="purepursuit" doc="name of the node"/>
     <arg name="node_type" default="purepursuit_node.py" doc="name of the type"/>
 
+    <node pkg="$(arg pkg_name)" type="test_purepursuit_node.py" name="planned_path"/>
+
     <node pkg="$(arg pkg_name)" type="$(arg node_type)" name="$(arg node_name)"
           output="$(arg output)" required="$(arg req)">
         <rosparam command="load" file="$(arg config)" />
     </node>
+
+    <group if="$(arg rviz)">
+        <node type="rviz" name="rviz" pkg="rviz" args="-d $(find purepursuit)/launch/rviz/rviz_config.rviz"/>
+    </group>
+    
+    <!-- static_transform_publisher x y z qx qy qz qw frame_id child_frame_id  period_in_ms -->
+    <!-- launch dummy static vehicle transform w.r.t. world frame -->
+    <node pkg="tf2_ros" type="static_transform_publisher"
+          name="vehicle_broadcaster"
+          args="1 1 0 0 0 0 1 world vehicle"/>
+
+    <node pkg="rostopic" type="rostopic" name="static_reference_speed"
+    args="pub /reference_speed std_msgs/Float64 .5" />
+
 </launch>
