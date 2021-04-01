@@ -1,6 +1,6 @@
 <launch>
     <arg name="pkg_name" value="purepursuit" doc="name of the package"/>
-    <arg name="node_name" default="purepursuit_test_node" doc="name of the node"/>
+    <arg name="node_name" default="planned" doc="name of the node"/>
     <arg name="node_type" default="purepursuit_test_node.py" doc="name of the type"/>
 
     <arg name="config" default="$(find purepursuit)/config/purepursuit.yaml"/>

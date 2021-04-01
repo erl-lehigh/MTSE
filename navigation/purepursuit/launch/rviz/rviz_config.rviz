@@ -11,7 +11,7 @@ Panels:
         - /Planned Path1
         - /Pose1
         - /Path1
-        - /Path1/Status1
+        - /Path2
       Splitter Ratio: 0.5
     Tree Height: 596
   - Class: rviz/Selection
@@ -122,10 +122,10 @@ Visualization Manager:
       Class: rviz/Pose
       Color: 255; 25; 0
       Enabled: true
-      Head Length: 0.30000001192092896
+      Head Length: 0.10000000149011612
       Head Radius: 0.10000000149011612
       Name: Pose
-      Shaft Length: 2
+      Shaft Length: 0.30000001192092896
       Shaft Radius: 0.05000000074505806
       Shape: Arrow
       Topic: /vehicle_location_pub
@@ -152,6 +152,29 @@ Visualization Manager:
       Shaft Diameter: 0.10000000149011612
       Shaft Length: 0.10000000149011612
       Topic: /lookahead_shape
+      Unreliable: false
+      Value: true
+    - Alpha: 1
+      Buffer Length: 1
+      Class: rviz/Path
+      Color: 10; 180; 255
+      Enabled: true
+      Head Diameter: 0.30000001192092896
+      Head Length: 0.20000000298023224
+      Length: 0.30000001192092896
+      Line Style: Lines
+      Line Width: 0.029999999329447746
+      Name: Path
+      Offset:
+        X: 0
+        Y: 0
+        Z: 0
+      Pose Color: 255; 85; 255
+      Pose Style: None
+      Radius: 0.029999999329447746
+      Shaft Diameter: 0.10000000149011612
+      Shaft Length: 0.10000000149011612
+      Topic: /speed_visual_pub
       Unreliable: false
       Value: true
   Enabled: true
@@ -182,25 +205,25 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 7.008310317993164
+      Distance: 7.849307537078857
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: -0.3979874849319458
-        Y: -0.9487941265106201
-        Z: 0.21529968082904816
+        X: -0.798875629901886
+        Y: -1.5960463285446167
+        Z: 1.1272660493850708
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: true
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.5952025651931763
+      Pitch: 1.055202603340149
       Target Frame: vehicle
       Value: Orbit (rviz)
-      Yaw: 3.1067702770233154
+      Yaw: 2.5081284046173096
     Saved:
       - Class: rviz/Orbit
         Distance: 1.4665813446044922

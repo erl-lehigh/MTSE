@@ -1,7 +1,0 @@
-<launch>
-    <arg name="config" default="$(find purepursuit)/config/purepursuit.yaml"/>
-    
-    <node pkg="$(find purepursuit)/test/purepursuit_node.test"
-	  nam
-
-</launch>

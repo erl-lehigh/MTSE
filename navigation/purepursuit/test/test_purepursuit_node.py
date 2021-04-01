@@ -9,7 +9,7 @@ from nav_msgs.msg import Path
 from geometry_msgs.msg import PoseStamped
 
 from purepursuit import PurePursuit
-
+from test_paths import test_paths
 
 class TestPurePursuitNode(object):
     '''
@@ -67,7 +67,8 @@ class TestPurePursuitNode(object):
         path.header.frame_id = "world"
 
 
-        path_coords = [(-1, -1), (2, 1), (4, 0)]
+        path_coords = test_paths[3]
+	#The list above is referencing from a list of tests that are in a python folder in the test directory
         for x, y in path_coords:
             pose = PoseStamped()
             pose.header.stamp = rospy.Time.now()
