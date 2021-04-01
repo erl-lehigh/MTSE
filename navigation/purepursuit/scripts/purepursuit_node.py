@@ -132,7 +132,7 @@ class PurePursuitNode(object):
 
     def get_vehicle_pose(self):
         '''
-        Returns the vehicle's pose (position and orientation) of the vehicle.
+        Returns the vehicle's pose (position and orientation).
 
         Parameters
         ----------
@@ -148,7 +148,7 @@ class PurePursuitNode(object):
         try:
             trans = self.tf_buffer.lookup_transform(self.child_frame,
                                                     self.parent_frame,
-                                                    rospy.Time.now(),
+                                                    rospy.Time(),
                                                     self.period)
         except (tf2_ros.LookupException, tf2_ros.ConnectivityException,
                 tf2_ros.ExtrapolationException):
@@ -232,6 +232,7 @@ class PurePursuitNode(object):
             locationOfVehicle = self.get_vehicle_pose()
 	    vehicle_location_msg.pose.position.x = locationOfVehicle[0]
 	    vehicle_location_msg.pose.position.y = locationOfVehicle[1]
+	    vehicle_location_msg.pose.orientation = locationOfVehicle[3]
 	    rospy.loginfo(str(locationOfVehicle))
 	    vehicle_location_msg.pose.orientation = locationOfVehicle[3] 
 	    #rospy.loginfo('Vehicle - X:%5.2f Y:%5.2f', locationOfVehicle[0][0], locationOfVehicle[0][1])
