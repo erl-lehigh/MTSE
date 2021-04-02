@@ -59,22 +59,6 @@ class TFUpdaterNode(object):
 	
 	#Create TF
 	self.tfBroadcaster = tf2_ros.TransformBroadcaster()
-	#self.tfBuffer = tf2_ros.Buffer()
-	#self.tfListener = tf2_ros.TransformListener(self.tfBuffer)	
-	
-	#Initial Transform
-	#t = geometry_msgs.msg.TransformStamped()
-	#t.header.stamp = rospy.Time.now()
-	#t.header.frame_id = "world"
-	#t.child_frame_id = "vehicle"
-	#t.transform.translation.x = 0.0
-	#t.transform.translation.y = 0.0
-	#t.transform.translation.z = 0.0
-	#t.transform.rotation.x = 0
-	#t.transform.rotation.y = 0
-	#t.transform.rotation.z = 0
-	#t.transform.rotation.w = 0
-
 	
 	# Create timers
         self.timer = rospy.Timer(rospy.Duration(1.0 / self.rate),
