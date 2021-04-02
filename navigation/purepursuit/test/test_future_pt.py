@@ -15,8 +15,8 @@ def dpp():
     #paths = [LineString([(1, 1), (8, 4)]), LineString([(1, 1), (8, 12)]), LineString([(8, 2), (8, 4)]), LineString([(10, 1), (8, 4)])] # given line path
     distances = []
     speed = 3   # given vehicle speed
-    vehicle_cords = Point(2,3)   # initial vehicle coordinates
-    theta = 0  # rad
+    vehicle_cords = Point(0,0)   # initial vehicle coordinates
+    theta = -1  # rad
     lookahead = rospy.get_param('~lookahead', 4)
     wheelbase = rospy.get_param('~wheelbase', 1)
     lookahead_min = rospy.get_param('~lookahead_min', 3)
