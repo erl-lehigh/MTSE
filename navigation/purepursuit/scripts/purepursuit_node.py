@@ -226,11 +226,12 @@ class PurePursuitNode(object):
 	vehicle_location_msg.header.frame_id = self.parent_frame
 	if self.purepursuit.path is not None:
 	    rospy.loginfo('there is a path')
-            position = self.purepursuit.future_point()
+	    locationOfVehicle = self.get_vehicle_pose()
+            self.purepursuit.set_vehicle_pose(locationOfVehicle)
+	    position = self.purepursuit.future_point()
             pose_msg.pose.position.x = position.x
             pose_msg.pose.position.y = position.y
             msg.speed = self.purepursuit.speed
-            locationOfVehicle = self.get_vehicle_pose()
 	    vehicle_location_msg.pose.position.x = locationOfVehicle[0]
 	    vehicle_location_msg.pose.position.y = locationOfVehicle[1]
 	    vehicle_location_msg.pose.orientation = locationOfVehicle[3]

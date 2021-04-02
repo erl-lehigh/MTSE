@@ -87,8 +87,8 @@ Visualization Manager:
       Head Length: 0
       Head Radius: 0
       Name: Pose (Pure Pursuit)
-      Shaft Length: 0.20000000298023224
-      Shaft Radius: 0.5
+      Shaft Length: 2
+      Shaft Radius: 4
       Shape: Arrow
       Topic: /target
       Unreliable: false
@@ -125,8 +125,8 @@ Visualization Manager:
       Head Length: 0.10000000149011612
       Head Radius: 0.10000000149011612
       Name: Pose
-      Shaft Length: 0.30000001192092896
-      Shaft Radius: 0.05000000074505806
+      Shaft Length: 2
+      Shaft Radius: 1
       Shape: Arrow
       Topic: /vehicle_location_pub
       Unreliable: false
@@ -205,16 +205,16 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 11.466940879821777
+      Distance: 123.88711547851562
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 0.0798921212553978
-        Y: 0.732042670249939
-        Z: 0.03397851064801216
+        X: -5.101450443267822
+        Y: 12.782729148864746
+        Z: -0.7505831718444824
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: true

@@ -27,6 +27,6 @@
 
     <!-- <node pkg="$(arg pkg_name)" type="variable_speed_node.py" name="variable_speed"/> -->
     <node pkg="rostopic" type="rostopic" name="static_reference_speed"
-    args="pub /reference_speed std_msgs/Float64 .5" />
+    args="pub /reference_speed std_msgs/Float64 3" />
 
 </launch>
