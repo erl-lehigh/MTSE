@@ -1,14 +1,15 @@
 # MSTE
-Team Member 
-  Yubo Wang
-  Vaibhav Anand
-  Nathan Bowler
-  Sarah Lange
-  Zehui Xiao
-  Declan Coster
-  Brian Zhu
-  Gustavo Cardona
-  Disha Kamale
+Team Members:  
+  
+  - Yubo Wang
+  - Vaibhav Anand
+  - Nathan Bowler
+  - Sarah Lange
+  - Zehui Xiao
+  - Declan Coster
+  - Brian Zhu
+  - Gustavo Cardona
+  - Disha Kamale
   
   
  ## Summary of current PRs: 
