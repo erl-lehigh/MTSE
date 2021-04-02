@@ -181,7 +181,7 @@ Visualization Manager:
   Global Options:
     Background Color: 48; 48; 48
     Default Light: true
-    Fixed Frame: vehicle
+    Fixed Frame: world
     Frame Rate: 30
   Name: root
   Tools:
@@ -205,25 +205,25 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 7.849307537078857
+      Distance: 11.466940879821777
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: -0.798875629901886
-        Y: -1.5960463285446167
-        Z: 1.1272660493850708
+        X: 0.0798921212553978
+        Y: 0.732042670249939
+        Z: 0.03397851064801216
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: true
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 1.055202603340149
-      Target Frame: vehicle
+      Pitch: 1.2747966051101685
+      Target Frame: world
       Value: Orbit (rviz)
-      Yaw: 2.5081284046173096
+      Yaw: 2.538118839263916
     Saved:
       - Class: rviz/Orbit
         Distance: 1.4665813446044922

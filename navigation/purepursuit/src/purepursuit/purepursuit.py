@@ -227,8 +227,9 @@ class PurePursuit:
         lookahead_point = np.array(self.future_point()) - self.vehicle_position
         line_of_sight_angle = np.arctan2(lookahead_point[1], lookahead_point[0])
         eta = line_of_sight_angle - self.vehicle_orientation
-        return -np.arctan(2 * self.wheelbase * np.sin(eta) / self.lookahead)
-
+        return np.arctan(2 * self.wheelbase * np.sin(eta) / self.lookahead)
+	#There was a negative sign above, but it was returning the opposite commands. 
+	
     def compute_angular_speed(self):
         '''
         Returns the computed angular speed of the vehicle.
