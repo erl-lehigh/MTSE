@@ -6,23 +6,32 @@ from math import pi
 import matplotlib.pyplot as plt
 from shapely.geometry import Point, LineString
 from purepursuit import PurePursuit
-
+import rospy
 
 def dpp():
     fig = plt.figure()
     ax1 = fig.add_subplot(1,1,1)
 
-    lookahead = 4
+    
     # input data
     path = LineString([(1, 1), (8, 4)]) # given line path
     speed = 3   # given vehicle speed
     vehicle_cords = Point(2,3)   # initial vehicle coordinates
     theta = 0  # rad
-    wheelbase = 1.0   #specifies the distance between the midpoint of the read and front axle
+    lookahead = rospy.get_param('~lookahead', 4)
+    wheelbase = rospy.get_param('~wheelbase', 1)
+    lookahead_min = rospy.get_param('~lookahead_min', 3)
+    lookahead_max = rospy.get_param('~lookahead_max', 12)
+    lower_threshold_v = rospy.get_param('~lower_threshold_v', 1.34)
+    upper_threshold_v = rospy.get_param('~upper_threshold_v', 5.36)
+    lookahead_gain = rospy.get_param('~lookahead_gain', 2.24)
+
 
     #instance_of_PurePursuit = PurePursuit(path, speed,vehicle_cords, theta)	#should be  (wheelbase, lookahead, speed=None, vehicle_pose=None, path=None):
-    instance_of_PurePursuit = PurePursuit(wheelbase, lookahead, speed=speed, 
-						vehicle_pose=(vehicle_cords.x, vehicle_cords.y, theta), path=path)
+    instance_of_PurePursuit = PurePursuit(wheelbase, lookahead, lookahead_min, lookahead_max, lower_threshold_v, upper_threshold_v, lookahead_gain, speed=speed, vehicle_pose=(vehicle_cords.x, vehicle_cords.y, theta), path=path)
+    
+	
+
     print('vehicle coords: '+ str(vehicle_cords.x) + ',' + str(vehicle_cords.y))
 
     x,y = instance_of_PurePursuit.construct_path()
@@ -72,7 +81,7 @@ def dpp():
 
     #############
 
-    instance_of_PurePursuit.update_lookahead(speed)
+    instance_of_PurePursuit.update_lookahead(speed, lookahead_min, lookahead_max, lower_threshold_v, upper_threshold_v, lookahead_gain)
     lookahead = instance_of_PurePursuit.get_lookahead()
 
     ###########
@@ -90,9 +99,10 @@ def dpp():
     print('lookahead: ' + str(lookahead))
     print('steering angle (rad): ' + str(delta))
     print('angular speed (rad/s): ' + str(omega))
-    
+    print('future point: ' + str(future_pt))
+	 
     plt.show()
-    return front_pt.x, front_pt.y, r, curv, speed, delta, omega, lookahead
+    return front_pt.x, front_pt.y, r, curv, speed, delta, omega, lookahead, future_pt, path
 
 if __name__ == '__main__':
     print(dpp())
