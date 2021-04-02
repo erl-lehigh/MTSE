@@ -25,6 +25,14 @@ class PurePursuit:
         position of vehicle
     vehicle_orientation : float
         orientation of vehicle
+
+    Methods
+    -------
+    set_path(msg)
+        generates a path LineString (to be tracked) from a set of position
+        coordinates (pose)
+    control_loop(event=None)
+        computes the speed and steering angle at each iteration
     '''
 
     # constructor
@@ -168,7 +176,7 @@ class PurePursuit:
         lookahead_point = np.array(self.future_point()) - self.vehicle_position
         line_of_sight_angle = np.arctan2(lookahead_point[1], lookahead_point[0])
         eta = line_of_sight_angle - self.vehicle_orientation
-        return -np.arctan(2 * self.wheelbase * np.sin(eta) / self.lookahead)
+        return np.arctan(2 * self.wheelbase * np.sin(eta) / self.lookahead)
 
     def compute_angular_speed(self):
         '''

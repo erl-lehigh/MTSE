@@ -16,7 +16,6 @@ from purepursuit import PurePursuit
 class PurePursuitNode(object):
     '''
     A class to represent a pure pursuit node in ROS
-
     Attributes
     ----------
     node_name : str
@@ -43,7 +42,6 @@ class PurePursuitNode(object):
         the listener for ROS transforms
     timer : rospy.Timer
         the control loop timer
-
     Methods
     -------
     set_path(msg):
@@ -67,11 +65,11 @@ class PurePursuitNode(object):
 
         # Read parameters
         self.rate = rospy.get_param('~rate', 1)
-        self.parent_frame = rospy.get_param('~parent_frame', 'world')
-        self.child_frame = rospy.get_param('~child_frame', 'vehicle')
+        self.parent_frame = rospy.get_param('~parent_frame', 'map')
+        self.child_frame = rospy.get_param('~child_frame', 'ego_vehicle')
         lookahead = rospy.get_param('~lookahead', 4)
         wheelbase = rospy.get_param('~wheelbase', 1)
-        speed = rospy.get_param('~speed', 3)
+        speed = rospy.get_param('~speed', 1)
 
         self.period = rospy.Duration(1.0 / self.rate)
 
@@ -110,8 +108,8 @@ class PurePursuitNode(object):
             vehicle coordinates (x,y) and orientation (angle)
         '''
         try:
-            trans = self.tf_buffer.lookup_transform(self.child_frame,
-                                                    self.parent_frame,
+            trans = self.tf_buffer.lookup_transform(self.parent_frame,
+                                                    self.child_frame,
                                                     rospy.Time.now(),
                                                     self.period)
         except (tf2_ros.LookupException, tf2_ros.ConnectivityException,
