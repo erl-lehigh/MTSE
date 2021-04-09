@@ -1,0 +1,13 @@
+digraph G {
+"map" -> "ego_vehicle/camera/rgb/front"[label="Broadcaster: /carla_ros_bridge\nAverage rate: 19.630 Hz\nMost recent transform: 6222.035 ( 0.050 sec old)\nBuffer length: 2.700 sec\n"];
+"map" -> "ego_vehicle/camera/rgb/view"[label="Broadcaster: /carla_ros_bridge\nAverage rate: 20.000 Hz\nMost recent transform: 6222.035 ( 0.050 sec old)\nBuffer length: 2.700 sec\n"];
+"map" -> "ego_vehicle/lidar/lidar1"[label="Broadcaster: /carla_ros_bridge\nAverage rate: 20.370 Hz\nMost recent transform: 6222.035 ( 0.050 sec old)\nBuffer length: 2.700 sec\n"];
+"map" -> "ego_vehicle/imu"[label="Broadcaster: /carla_ros_bridge\nAverage rate: 20.370 Hz\nMost recent transform: 6222.035 ( 0.050 sec old)\nBuffer length: 2.700 sec\n"];
+"map" -> "ego_vehicle/gnss/gnss1"[label="Broadcaster: /carla_ros_bridge\nAverage rate: 20.000 Hz\nMost recent transform: 6222.085 ( 0.000 sec old)\nBuffer length: 2.700 sec\n"];
+"map" -> "ego_vehicle"[label="Broadcaster: /carla_ros_bridge\nAverage rate: 40.741 Hz\nMost recent transform: 6222.085 ( 0.000 sec old)\nBuffer length: 2.700 sec\n"];
+"map" -> "ego_vehicle/radar/front"[label="Broadcaster: /carla_ros_bridge\nAverage rate: 18.148 Hz\nMost recent transform: 6222.085 ( 0.000 sec old)\nBuffer length: 2.700 sec\n"];
+edge [style=invis];
+ subgraph cluster_legend { style=bold; color=black; label ="view_frames Result";
+"Recorded at time: 6222.085"[ shape=plaintext ] ;
+ }->"map";
+}
