@@ -4,17 +4,22 @@ project(carla_setup)
 find_package(catkin REQUIRED COMPONENTS
   rospy
   std_msgs
-  message_generation
+  ackermann_msgs
+  sensor_msgs
+  nav_msgs
+  geometry_msgs
+  carla_msgs
+  carla_ros_bridge
 )
-
-generate_messages(
-  DEPENDENCIES
-  std_msgs
-)
-
 
 catkin_package(
-      CATKIN_DEPENDS
-      rospy
+  CATKIN_DEPENDS
+  rospy
+  std_msgs
+  ackermann_msgs
+  sensor_msgs
+  nav_msgs
+  geometry_msgs
+  carla_msgs
+  carla_ros_bridge
 )
-
