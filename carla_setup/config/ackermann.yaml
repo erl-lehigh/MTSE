@@ -1,0 +1,10 @@
+host: localhost # sets the host
+port: 2000 # sets the port
+role_name: ego_vehicle # sets the vehicle role name
+vehicle_filter: vehicle.* # sets the vehicle filter
+spawn_point: '0,0,0,0,0,0'  # sets the spawn point
+town: '' # sets the town map
+synchronous_mode: '' # sets synchronous_mode
+synchronous_mode_wait-for_vehicle_control_command: ''
+fixed_delta_seconds: '' # sets fixed_delta_seconds
+

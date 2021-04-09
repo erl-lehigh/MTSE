@@ -1,0 +1,18 @@
+<launch>
+    <arg name="rviz" default="False"/>
+    <arg name="config" default="$(find purepursuit)/config/purepursuit.yaml"
+         doc="Specify a config"/>
+
+    <arg name="output" default="screen" doc="Output display"/>
+    <arg name="param_file_name" default="default" doc="Specify a param file"/>
+    <arg name="req" default="true"/>
+
+    <arg name="pkg_name" value="purepursuit" doc="name of the package"/>
+    <arg name="node_name" default="purepursuit" doc="name of the node"/>
+    <arg name="node_type" default="purepursuit_node.py" doc="name of the type"/>
+
+    <node pkg="$(arg pkg_name)" type="$(arg node_type)" name="$(arg node_name)"
+          output="$(arg output)" required="$(arg req)">
+        <rosparam command="load" file="$(arg config)" />
+    </node>
+</launch>
