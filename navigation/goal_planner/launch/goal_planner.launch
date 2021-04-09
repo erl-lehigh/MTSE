@@ -1,6 +1,6 @@
 
 <launch>
-    <arg name="rviz" default="False"/>
+    <arg name="rviz" default="True"/>
     <arg name="config" default="$(find goal_planner)/config/goal_planner.yaml"
          doc="Specify a config"/>
 
