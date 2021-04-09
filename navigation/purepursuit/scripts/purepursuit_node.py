@@ -144,7 +144,7 @@ class PurePursuitNode(object):
             vehicle coordinates (x,y) and orientation (angle) and quaterion (direction for rvix)
         '''
 
-	#the below was child then parent
+	#the below section was initially wrong in the main. The below is the correct order of parent, child, time, period.
         try:
             trans = self.tf_buffer.lookup_transform(self.parent_frame,
                                                     self.child_frame,
