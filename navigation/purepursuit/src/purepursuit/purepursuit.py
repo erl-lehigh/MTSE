@@ -25,6 +25,38 @@ class PurePursuit:
         position of vehicle
     vehicle_orientation : float
         orientation of vehicle
+
+    Methods
+    -------
+
+    set_vehicle_pose(vehicle_pose)
+	sets the vehicles position and the orientation if the parameter is not none
+    closest_point()
+	Returns the computed closest point on the path from the midpoint of the
+        rear axle of the vehicle.
+    future_point()
+	Returns the computed future point on the path for the vehicle to keep
+        track of.
+    update_lookahead(self, v_cmd, lookahead_min, lookahead_max, lower_threshold_v, upper_threshold_v, lookahead_gain)
+	Updates the lookahead based on the most recent commanded speed
+    get_lookahead()
+	Returns the most up-to-date lookahead distance
+    compute_speed()
+	Returns the computed speed of the vehicle.
+    vehicle_front_point()
+ 	Returns the computed front axle midpoint of vehicle.
+    compute_steering_angle()
+	Returns the computed steering angle of the vehicle based on where the
+        vehicle is in relation to the path that it is following.
+    compute_angular_speed()
+	Returns the computed angular speed of the vehicle.
+    compute_curvature()
+	Returns the computed curvature.
+    compute_turning_radius()
+	Returns the computed turning radius.
+    construct_path()
+	This is just a smaller version at the purepursuit test can be run.
+	Uses LineString as the way to store the path in the test.
     '''
 
     # constructor
@@ -36,7 +68,6 @@ class PurePursuit:
         does geometric computation and then outputs the goal point, speed, and
         steering angle for the vehicle to stay on the path to be followed based
         on the aforementioned inputs.
-
         Parameters
         ----------
         wheelbase : float
