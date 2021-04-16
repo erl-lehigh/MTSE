@@ -1,0 +1,56 @@
+global_frame: map 
+robot_base_frame: ego_vehicle
+update_frequency: 5
+publish_frequency: 5
+static_map: false
+rolling_window: true
+always_send_full_costmap: true
+width: 30
+height: 30
+resolution: 0.2
+footprint: [[-1.5, -0.75], [-1.5, 0.75], [1.5, 0.75], [1.5, -0.75]]
+map_type: costmap
+plugins:
+  # - {name: static_map,       type: "costmap_2d::StaticLayer"}
+  # - {name: obstacle_layer,  type: "costmap_2d::ObstacleLayer"}
+  # - {name: inflation_layer, type: "costmap_2d::InflationLayer"}
+  - {name: obstacle_layer,  type: "costmap_2d::VoxelLayer"}
+obstacle_layer:
+  z_origin: 2.4
+  z_resolution: 0.2
+  z_voxel: 10
+  publish_voxel_map: false
+  combination_method: 1
+  # max_obstacle_height: 4.0
+  obstacle_range: 50.0
+  raytrace_range: 100.0
+  # observation_sources: laser_scan_sensor
+  # laser_scan_sensor: {sensor_frame: ego_vehicle/lidar/lidar1, data_type: LaserScan, topic: /scan, marking: true, clearing: false}
+  # inf_is_valid: true
+  observation_sources: point_cloud_sensor
+  # scan:
+  #   data_type: LaserScan
+  #   topic: scan
+  #   marking: true
+  #   clearing: true
+  #   inf_ifvalid: true
+  #   min_obstacle_height: 1.2
+  #   max_obstacle_height: 4.0
+  point_cloud_sensor:
+      topic: /carla/ego_vehicle/lidar/lidar1/point_cloud
+      sensor_frame: ego_vehicle/lidar/lidar1
+      data_type: PointCloud2
+      marking: true
+      clearing: true
+      max_obstacle_height: 4.0
+      min_obstacle_height: 1.2
+      mark_threshold: 3  # point_cloud_sensor_clearing:
+      topic: /carla/ego_vehicle/lidar/lidar1/point_cloud
+      sensor_frame: ego_vehicle/lidar/lidar1
+      data_type: PointCloud2
+      marking: true
+      clearing: true
+      max_obstacle_height: 4.0
+      min_obstacle_heught: 0.2
+inflation_layer:
+  inflation_radius: 0.25
