@@ -159,7 +159,11 @@ class PurePursuit:
             computed future point
         '''
         #print(type(self.vehicle_position))
-        closest_dist = min(self.vehicle_position.distance(self.closest_point()),self.lookahead)
+	if self.path == None:
+	        return Point(0.0, 0.0)
+	closest_dist = 0
+	if self.vehicle_position != None:
+		closest_dist = min(self.vehicle_position.distance(self.closest_point()),self.lookahead)
         dist_on_path = (self.lookahead ** 2 - closest_dist ** 2) ** 0.5
         arc_dist = self.path.project(self.vehicle_position)
         return self.path.interpolate(arc_dist + dist_on_path)
@@ -289,7 +293,9 @@ class PurePursuit:
         float
             computed curvature
         '''
-        lookahead_point = np.array(self.future_point()) - self.vehicle_position
+        if self.future_point() == None or self.vehicle_position == None:
+		return .5
+	lookahead_point = np.array(self.future_point()) - self.vehicle_position
         line_of_sight_angle = np.arctan2(lookahead_point[1], lookahead_point[0])
         eta = line_of_sight_angle - self.vehicle_orientation
         return 2 * np.abs(np.sin(eta)) / self.lookahead

@@ -129,6 +129,8 @@ class PurePursuitNode(object):
                                  self.control_loop)
 
         rospy.loginfo('[%s] Node started!', self.node_name)
+	
+
 
     def get_vehicle_pose(self):
         '''
@@ -142,6 +144,12 @@ class PurePursuitNode(object):
         -------
         tuple
             vehicle coordinates (x,y) and orientation (angle) and quaterion (direction for rvix)
+	
+	Note
+	----
+		The code in the try section had problems in its state in main. It is now correct here and in the 
+		fix/purepursuit_integration. This correct version of code is also posted in the TF guide on the 
+		drive and has a littl explanation as to why there might have been an issue.
         '''
 
 	#the below section was initially wrong in the main. The below is the correct order of parent, child, time, period.
@@ -185,6 +193,7 @@ class PurePursuitNode(object):
     def set_speed(self, msg):	#Float64 is the msg that is passed
 	'''
 	This method changes the speed based on the speed commanded. It also changes the lookahead distance too.
+	This method also changes the speed in accordance of the curvature (inverse proportional)
 
 	Parameters
 	----------
@@ -195,10 +204,12 @@ class PurePursuitNode(object):
 	------
 	none
 	'''
-        self.purepursuit.speed = msg.data
-        #speed = msg.data
-        self.purepursuit.update_lookahead(msg.data, self.purepursuit.lookahead_min, self.purepursuit.lookahead_max, self.purepursuit.lower_threshold_v, self.purepursuit.upper_threshold_v, self.purepursuit.lookahead_gain) # [different function in 
-	rospy.loginfo('speed changed to %5.2f m/s', msg.data)
+        curvature = self.purepursuit.compute_curvature() #calculate curvature
+	rospy.loginfo('curvature is %f', curvature)
+        newSpeed = msg.data * (1 - curvature)    #make the speed proportional to curvature.
+        self.purepursuit.speed = newSpeed
+        self.purepursuit.update_lookahead(newSpeed, self.purepursuit.lookahead_min, self.purepursuit.lookahead_max, self.purepursuit.lower_threshold_v, self.purepursuit.upper_threshold_v, self.purepursuit.lookahead_gain) # [different function in 
+	rospy.loginfo('speed commanded: %5.2f m/s\n\t\tspeed set: %5.2f m/s', msg.data, newSpeed)
         #purepursuit class]
         # have lower and upper bound for lookahead based on the speed
 

@@ -1,0 +1,11 @@
+rate: 5.0 # control loop frequency [Hz]
+parent_frame: map # Parent Reference frame (world)
+child_frame: ego_vehicle_filtered # Child Reference frame (vehicle)
+lookahead: 5 # distance to goal point [m]
+wheelbase: 2 # distance between vehicle's front and reat axles [m]
+lookahead_min: 3 # the minimum lookahead [m]
+lookahead_max: 12 # the maximum lookahead [m]
+lower_threshold_v: 1.34 # the lower threshold of the velocity that cooresponds to lookahead_min
+upper_threshold_v: 5.36 # the above, but for max/upper
+lookahead_gain: 2.24 # this is the scalar to multiply with v_cmd if in between the extremes
+speed: 5 # !!! This was part of the fix/purepursuitintegration original config, but this should not be necessary
