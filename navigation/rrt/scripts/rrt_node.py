@@ -169,14 +169,36 @@ class RRTNode(object):
         if np.random.uniform() < self.goal_bias:
             return goal
 
+        # origin.x,y is the position of the bottom leftmost corner of the map
         origin = self.costmap.info.origin.position
         width = self.costmap.info.width * self.costmap.info.resolution
         height = self.costmap.info.height * self.costmap.info.resolution
 
-        x_min, x_max = origin.x - width / 2., origin.x + width / 2.
-        x = np.random.uniform(x_min, x_max)
 
-        y_min, y_max = origin.y - height / 2., origin.y + height / 2.
+        # 80% of the time, we want to sample a smaller area, from the vehicle to the goal pose
+        if np.random.uniform() < .8:
+            vhx,vhy,_ = self.get_vehicle_pose()
+            gx,gy = goal.x, goal.y
+            offset = 1
+            if vhx > gx:
+                x_min = gx-offset
+                x_max = vhx+offset
+            else:
+                x_min = vhx-offset
+                x_max = gx+offset
+                
+            if vhy > gy:
+                y_min = gy-offset
+                y_max = vhy+offset
+            else:
+                y_min = gy-offset
+                y_max = vhy+offset
+        else:
+            x_min, x_max = origin.x, origin.x + width
+            y_min, y_max = origin.y, origin.y + height
+
+
+        x = np.random.uniform(x_min, x_max)
         y = np.random.uniform(y_min, y_max)
 
         return DubinsState(x=x, y=y, yaw=0, v=0, omega=0)
