@@ -5,12 +5,14 @@ import tf2_ros
 import tf.transformations as tr
 
 from std_msgs.msg import Header
-from geometry_msgs.msg import PoseStamped
+from geometry_msgs.msg import Pose, PoseStamped
 from nav_msgs.msg import Path, OccupancyGrid
+from rrt.msg import TreeStamped
 
 import numpy as np
 
 from rrt import RRTPlanner, DynamicDubinsVehicle, DubinsState
+from collections import deque
 
 
 class RRTNode(object):
@@ -54,9 +56,13 @@ class RRTNode(object):
         self.best_path = Path()
         self.best_path.header.frame_id = self.parent_frame
 
+        self.tree = TreeStamped()
+        self.tree.header.frame_id = self.parent_frame
+
         # Create publishers
         self.path_pub  = rospy.Publisher('planned_path', Path,
                                          queue_size=1)
+        self.tree_pub = rospy.Publisher('rrts_tree', TreeStamped, queue_size=1)
         # Create subscribers
         self.costmap_sub = rospy.Subscriber('costmap', OccupancyGrid,
                                             self.set_costmap)
@@ -142,10 +148,10 @@ class RRTNode(object):
             py = dubinsState.y
             x = (px - positionX)/resolution
             y = (py - positionY)/resolution
-            if(0 <= x <= width or 0 <= y <= height):
-                if(grid[int(x),int(y)] >= 100):
+            if(0 <= x < width-1 and 0 <= y < height-1):
+                if(grid[int(y),int(x)] >= 100): #Changed x and y, look into
                     return False
-                elif(0 <= grid[int(x),int(y)] < 100):
+                elif(0 <= grid[int(y),int(x)] < 100):
                     continue
                 else:
                     return False
@@ -191,7 +197,6 @@ class RRTNode(object):
         self.rrt_planner.vehicle.current_state = DubinsState(x, y, yaw, 0, 0)
         # Plan path from current state to goal
         path = self.rrt_planner.plan(self.goal)
-        #print(self.goal)
 
         # Publish returned path
         self.best_path.header.stamp = rospy.Time.now()
@@ -203,17 +208,90 @@ class RRTNode(object):
             pose.pose.position.y = y
            #pose.pose.orientation = tr.quaternion_from_euler(0, 0, yaw)
 
-            #TESTING
             quanternion = tr.quaternion_from_euler(0, 0, yaw)
             pose.pose.orientation.x = quanternion[0]
             pose.pose.orientation.y = quanternion[1]
             pose.pose.orientation.z = quanternion[2]
             pose.pose.orientation.w = quanternion[3]
-            #print(pose.pose.orientation)
 
             self.best_path.poses.append(pose)
         self.path_pub.publish(self.best_path)
 
+        #publish tree
+        nodes = self.rrt_planner.g.nodes
+        self.tree.header.stamp = rospy.Time.now()
+        self.tree.nodes = []
+        self.tree.parents = []
+        self.header.stamp = rospy.Time.now()
+        root = None
+        for node in nodes:
+            # if no predecessors than its the root
+            pred = self.rrt_planner.g.predecessors(node)
+            if not any(pred):
+                root = node
+
+        self.BFS(root, nodes)
+        self.tree_pub.publish(self.tree)
+
+    def BFS(self, v, nodes):
+        '''
+        Traverses the rrt tree using Breadth-First Search and
+        adds the nodes and parent list representation of the tree
+        for the TreeStamped message utilized in visualization.py
+
+        Parameters
+        ----------
+        v:      the root node of the rrt tree
+
+        nodes:  the list of nodes of the rrrt tree 
+                    DiGraph.nodes()
+        
+        Returns
+        -------
+        Nothing
+        '''
+        parent_id = 0
+        Q = deque([]) # Queue
+        visited = {}
+        for node in nodes:
+            visited[node] = False
+        Q.append(v)
+        visited[v] = True
+        point = Pose()
+        point.position.x = v.x
+        point.position.y = v.y
+
+        quanternion = tr.quaternion_from_euler(0, 0, v.yaw)
+        point.orientation.x = quanternion[0]
+        point.orientation.y = quanternion[1]
+        point.orientation.z = quanternion[2]
+        point.orientation.w = quanternion[3]
+        
+        self.tree.nodes.append(point)
+        self.tree.parents.append(-1) # init the root
+
+        while Q:
+            u = Q.popleft()
+            neighbors = self.rrt_planner.g.successors(u)
+            for neighbor in neighbors: 
+                if not visited[neighbor]:
+                    Q.append(neighbor)
+                    visited[neighbor] = True
+
+                    # append to nodes[] and parents[] in TreeStamped message
+                    point = Pose()
+                    point.position.x = neighbor.x
+                    point.position.y = neighbor.y
+
+                    quanternion = tr.quaternion_from_euler(0, 0, neighbor.yaw)
+                    point.orientation.x = quanternion[0]
+                    point.orientation.y = quanternion[1]
+                    point.orientation.z = quanternion[2]
+                    point.orientation.w = quanternion[3]
+
+                    self.tree.nodes.append(point)
+                    self.tree.parents.append(parent_id)
+            parent_id += 1
 
 if __name__ == "__main__":
     # Initialize node with rospy
