@@ -13,13 +13,13 @@
     <!-- launch dummy static vehicle transform w.r.t. world frame -->
     <node pkg="tf2_ros" type="static_transform_publisher"
           name="vehicle_broadcaster"
-          args="10.0 10.0 0 0 0 0 1 world vehicle"/>
+          args="0 0 0 0 0 0 1 vehicle world"/>
 
     <!-- publish dummy static goal for the vehicle -->
     <node pkg="rostopic" type="rostopic" name="rrt_goal"
           args="pub /goal geometry_msgs/PoseStamped
           &quot;{header: {frame_id: 'world'},
-                 pose: {position: {x: 15, y: 15, z: 0},
+                 pose: {position: {x: 15, y: 0, z: 0},
                         orientation: {x: 0, y: 0, z: 0, w: 1}}}&quot;"/>
 
     <!-- TODO: write test code and add it here as a test. -->
