@@ -37,7 +37,8 @@ class PurePursuit:
     future_point()
 	Returns the computed future point on the path for the vehicle to keep
         track of.
-    update_lookahead(self, v_cmd, lookahead_min, lookahead_max, lower_threshold_v, upper_threshold_v, lookahead_gain)
+    update_lookahead(self, v_cmd, lookahead_min, lookahead_max, 
+		     lower_threshold_v, upper_threshold_v, lookahead_gain)
 	Updates the lookahead based on the most recent commanded speed
     get_lookahead()
 	Returns the most up-to-date lookahead distance
@@ -60,7 +61,9 @@ class PurePursuit:
     '''
 
     # constructor
-    def __init__(self, wheelbase, lookahead, lookahead_min, lookahead_max, lower_threshold_v, upper_threshold_v, lookahead_gain, speed=None, vehicle_pose=None,
+    def __init__(self, wheelbase, lookahead_min, 
+	         lookahead_max, lower_threshold_v, upper_threshold_v, 
+		 lookahead_gain, speed=None, vehicle_pose=None,
                  path=None):
         '''
         Initializes the PurePursuit object by passing input parameters
@@ -79,12 +82,15 @@ class PurePursuit:
 	    the minimum the lookahead can be (set in configs)
         lookahead_max : float
 	    the maximum the lookahead can be (set in configs)
-        lower_threshold_v : float
-	    the lower bound speed, under this speed uses the minimum lookahead_min distance
-        upper_threshold_v : float
-	    the upper bound speed, above this speed uses the maximum lookahead_max distance
+        lower_velocity_threshold : float
+	    the lower bound speed, under this speed uses the minimum lookahead_min 
+	    distance
+        upper_velocity_threshold : float
+	    the upper bound speed, above this speed uses the maximum lookahead_max
+	    distance
 	lookahead_gain : float
-	    the scalar to multiply to get lookahead by multiplying with v_cmd when the lookahead is not outside the max or min.
+	    the scalar to multiply to get lookahead by multiplying with v_cmd
+	     when the lookahead is not outside the max or min.
 	path : Path
             path to be tracked for the vehicle
         speed : float
@@ -96,7 +102,7 @@ class PurePursuit:
         # distance between front and rear axles
         self.wheelbase = wheelbase
         # look ahead distance to the
-        self.lookahead = lookahead
+        self.lookahead = lookahead_min
 	self.lookahead_min = lookahead_min
 	self.lookahead_max = lookahead_max
 	self.lower_threshold_v = lower_threshold_v

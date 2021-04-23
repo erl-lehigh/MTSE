@@ -10,7 +10,8 @@ from std_msgs.msg import Float64
 
 class VariableSpeedNode(object):
     '''
-    This node is meant for calculating a variable speed in order to show the relationship between lookahead and speed
+    This node is meant for calculating a variable speed in order to show the
+    relationship between lookahead and speed
 
     Attributes
     ----------
@@ -27,18 +28,19 @@ class VariableSpeedNode(object):
 
     def __init__(self):
 	'''
-	Initializes by setting publisher and set the start time which will be used to calculate the speed
+	Initializes by setting publisher and set the start time which will 
+	be used to calculate the speed
 	'''
 	#set start time
 	self.startTime = time.time()
 	self.node_name = rospy.get_name()
 	self.rate = rospy.get_param('~rate', 1)
-	
+
 	#Create Publishers
 	self.reference_speed_pub = rospy.Publisher('reference_speed', 
 							Float64,
 							queue_size = 1)
-	
+
 	# Create timers
 	self.timer = rospy.Timer(rospy.Duration(1.0 / self.rate),
                                  self.sinusoidalSpeed)
@@ -48,8 +50,9 @@ class VariableSpeedNode(object):
     def sinusoidalSpeed(self, event=None):
 	'''
 	Used the difference in time start and now to change the speed.
-	The speed is centered at 3.35 which is the midpoint between the lookaway velocity bounds.
-	
+	The speed is centered at 3.35 which is the midpoint between 
+	the lookaway velocity bounds.
+
 	Parameters
 	----------
 	None
@@ -71,5 +74,4 @@ if __name__ == "__main__":
     #Create the node object
     _ = VariableSpeedNode()
     #Keep the node alive
-    print('spinning Variable Speed')
     rospy.spin()

@@ -4,15 +4,16 @@ import rostest
 import unittest
 from math import pi
 import matplotlib.pyplot as plt
+
 from shapely.geometry import Point, LineString
 from purepursuit import PurePursuit
 import rospy
+
 from test_paths import test_paths
 
 def dpp():
 
     # input data
-    #paths = [LineString([(1, 1), (8, 4)]), LineString([(1, 1), (8, 12)]), LineString([(8, 2), (8, 4)]), LineString([(10, 1), (8, 4)])] # given line path
     distances = []
     speed = 3   # given vehicle speed
     vehicle_cords = Point(0,0)   # initial vehicle coordinates
@@ -26,13 +27,21 @@ def dpp():
     lookahead_gain = rospy.get_param('~lookahead_gain', 2.24)
 
     for path_List in test_paths:
-    	#instance_of_PurePursuit = PurePursuit(path, speed,vehicle_cords, theta)	#should be  (wheelbase, lookahead, speed=None, vehicle_pose=None, path=None):
 	path = LineString(path_List)
-    	instance_of_PurePursuit = PurePursuit(wheelbase, lookahead, lookahead_min, lookahead_max, lower_threshold_v, upper_threshold_v, lookahead_gain, speed=speed, vehicle_pose=(vehicle_cords.x, vehicle_cords.y, theta), path=path)
+	pose_for_vehicle = (vehicle_cords.x, vehicle_cords.y, theta)
+    	instance_of_PurePursuit = PurePursuit(
+				   wheelbase, lookahead_min, 
+				   lookahead_max, lower_threshold_v, 
+				   upper_threshold_v, lookahead_gain, 
+				   speed=speed, vehicle_pose= pose_for_vehicle,
+				   path=path)
     	x,y = instance_of_PurePursuit.construct_path()
     	closest_pt = instance_of_PurePursuit.closest_point()
     	future_pt = instance_of_PurePursuit.future_point()
-    	instance_of_PurePursuit.update_lookahead(speed, lookahead_min, lookahead_max, lower_threshold_v, upper_threshold_v, lookahead_gain)
+    	instance_of_PurePursuit.update_lookahead(
+				   speed, lookahead_min, 
+				   lookahead_max, lower_threshold_v, 
+				   upper_threshold_v, lookahead_gain)
     	lookahead = instance_of_PurePursuit.get_lookahead()
 	distances.append(path.distance(future_pt)) 
 

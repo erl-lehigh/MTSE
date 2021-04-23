@@ -1,9 +1,10 @@
 #! /usr/bin/env python
 
+from math import pi
 import rostest
 import unittest
-from math import pi
 import matplotlib.pyplot as plt
+
 from shapely.geometry import Point, LineString
 from purepursuit import PurePursuit
 import rospy
@@ -12,7 +13,6 @@ def dpp():
     fig = plt.figure()
     ax1 = fig.add_subplot(1,1,1)
 
-    
     # input data
     path = LineString([(1, 1), (8, 4)]) # given line path
     speed = 3   # given vehicle speed
@@ -26,11 +26,7 @@ def dpp():
     upper_threshold_v = rospy.get_param('~upper_threshold_v', 5.36)
     lookahead_gain = rospy.get_param('~lookahead_gain', 2.24)
 
-
-    #instance_of_PurePursuit = PurePursuit(path, speed,vehicle_cords, theta)	#should be  (wheelbase, lookahead, speed=None, vehicle_pose=None, path=None):
-    instance_of_PurePursuit = PurePursuit(wheelbase, lookahead, lookahead_min, lookahead_max, lower_threshold_v, upper_threshold_v, lookahead_gain, speed=speed, vehicle_pose=(vehicle_cords.x, vehicle_cords.y, theta), path=path)
-    
-	
+    instance_of_PurePursuit = PurePursuit(wheelbase, lookahead_min, lookahead_max, lower_threshold_v, upper_threshold_v, lookahead_gain, speed=speed, vehicle_pose=(vehicle_cords.x, vehicle_cords.y, theta), path=path)
 
     print('vehicle coords: '+ str(vehicle_cords.x) + ',' + str(vehicle_cords.y))
 

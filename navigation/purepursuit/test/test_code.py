@@ -1,10 +1,12 @@
 #! /usr/bin/env python
 
 import unittest
+
 import rostest
+
 import test_purepursuit
 
-class testCase(unittest.TestCase):
+class Test_PurePursuit_Calculations(unittest.TestCase):
     def test_pp(self):
         output = test_purepursuit.dpp()
 	self.assertEqual(output[0], 3.0)	#x = 3.0
@@ -28,4 +30,4 @@ class testCase(unittest.TestCase):
 '''
 
 if __name__ == "__main__":
-    rostest.rosrun('template_ros_package', 'test_code', testCase)
+    rostest.rosrun('template_ros_package', 'test_code', Test_PurePursuit_Calculations)
