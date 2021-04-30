@@ -143,15 +143,20 @@ class PurePursuitNode(object):
         Returns
         -------
         tuple
-            vehicle coordinates (x,y) and orientation (angle) and quaterion (direction for rvix)
+            vehicle coordinates (x,y) and orientation (angle) and 
+	    quaterion (direction for rvix)
 	Note
 	----
-		The code in the try section had problems in its state in main. It is now correct here and in the 
-		fix/purepursuit_integration. This correct version of code is also posted in the TF guide on the 
-		drive and has a littl explanation as to why there might have been an issue.
+		The code in the try section had problems in its state
+		in main. It is now correct here and in the 
+		fix/purepursuit_integration. This correct version of
+		code is also posted in the TF guide on the 
+		drive and has a littl explanation as to why there 
+		might have been an issue.
         '''
 
-	#the below section was initially wrong in the main. The below is the correct order of parent, child, time, period.
+	#the below section was initially wrong in the main. 
+	#The below is the correct order of parent, child, time, period.
         try:
             trans = self.tf_buffer.lookup_transform(self.parent_frame,
                                                     self.child_frame,
@@ -307,9 +312,10 @@ class PurePursuitNode(object):
 
     def publish_speed_shape(self):
         '''
-        Uses the vehicle location to draw a cross with side lengths equal to the meters for the meters for second
-	speed. 
-        Parameters
+        Uses the vehicle location to draw a cross with side lengths equal 
+	to the meters for the meters for second speed. 
+        
+	Parameters
         ----------
         None
 
