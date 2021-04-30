@@ -172,10 +172,10 @@ class PurePursuit:
         '''
         #print(type(self.vehicle_position))
 	if self.path == None:
-	        return Point(0.0, 0.0)
+	     return Point(0.0, 0.0)
 	closest_dist = 0
 	if self.vehicle_position != None:
-		closest_dist = min(
+	     closest_dist = min(
                        self.vehicle_position.distance(self.closest_point()),
                        self.lookahead)
         dist_on_path = (self.lookahead ** 2 - closest_dist ** 2) ** 0.5
