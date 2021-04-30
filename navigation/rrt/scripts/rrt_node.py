@@ -76,7 +76,7 @@ class RRTNode(object):
         rospy.loginfo('[%s] Node started!', self.node_name)
 
     def set_goal(self, msg):
-        '''TODO: docstring
+        '''
         Converte the user input goal from orientation into quaternion
         Parameters
         ----------
@@ -160,7 +160,18 @@ class RRTNode(object):
         return True
 
     def sample(self, goal):
-        '''TODO: docstring
+        '''
+        goal_bias describes the percentage that we return the goal pose as the sampled point.
+        Otherwise, we sample from the costmap. When sampling the costmap, 80% of the time we
+        will sample from a smaller area between the vehicle and goal
+
+        Parameters
+        ----------
+        path: goal pose
+        
+        Returns
+        -------
+        DubinsState coordinates of the sampled point
         '''
         if self.costmap is None:
             rospy.logwarn('No costmap set!')
@@ -179,7 +190,7 @@ class RRTNode(object):
         if np.random.uniform() < .8:
             vhx,vhy,_ = self.get_vehicle_pose()
             gx,gy = goal.x, goal.y
-            offset = 1
+            offset = 2
             if vhx > gx:
                 x_min = gx-offset
                 x_max = vhx+offset
@@ -191,8 +202,8 @@ class RRTNode(object):
                 y_min = gy-offset
                 y_max = vhy+offset
             else:
-                y_min = gy-offset
-                y_max = vhy+offset
+                y_min = vhy-offset
+                y_max = gy+offset
         else:
             x_min, x_max = origin.x, origin.x + width
             y_min, y_max = origin.y, origin.y + height
@@ -228,7 +239,6 @@ class RRTNode(object):
             pose = PoseStamped(header=self.header)
             pose.pose.position.x = x
             pose.pose.position.y = y
-           #pose.pose.orientation = tr.quaternion_from_euler(0, 0, yaw)
 
             quanternion = tr.quaternion_from_euler(0, 0, yaw)
             pose.pose.orientation.x = quanternion[0]
