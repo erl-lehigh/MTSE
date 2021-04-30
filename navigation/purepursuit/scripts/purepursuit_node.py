@@ -211,9 +211,11 @@ class PurePursuitNode(object):
 	------
 	none
 	'''
-	self.purepursuit.speed = msg.data #set speed to the message
+	curvature = self.purepursuit.compare_curvature() #calc curvature
+	new_speed = msg.data * (1 - curvature) # speed(inverse curvature)
+	self.purepursuit.speed = new_speed
         self.purepursuit.update_lookahead(
-           msg.data, self.purepursuit.lookahead_min, 
+           new_speed, self.purepursuit.lookahead_min, 
 	   self.purepursuit.lookahead_max, self.purepursuit.lower_threshold_v, 
 	   self.purepursuit.upper_threshold_v, self.purepursuit.lookahead_gain)  
            #update lookahead
