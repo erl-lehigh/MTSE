@@ -1,7 +1,4 @@
 #!/usr/bin/env python
-'''
-TODO:
-'''
 
 import itertools as it
 
@@ -13,13 +10,12 @@ from visualization_msgs.msg import Marker
 from geometry_msgs.msg import Point
 
 # TODO: import needs to match package name, e.g., "rrt"
-from TODO.msg import TreeStamped
+from rrt.msg import TreeStamped
 
 
 class TreeVisualizer(object):
 
     def __init__(self):
-        self.lock = th.Lock()
 
         # TODO: expose topic name as parameter
         self.tree_pub = rospy.Publisher("planner_tree", Marker, queue_size=1,
@@ -39,7 +35,6 @@ class TreeVisualizer(object):
                 points.append(pose.position)
                 points.append(msg.nodes[parent].position)
 
-        self.lock.acquire()
         self.tree_marker.header = msg.header
         self.tree_marker.ns = 'tree'
         self.tree_marker.id = 0 #TODO:
@@ -58,12 +53,9 @@ class TreeVisualizer(object):
         self.tree_marker.color.g = 1.0
         self.tree_marker.color.a = 1.0
         self.tree_marker.points = points
-        self.lock.release()
 
     def publish_tree(self, event):
-        self.lock.acquire()
         self.tree_pub.publish(self.tree_marker)
-        self.lock.release()
 
 if __name__ == '__main__':
     # Initialize the node with rospy
