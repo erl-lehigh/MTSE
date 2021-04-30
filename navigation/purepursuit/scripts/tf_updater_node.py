@@ -14,7 +14,8 @@ import geometry_msgs.msg
 
 class TFUpdaterNode(object):
     '''
-    This node will receive messages for the ackermann msgs in 'speed_commad'
+    This node will receive messages for the 
+    ackermann msgs in 'speed_commad'
 
     Attributes
     ----------
@@ -31,8 +32,9 @@ class TFUpdaterNode(object):
 
     def __init__(self):
 	'''
-	Initializes by setting up the publisher to change the tf and then
-	also subscribe to the  the ackermann 'speed_command'
+	Initializes by setting up the publisher 
+        to change the tf and then also subscribe
+        to the  the ackermann 'speed_command'
 	'''
 	#Initial Stuff
 	self.rate = rospy.get_param('~rate', 1)
@@ -63,7 +65,7 @@ class TFUpdaterNode(object):
 	# Create timers
         self.timer = rospy.Timer(rospy.Duration(1.0 / self.rate),
                                  self.update_vehicle_location)
-        rospy.loginfo('[%s] Node started!', self.node_name)
+        rospy.logdebug('[%s] Node started!', self.node_name)
 
     def get_message(self, msg):
 	'''
@@ -80,9 +82,9 @@ class TFUpdaterNode(object):
     def update_vehicle_location(self, event=None):
 	'''
 	Dependent on the Ackermann message it should update the location
-	of the child frame vehicle.
-	Since this method will be called in accordance to the rate, we will
-	have the distance change be a function of the speed and steering angle
+	of the child frame vehicle. Since this method will be called 
+        in accordance to the rate, we will have the distance change 
+        be a function of the speed and steering angle
 
 	Parameters
 	----------
@@ -114,7 +116,9 @@ class TFUpdaterNode(object):
 	t.transform.translation.x = self.x
 	t.transform.translation.y = self.y
 	t.transform.translation.z = 0.0
-	q = tf_conversions.transformations.quaternion_from_euler(0, 0, self.theta) 
+	q = tf_conversions.transformations.quaternion_from_euler(0,
+                                                                 0,
+                                                                 self.theta)
 	#address qs
 	t.transform.rotation.x = q[0]
 	self.qx = q[0]
@@ -127,7 +131,7 @@ class TFUpdaterNode(object):
 
 	#Sending Transform
 	self.tfBroadcaster.sendTransform(t)
-	rospy.loginfo("( %5.2f , %5.2f , %5.2f )", self.x, self.y, self.theta)
+	rospy.logdebug("( %5.2f , %5.2f , %5.2f )", self.x, self.y, self.theta)
 
 if __name__ == "__main__":
 	#initialize node with rospy

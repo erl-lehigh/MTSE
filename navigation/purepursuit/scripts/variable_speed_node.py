@@ -10,8 +10,9 @@ from std_msgs.msg import Float64
 
 class VariableSpeedNode(object):
     '''
-    This node is meant for calculating a variable speed in order to show the
-    relationship between lookahead and speed
+    This node is meant for calculating a variable 
+    speed in order to show the relationship between
+    lookahead and speed
 
     Attributes
     ----------
@@ -28,8 +29,9 @@ class VariableSpeedNode(object):
 
     def __init__(self):
 	'''
-	Initializes by setting publisher and set the start time which will 
-	be used to calculate the speed
+	Initializes by setting publisher and set the 
+        start time which will be used to calculate 
+        the speed
 	'''
 	#set start time
 	self.startTime = time.time()
@@ -44,7 +46,7 @@ class VariableSpeedNode(object):
 	# Create timers
 	self.timer = rospy.Timer(rospy.Duration(1.0 / self.rate),
                                  self.sinusoidalSpeed)
-        rospy.loginfo('[%s] Node started!', self.node_name)
+        rospy.logdebug('[%s] Node started!', self.node_name)
 
 
     def sinusoidalSpeed(self, event=None):
@@ -61,12 +63,18 @@ class VariableSpeedNode(object):
 	-------
 	None
 	'''
-   	difTime = time.time() - self.startTime		#difference in time
-	thetaTime = difTime/3				#divide delta by 60 (make more smooth)
-	speed = 3.35 + 3 * math.cos(thetaTime)	#calculate the speed
-	speed_msg = Float64()				#initialize the message
-	speed_msg.data = speed				#set msg data section
-	self.reference_speed_pub.publish(speed_msg)	#publish message
+   	difTime = time.time() - self.startTime
+        #difference in time
+	thetaTime = difTime/3
+        #divide delta by 60 (make more smooth)
+	speed = 3.35 + 3 * math.cos(thetaTime)
+        #calculate the speed
+	speed_msg = Float64()
+        #initialize the message
+	speed_msg.data = speed
+        #set msg data section
+	self.reference_speed_pub.publish(speed_msg)
+        #publish message
 
 if __name__ == "__main__":
     #Initialize node with rospy

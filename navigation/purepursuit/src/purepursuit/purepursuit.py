@@ -1,5 +1,6 @@
 '''
-Pure Pursuit Algorithm for path tracking and speed/steerig angle computation
+Pure Pursuit Algorithm for path tracking 
+and speed/steerig angle computation
 '''
 
 
@@ -14,9 +15,11 @@ class PurePursuit:
     Attributes
     ----------
     wheelbase : float
-        specifies the distance between the midpoint of the read and front axle
+        specifies the distance between the 
+        midpoint of the read and front axle
     lookahead : float
-        specifies the distance to the target position along the tracked path
+        specifies the distance to the target 
+        position along the tracked path
     path : Path
         path to be tracked by the vehicle
     speed : float
@@ -30,13 +33,15 @@ class PurePursuit:
     -------
 
     set_vehicle_pose(vehicle_pose)
-	sets the vehicles position and the orientation if the parameter is not none
+	sets the vehicles position and the 
+        orientation if the parameter is not none
     closest_point()
-	Returns the computed closest point on the path from the midpoint of the
-        rear axle of the vehicle.
+	Returns the computed closest point on 
+        the path from the midpoint of the rear
+        axle of the vehicle.
     future_point()
-	Returns the computed future point on the path for the vehicle to keep
-        track of.
+	Returns the computed future point on the
+        path for the vehicle to keep track of.
     update_lookahead(self, v_cmd, lookahead_min, lookahead_max, 
 		     lower_threshold_v, upper_threshold_v, lookahead_gain)
 	Updates the lookahead based on the most recent commanded speed
@@ -83,11 +88,11 @@ class PurePursuit:
         lookahead_max : float
 	    the maximum the lookahead can be (set in configs)
         lower_velocity_threshold : float
-	    the lower bound speed, under this speed uses the minimum lookahead_min 
-	    distance
+	    the lower bound speed, under this speed uses the minimum 
+            lookahead_min distance
         upper_velocity_threshold : float
-	    the upper bound speed, above this speed uses the maximum lookahead_max
-	    distance
+	    the upper bound speed, above this speed uses the maximum
+            lookahead_max distance
 	lookahead_gain : float
 	    the scalar to multiply to get lookahead by multiplying with v_cmd
 	     when the lookahead is not outside the max or min.
@@ -114,7 +119,8 @@ class PurePursuit:
 
     def set_vehicle_pose(self, vehicle_pose):
         '''
-        Sets the vehicle position and the orientation if `vehicle_pose` is not
+        Sets the vehicle position and the orientation 
+        if `vehicle_pose` is not
         `None`.
 
         Parameters
@@ -135,8 +141,8 @@ class PurePursuit:
 
     def closest_point(self):
         '''
-        Returns the computed closest point on the path from the midpoint of the
-        rear axle of the vehicle.
+        Returns the computed closest point on the path from the
+        midpoint of the rear axle of the vehicle.
 
         Parameters
         ----------
@@ -152,8 +158,8 @@ class PurePursuit:
 
     def future_point(self):
         '''
-        Returns the computed future point on the path for the vehicle to keep
-        track of.
+        Returns the computed future point on the path for the
+        vehicle to keep track of.
 
         Parameters
         ----------
@@ -169,13 +175,18 @@ class PurePursuit:
 	        return Point(0.0, 0.0)
 	closest_dist = 0
 	if self.vehicle_position != None:
-		closest_dist = min(self.vehicle_position.distance(self.closest_point()),self.lookahead)
+		closest_dist = min(
+                       self.vehicle_position.distance(self.closest_point()),
+                       self.lookahead)
         dist_on_path = (self.lookahead ** 2 - closest_dist ** 2) ** 0.5
         arc_dist = self.path.project(self.vehicle_position)
         return self.path.interpolate(arc_dist + dist_on_path)
 
 
-    def update_lookahead(self, v_cmd, lookahead_min, lookahead_max, lower_threshold_v, upper_threshold_v, lookahead_gain):
+    def update_lookahead(self, v_cmd,
+                         lookahead_min, lookahead_max,
+                         lower_threshold_v, upper_threshold_v,
+                         lookahead_gain):
         '''
 	Updates the lookahead based on the most recent commanded speed
 
@@ -188,11 +199,15 @@ class PurePursuit:
 	float
 	    lookahead_max - the maximum the lookahead can be (set in configs)
 	float
-	    lower_threshold_v - the lower bound speed, under this speed uses the minimum lookahead_min distance
+	    lower_threshold_v - the lower bound speed, under this 
+                                speed uses the minimum lookahead_min 
+                                distance
 	float
-	    upper_threshold_v - the upper bound speed, above this speed uses the maximum lookahead_max distance
+	    upper_threshold_v - the upper bound speed, above this speed
+                                uses the maximum lookahead_max distance
 	float
-	    lookahead_gain - the scalar multiplied by v_cmd to get the lookahead when the value is not set to max or min
+	    lookahead_gain - the scalar multiplied by v_cmd to get the
+                             lookahead when the value is not set to max or min
 	Return
 	------
 	none
@@ -269,7 +284,8 @@ class PurePursuit:
         line_of_sight_angle = np.arctan2(lookahead_point[1], lookahead_point[0])
         eta = line_of_sight_angle - self.vehicle_orientation
         return np.arctan(2 * self.wheelbase * np.sin(eta) / self.lookahead)
-	#There was a negative sign above, but it was returning the opposite commands. 
+	#There was a negative sign above, but it was returning the opposite
+        # commands. 
 	
     def compute_angular_speed(self):
         '''
@@ -284,7 +300,9 @@ class PurePursuit:
         float
             computed speed
         '''
-        return self.speed * np.tan(self.compute_steering_angle()) / self.wheelbase
+        return ((self.speed
+               * np.tan(self.compute_steering_angle()))
+               / self.wheelbase)
 
     def compute_curvature(self):
         '''
