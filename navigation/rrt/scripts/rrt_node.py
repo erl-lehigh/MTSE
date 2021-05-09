@@ -16,11 +16,27 @@ from collections import deque
 
 
 class RRTNode(object):
-    '''TODO: docstring
+    '''
+    Starts RRTNode which will build the rrt tree and 
+    find a path from the vehicle to the goal
+
+    Subscribers
+    ----------
+    costmap
+    goal
+
+    Publishers
+    ----------
+    rrts_tree: 
+        rrt tree for visualization
+
+    planned path
     '''
 
     def __init__(self):
-        '''TODO: docstring
+        '''
+        Grabs parameters from rrt.yaml file and initializes
+        rrtNode fields, publishers, and subscribers
         '''
         self.node_name = rospy.get_name()
 
@@ -95,13 +111,32 @@ class RRTNode(object):
                                 yaw=yaw, v=0, omega=0)
 
     def set_costmap(self, msg):
-        '''TODO: docstring
+        '''
+        Callback handler for getting costmap messages
+
+        Parameters
+        ----------
+        msg: 
+        costmap to be used for rrt
+
+        Return
+        ------
+        None
         '''
         assert self.header.frame_id == self.parent_frame
         self.costmap = msg
 
     def get_vehicle_pose(self):
-        '''TODO: docstring
+        '''
+        Gets vehicle pose from tf
+
+        Parameters
+        ----------
+        None
+
+        Return
+        ------
+        Vehicle pose (x, y, orientation)
         '''
         try:
             trans = self.tf_buffer.lookup_transform(self.child_frame,
@@ -215,7 +250,17 @@ class RRTNode(object):
         return DubinsState(x=x, y=y, yaw=0, v=0, omega=0)
 
     def control_loop(self, event):
-        '''TODO: docstring
+        '''
+        Where all of the function calls
+        and publishing occur
+
+        Parameters
+        ----------
+        event
+        
+        Returns
+        -------
+        None
         '''
         if self.goal is None:
             rospy.logwarn('No goal set!')
