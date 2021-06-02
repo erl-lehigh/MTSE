@@ -36,6 +36,8 @@ class VariableSpeedNode(object):
         self.startTime = time.time()
         self.node_name = rospy.get_name()
         self.rate = rospy.get_param('~rate', 1)
+        self.amplitude = rospy.get_param('~speed_amplitude', 3)
+        self.base_speed = rospy.get_param('~base_speed', 3.35)
 
         # create publishers
         self.reference_speed_pub = rospy.Publisher('reference_speed',  Float64,
@@ -61,9 +63,10 @@ class VariableSpeedNode(object):
         -------
         None
         '''
-        difTime = time.time() - self.startTime # difference in time
-        thetaTime = difTime / 3 # divide delta by 60 (make more smooth)
-        speed = 3.35 + 3 * math.cos(thetaTime) # calculate the speed
+        diff_time = time.time() - self.startTime # difference in time
+        theta_time = diff_time / 3 # divide delta by 60 (make more smooth)
+        # calculate the speed
+        speed = self.base_speed + self.amplitude * math.cos(theta_time)
         speed_msg = Float64() # initialize the message
         speed_msg.data = speed # set msg data section
         self.reference_speed_pub.publish(speed_msg) # publish message
