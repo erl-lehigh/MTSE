@@ -68,7 +68,8 @@ class TestPurePursuitNode(object):
 
 
         path_coords = test_paths[4]
-	#The list above is referencing from a list of tests that are in a python folder in the test directory
+        # The list above is referencing from a list of tests that are in
+	# a python folder in the test directory
         for x, y in path_coords:
             pose = PoseStamped()
             pose.header.stamp = rospy.Time.now()
