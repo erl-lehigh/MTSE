@@ -38,11 +38,10 @@ class PurePursuitNode(object):
     path_sub : rospy.Subscriber
         the subscriber for the tracked path
     lookahead_pud : nav_msgs.msg.Path
-	Circle of radius of the lookahead
-	Centered at vehicle
+        Circle of radius of the lookahead centered at vehicle
     speed_visual_pub : nav_msgs.msg.Path
-	Cross with points of length of the meters in the speed (m/s)
-	Centered at vehicle
+        Cross with points of length of the meters in the speed (m/s) centered
+        at vehicle
     draw_speed_and_lookahead : Boolean
         Whether the shapes should be drawn or not.
     tf_buffer : tf2_ros.Buffer
@@ -78,49 +77,43 @@ class PurePursuitNode(object):
         self.parent_frame = rospy.get_param('~parent_frame', 'world')
         self.child_frame = rospy.get_param('~child_frame', 'vehicle')
         wheelbase = rospy.get_param('~wheelbase', 1)
-	lookahead_min = rospy.get_param('~lookahead_min', 3)
-	lookahead_max = rospy.get_param('~lookahead_max', 12)
-	lower_threshold_v = rospy.get_param('~lower_velocity_threshold', 1.34)
-	upper_threshold_v = rospy.get_param('~upper_velocity_threshold', 5.36)
-	lookahead_gain = rospy.get_param('~lookahead_gain', 2.24)
-        self.draw_speed_and_lookahead = rospy.get_param('~draw_speed_and_lookahead',
-                                                   False)
+        lookahead_min = rospy.get_param('~lookahead_min', 3)
+        lookahead_max = rospy.get_param('~lookahead_max', 12)
+        lower_threshold_v = rospy.get_param('~lower_velocity_threshold', 1.34)
+        upper_threshold_v = rospy.get_param('~upper_velocity_threshold', 5.36)
+        lookahead_gain = rospy.get_param('~lookahead_gain', 2.24)
+        self.draw_speed_and_lookahead = rospy.get_param(
+                                             '~draw_speed_and_lookahead', False)
 
         self.period = rospy.Duration(1.0 / self.rate)
 
-        self.purepursuit = PurePursuit(wheelbase, lookahead_min, 
-                                       lookahead_max, lower_threshold_v, 
+        self.purepursuit = PurePursuit(wheelbase, lookahead_min,
+                                       lookahead_max, lower_threshold_v,
                                        upper_threshold_v, lookahead_gain,
                                        speed=0)
 
         # Create publishers
-        self.command_pub = rospy.Publisher('speed_command', 
-					    AckermannDrive,
+        self.command_pub = rospy.Publisher('speed_command', AckermannDrive,
                                            queue_size=1)
 
         self.target_pub = rospy.Publisher('~/target', PoseStamped, queue_size=1)
 
-	self.lookahead_pub = rospy.Publisher('lookahead_shape', 
-						Path,
-						queue_size=1)
-	# A publisher for the shape of the lookahead 
+        self.lookahead_pub = rospy.Publisher('lookahead_shape', Path,
+                                             queue_size=1)
+        # A publisher for the shape of the lookahead
         # ( circle with radius of the lookahead)
-	self.speed_visual_pub = rospy.Publisher('speed_visual_pub',
-                                                Path, 
+        self.speed_visual_pub = rospy.Publisher('speed_visual_pub', Path,
                                                 queue_size=1)
 
-	self.vehicle_location_pub = rospy.Publisher('vehicle_location_pub', 
-                                                    PoseStamped, 
+        self.vehicle_location_pub = rospy.Publisher('vehicle_location_pub',
+                                                    PoseStamped,
                                                     queue_size=1)
 
         # Create subscribers
-	self.path_sub = rospy.Subscriber('planned_path', 
-					Path, 
-					self.set_path)
-	self.speed_sub = rospy.Subscriber('reference_speed', 
-						Float64, 
-						self.set_speed) 
-	#this will hold Vcmd in .data public attribute
+        self.path_sub = rospy.Subscriber('planned_path', Path, self.set_path)
+        self.speed_sub = rospy.Subscriber('reference_speed', Float64,
+                                          self.set_speed)
+        # this will hold Vcmd in .data public attribute
 
         # Create transform listener
         self.tf_buffer = tf2_ros.Buffer()
@@ -143,20 +136,16 @@ class PurePursuitNode(object):
         Returns
         -------
         tuple
-            vehicle coordinates (x,y) and orientation (angle) and 
-	    quaterion (direction for rvix)
-	Note
-	----
-		The code in the try section had problems in its state
-		in main. It is now correct here and in the 
-		fix/purepursuit_integration. This correct version of
-		code is also posted in the TF guide on the 
-		drive and has a littl explanation as to why there 
-		might have been an issue.
+            vehicle coordinates (x,y), orientation (angle) and quaterion
+            representation for orientation
+        Note
+        ----
+            The code in the try section had problems in its state in main.
+            It is now correct here and in the fix/purepursuit_integration. This
+            correct version of code is also posted in the TF guide on the drive
+            and has a littl explanation as to why there might have been an issue.
         '''
-
-	#the below section was initially wrong in the main. 
-	#The below is the correct order of parent, child, time, period.
+        # order of tf lookup is parent, child, time, period
         try:
             trans = self.tf_buffer.lookup_transform(self.parent_frame,
                                                     self.child_frame,
@@ -175,8 +164,7 @@ class PurePursuitNode(object):
 
     def set_path(self, msg):
         '''
-        Generates a path LineString (to be tracked) 
-        from a set of position
+        Generates a path LineString (to be tracked) from a set of position
         coordinates (pose).
 
         Parameters
@@ -195,37 +183,33 @@ class PurePursuitNode(object):
         self.purepursuit.path = LineString(pose_list)
 
 
-    def set_speed(self, msg):	#Float64 is the msg that is passed
-	'''
-	This method changes the speed based on the speed commanded. 
-        It also changes the lookahead distance too.
-	This method also changes the speed in accordance 
-        of the curvature (inverse proportional)
+    def set_speed(self, msg):
+        '''
+        This method changes the speed based on the speed commanded. It also
+        changes the lookahead distance too. This method also changes the speed
+        in accordance of the curvature (inverse proportional)
 
-	Parameters
-	----------
-	msgs : Float64
-	    the speed commanded
+        Parameters
+        ----------
+        msg : Float64
+            the speed command
 
-	Return
-	------
-	none
-	'''
-	self.purepursuit.speed = msg.data #set speed to the message
+        Return
+        ------
+        none
+        '''
+        self.purepursuit.speed = msg.data # set speed to the message
+        # update lookahead
         self.purepursuit.update_lookahead(
-           msg.data, self.purepursuit.lookahead_min, 
-	   self.purepursuit.lookahead_max, self.purepursuit.lower_threshold_v, 
-	   self.purepursuit.upper_threshold_v, self.purepursuit.lookahead_gain)  
-           #update lookahead
-	rospy.logdebug('speed changed to %5.2f m/s', msg.data) 
-           #message on speed change
+            msg.data, self.purepursuit.lookahead_min,
+            self.purepursuit.lookahead_max, self.purepursuit.lower_threshold_v,
+            self.purepursuit.upper_threshold_v, self.purepursuit.lookahead_gain)
+        rospy.logdebug('speed changed to %5.2f m/s', msg.data)
 
     def control_loop(self, event=None):
         '''
-        The control loop computes the vehicle's 
-        speed and steering angle if
-        path to track is set, and publishes 
-        AckermannDrive messages.
+        The control loop computes the vehicle's speed and steering angle if path
+        to track is set, and publishes AckermannDrive messages.
 
         Parameters
         ----------
@@ -236,86 +220,53 @@ class PurePursuitNode(object):
         -------
         None
         '''
-	msg = AckermannDrive(1.0, 0, 0, 0, 0)
+        msg = AckermannDrive(1.0, 0, 0, 0, 0)
         pose_msg = PoseStamped()
         pose_msg.header.stamp = rospy.Time.now()
-        pose_msg.header.frame_id = self.parent_frame 
-        #The frame is the parent id so the below locations 
-        #align with  get_vehicle_pose()
-	vehicle_location_msg = PoseStamped()
-	vehicle_location_msg.header.stamp = rospy.Time.now()
-	vehicle_location_msg.header.frame_id = self.parent_frame
-	if self.purepursuit.path is not None:
-	    locationOfVehicle = self.get_vehicle_pose()
-            self.purepursuit.set_vehicle_pose(locationOfVehicle)
-	    position = self.purepursuit.future_point()
+        pose_msg.header.frame_id = self.parent_frame
+        # The frame is the parent id so the below locations
+        # align with  get_vehicle_pose()
+        vehicle_location_msg = PoseStamped()
+        vehicle_location_msg.header.stamp = rospy.Time.now()
+        vehicle_location_msg.header.frame_id = self.parent_frame
+
+        if self.purepursuit.path is not None:
+            vehicle_location = self.get_vehicle_pose()
+            self.purepursuit.set_vehicle_pose(vehicle_location)
+
+            position = self.purepursuit.future_point()
             pose_msg.pose.position.x = position.x
             pose_msg.pose.position.y = position.y
+
+
+            vehicle_location_msg.pose.position.x = vehicle_location[0]
+            vehicle_location_msg.pose.position.y = vehicle_location[1]
+            vehicle_location_msg.pose.orientation = vehicle_location[3]
+
+            rospy.logdebug(str(vehicle_location))
+            rospy.logdebug('Vehicle - X:%5.2f Y:%5.2f', vehicle_location[0],
+                             vehicle_location[1])
+
             msg.speed = self.purepursuit.speed
-	    vehicle_location_msg.pose.position.x = locationOfVehicle[0]
-	    vehicle_location_msg.pose.position.y = locationOfVehicle[1]
-	    vehicle_location_msg.pose.orientation = locationOfVehicle[3]
-	    rospy.logdebug(str(locationOfVehicle))
-	    rospy.logdebug('Vehicle - X:%5.2f Y:%5.2f', 
-                          locationOfVehicle[0], 
-                          locationOfVehicle[1])
-	    msg.steering_angle = self.purepursuit.compute_steering_angle()
-	    rospy.logdebug("AckDrvMsg: %5.2f m/s %5.2f rad", 
-                          msg.speed, 
-                          msg.steering_angle)
-        self.command_pub.publish(msg)
-        self.target_pub.publish(pose_msg)
-	#the published shapes are conditional
-        if self.draw_speed_and_lookahead:
-	     self.publish_lookahead_shape()
-	     self.publish_speed_shape()
-	self.vehicle_location_pub.publish(vehicle_location_msg)
+            msg.steering_angle = self.purepursuit.compute_steering_angle()
+            rospy.logdebug('AckDrvMsg: %5.2f m/s %5.2f rad', msg.speed,
+                           msg.steering_angle)
+
+            self.command_pub.publish(msg)
+            self.target_pub.publish(pose_msg)
+            self.vehicle_location_pub.publish(vehicle_location_msg)
+
+            # the published shapes are conditional
+            if self.draw_speed_and_lookahead:
+                self.publish_lookahead_shape()
+                self.publish_speed_shape()
 
     def publish_lookahead_shape(self):
-	'''
-    	Uses the vehicle location to draw a path circle around the 
-        vehicle. Publishes the shape.
-
-    	Parameters
-    	----------
-    	None
-
-    	Returns
-    	-------
-    	None
-    	'''
-	la_distance = self.purepursuit.lookahead
-        #lookahead distance
-	locationOfVehicle = self.get_vehicle_pose()
-        #location of vehicle (center of circle)
-	lookaheadCircle = Path()
-        #circle of lookahead radius
-	lookaheadCircle.header.stamp = rospy.Time.now()
-	lookaheadCircle.header.frame_id = self.parent_frame
-        theta = 0
-	deltaTheta = math.pi / 16
-	endTheta = 2 * math.pi + deltaTheta
-        #End case: 2pi
-	while theta <= endTheta and locationOfVehicle != None:
-	    pose = PoseStamped()		#Position part
-	    pose.header.stamp = rospy.Time.now()     #stamp
-	    pose.header.frame_id = self.parent_frame #reference
-	    pose.pose.position.x = (locationOfVehicle[0] 
-                                    + la_distance 
-                                    * math.cos(theta)) #x location
-	    pose.pose.position.y = (locationOfVehicle[1] 
-                                    + la_distance 
-                                    * math.sin(theta)) #y location
-	    lookaheadCircle.poses.append(pose)	#add location to path
-	    theta = theta + deltaTheta		#increment the theta
-	self.lookahead_pub.publish(lookaheadCircle)
-
-    def publish_speed_shape(self):
         '''
-        Uses the vehicle location to draw a cross with side lengths equal 
-	to the meters for the meters for second speed. 
-        
-	Parameters
+        Uses the vehicle location to draw a path circle around the vehicle.
+        Publishes the shape.
+
+        Parameters
         ----------
         None
 
@@ -323,40 +274,70 @@ class PurePursuitNode(object):
         -------
         None
         '''
-	#Make Path
-	locationOfVehicle = self.get_vehicle_pose()
-        #location of vehicle (center of circle)
+        la_distance = self.purepursuit.lookahead #lookahead distance
+        # location of vehicle (center of circle)
+        vehicle_location = self.get_vehicle_pose()
+        # circle of lookahead radius
+        lookahead_circle = Path()
+        lookahead_circle.header.stamp = rospy.Time.now()
+        lookahead_circle.header.frame_id = self.parent_frame
+        theta = 0
+        delta_theta = math.pi / 16
+        end_theta = 2 * math.pi + deltaTheta
+
+        while theta <= end_theta and vehicle_location != None:
+            pose = PoseStamped()
+            pose.header = lookahead_circle.header
+            pose.pose.position.x = (vehicle_location[0]
+                                    + la_distance * math.cos(theta))
+            pose.pose.position.y = (vehicle_location[1]
+                                    + la_distance * math.sin(theta))
+            lookahead_circle.poses.append(pose) # add pose to visualization path
+            theta = theta + delta_theta # increment the theta
+        self.lookahead_pub.publish(lookahead_circle)
+
+    def publish_speed_shape(self):
+        '''
+        Uses the vehicle location to draw a cross with side lengths equal to
+        the meters for the meters for second speed.
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        None
+        '''
+
+        # location of vehicle (center of circle)
+        vehicle_location = self.get_vehicle_pose()
+        # create path
         speed_vis = Path()
-        #circle of lookahead radius
         speed_vis.header.stamp = rospy.Time.now()
         speed_vis.header.frame_id = self.parent_frame
-	speed = self.purepursuit.speed
-	deltaList = [[1,0],[0,0],[-1,0],[0,0],[0,1],[0,0],[0,-1]]
-        #list of locations for the X shape
-	if locationOfVehicle != None:
-	    for delta in deltaList:
-		pose = PoseStamped()
-                #Position part
-                pose.header.stamp = rospy.Time.now()
-                #stamp
-                pose.header.frame_id = self.parent_frame
-                #reference
-                pose.pose.position.x = locationOfVehicle[0] + speed * delta[0]
-                #x location
-                pose.pose.position.y = locationOfVehicle[1] + speed * delta[1]
-                #y location
-                speed_vis.poses.append(pose)
-                #add location to path
-	#Publish Shape
-	self.speed_visual_pub.publish(speed_vis)
+        speed = self.purepursuit.speed
+        # list of locations for the X shape
+        deltaList = [[1,0], [0,0], [-1,0], [0,0], [0,1], [0,0], [0,-1]]
+        if vehicle_location != None:
+            for delta in deltaList:
+                pose = PoseStamped()
+                # set header
+                pose.header = speed_vis.header
+                # set location (x, y) to each pose on the visualization path
+                pose.pose.position.x = vehicle_location[0] + speed * delta[0]
+                pose.pose.position.y = vehicle_location[1] + speed * delta[1]
+                speed_vis.poses.append(pose) # add pose to path
+        # publish Shape
+        self.speed_visual_pub.publish(speed_vis)
+
 
 if __name__ == "__main__":
-    # Initialize node with rospy
+    # initialize node with rospy
     rospy.init_node('purepursuit', anonymous=False)
-    #Add ', log_level=rospy.DEBUG' into the above if
-    #if you would like the log information
-    # Create the node object
+    # add ', log_level=rospy.DEBUG' into the above if
+    # if you would like the log information
+    # create the node object
     _ = PurePursuitNode()
-    # Keep the node alive
+    # keep the node alive
     rospy.spin()
- 
