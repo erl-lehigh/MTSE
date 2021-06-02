@@ -25,6 +25,9 @@
     <!-- launch tf updater -->
     <node pkg="$(arg pkg_name)" type="tf_updater_node.py" name="vehicle_broadcaster"/>
 
-    <node pkg="$(arg pkg_name)" type="less_variable_speed_node.py" name="variable_speed"/>
+    <node pkg="$(arg pkg_name)" type="variable_speed_node.py" name="variable_speed">
+        <param name="speed_amplitude" value="0.05" />
+        <param name="base_speed" value="3.5" />
+    </node>
 
 </launch>
