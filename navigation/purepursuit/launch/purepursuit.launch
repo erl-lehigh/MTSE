@@ -1,5 +1,5 @@
 <launch>
-    <arg name="rviz" default="False"/> 
+    <arg name="rviz" default="False"/>
     <arg name="config" default="$(find purepursuit)/config/purepursuit.yaml"
          doc="Specify a config"/>
 

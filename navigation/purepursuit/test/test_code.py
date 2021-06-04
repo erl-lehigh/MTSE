@@ -21,13 +21,13 @@ class Test_PurePursuit_Calculations(unittest.TestCase):
 	future_pt = output[8]
 	path = output[9]
 	distance = path.distance(future_pt) #if the point is on the path the distance should be really small.
-	self.assertTrue(distance < .001) #check if point is on the line. 
-'''
+	self.assertTrue(distance < .001) #check if point is on the line.
+	'''
 	lookahead is:
 		{3 		| Vcmd < 1.34}
-		{2.24*Vcmd	| Vcmd=[1.34, 5.36]} 
+		{2.24*Vcmd	| Vcmd=[1.34, 5.36]}
 		{12		| other}
-'''
+	'''
 
 if __name__ == "__main__":
     rostest.rosrun('template_ros_package', 'test_code', Test_PurePursuit_Calculations)

@@ -68,7 +68,8 @@ class TestPurePursuitNode(object):
 
 
         path_coords = test_paths[4]
-	#The list above is referencing from a list of tests that are in a python folder in the test directory
+	    # The list above is referencing from a list of tests that are in
+        # a python folder in the test directory
         for x, y in path_coords:
             pose = PoseStamped()
             pose.header.stamp = rospy.Time.now()
@@ -84,9 +85,9 @@ class TestPurePursuitNode(object):
 
 
 if __name__ == "__main__":
-    # Initialize node with rospy
+    # initialize node with rospy
     rospy.init_node('test_purepursuit', anonymous=False)
-    # Create the node object
+    # create the node object
     _ = TestPurePursuitNode()
-    # Keep the node alive
+    # ceep the node alive
     rospy.spin()
