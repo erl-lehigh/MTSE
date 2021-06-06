@@ -58,7 +58,7 @@ class PurePursuit:
     # constructor
     def __init__(self, wheelbase, lookahead_min,
              lookahead_max, lower_threshold_v, upper_threshold_v,
-         lookahead_gain, speed=None, vehicle_pose=(0,0,0),
+         lookahead_gain, speed=None, vehicle_pose=None,
                  path=None):
         '''
         Initializes the PurePursuit object by passing input parameters
@@ -161,9 +161,9 @@ class PurePursuit:
             closest_dist = min(
                         self.vehicle_position.distance(self.closest_point()),
                         self.lookahead)
-        dist_on_path = (self.lookahead ** 2 - closest_dist ** 2) ** 0.5
-        arc_dist = self.path.project(self.vehicle_position)
-        return self.path.interpolate(arc_dist + dist_on_path)
+            dist_on_path = (self.lookahead ** 2 - closest_dist ** 2) ** 0.5
+            arc_dist = self.path.project(self.vehicle_position)
+            return self.path.interpolate(arc_dist + dist_on_path)
 
 
     def update_lookahead(self, v_cmd,
@@ -195,7 +195,7 @@ class PurePursuit:
         none
         '''
         if (v_cmd < lower_threshold_v):
-                self.lookahead = lookahead_min
+            self.lookahead = lookahead_min
         elif (lower_threshold_v <= v_cmd and v_cmd < upper_threshold_v):
             self.lookahead = lookahead_gain*v_cmd
         else:

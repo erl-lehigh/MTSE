@@ -182,7 +182,9 @@ class PurePursuitNode(object):
     def set_speed(self, msg):    #Float64 is the msg that is passed
         '''
         This method changes the speed based on the speed commanded.
-        It also changes the lookahead distance too.
+            It also changes the lookahead distance too.
+        This method also changes the speed in accordance
+            of the curvature (inverse proportional)
         Parameters
         ----------
         msgs : Float64

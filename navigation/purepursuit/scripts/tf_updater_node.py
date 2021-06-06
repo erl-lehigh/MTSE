@@ -112,9 +112,8 @@ class TFUpdaterNode(object):
         t.transform.translation.x = self.x
         t.transform.translation.y = self.y
         t.transform.translation.z = 0.0
-        q = tf_conversions.transformations.quaternion_from_euler(0,
-                                                                    0,
-                                                                    self.theta)
+        q = tf_conversions.transformations.quaternion_from_euler(
+                0, 0, self.theta)
         #address qs
         t.transform.rotation.x = q[0]
         self.qx = q[0]
