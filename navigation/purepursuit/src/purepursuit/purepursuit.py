@@ -205,7 +205,7 @@ class PurePursuit:
         none
         '''
         if (v_cmd < lower_threshold_v):
-                self.lookahead = lookahead_min
+            self.lookahead = lookahead_min
         elif (lower_threshold_v <= v_cmd and v_cmd < upper_threshold_v):
             self.lookahead = lookahead_gain*v_cmd
         else:
