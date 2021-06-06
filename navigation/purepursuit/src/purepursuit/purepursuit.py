@@ -191,15 +191,14 @@ class PurePursuit:
         float
             lookahead_max - the maximum the lookahead can be (set in configs)
         float
-            lower_threshold_v - the lower bound speed, under this
-                                    speed uses the minimum lookahead_min
-                                    distance
+            lower_threshold_v - the lower bound speed, under this speed uses
+                                the minimum lookahead_min distance
         float
             upper_threshold_v - the upper bound speed, above this speed
-                                    uses the maximum lookahead_max distance
+                                uses the maximum lookahead_max distance
         float
             lookahead_gain - the scalar multiplied by v_cmd to get the
-                                lookahead when the value is not set to max or min
+                             lookahead when the value is not set to max or min
         Return
         ------
         none

@@ -156,7 +156,7 @@ class PurePursuitNode(object):
         except (tf2_ros.LookupException, tf2_ros.ConnectivityException,
                 tf2_ros.ExtrapolationException) as err:
             rospy.logdebug("e: %s", err)
-        return
+            return
         quaternion_message = trans.transform.rotation
         quaternion = (quaternion_message.x, quaternion_message.y,
                       quaternion_message.z, quaternion_message.w)
