@@ -12,17 +12,14 @@ from ackermann_msgs.msg import AckermannDrive
 
 import geometry_msgs.msg
 
-
 class TFUpdaterNode(object):
     '''
     The node simulates the vehicle motion based on the bycicle model, and
     Ackermann speed command messages.
-
     Attributes
     ----------
     current_command : AckermannDrive.ackermann_msgs.msg
         the current Ackermann,
-
     Methods
     -------
     getMessage(msg):
@@ -33,42 +30,44 @@ class TFUpdaterNode(object):
 
     def __init__(self):
         '''
-        Initializes by setting up the publisher to change the tf and then also
-        subscribe to the the ackermann speed command topic.
+        Initializes by setting up the publisher
+        to change the tf and then also subscribe
+        to the  the ackermann 'speed_command'
         '''
-        # initialize parameters
+        #Initial Stuff
         self.rate = rospy.get_param('~rate', 1)
         self.period = rospy.Duration(1.0 / self.rate)
         self.node_name = rospy.get_name()
         self.parent_frame = rospy.get_param('~parent_frame', 'world')
         self.child_frame = rospy.get_param('~child_frame', 'vehicle')
-
-        # create Subscriber
-        self.command_sub = rospy.Subscriber('speed_command', AckermannDrive,
-                                            self.get_message)
-        # create AckermannDrive message
-        self.ad_message = AckermannDrive( 0.0, 0, 0, 0, 0)
-        # iterables
-        # 2D moventment
+        #self.counter = -5
+        #Create Subscriber
+        self.command_sub = rospy.Subscriber('speed_command',
+                            AckermannDrive,
+                            self.get_message)
+        #Create AckermannDrive Message holder
+        self.adMessage = AckermannDrive( 0.0, 0, 0, 0, 0)
+        #Iterables
+        ##2D moventment
         self.x = 0
         self.y = 0
-        # quanterion
+        ##Quanterion
         self.qx = 0
         self.qy = 0
         self.qz = 0
         self.qw = 0
-        # orientation (angle)
+        ##Orientation(Angle)
         self.theta = -1.0
-        # create TF
+        #Create TF
         self.tfBroadcaster = tf2_ros.TransformBroadcaster()
-        # create timers
+        # Create timers
         self.timer = rospy.Timer(rospy.Duration(1.0 / self.rate),
                                  self.update_vehicle_location)
         rospy.logdebug('[%s] Node started!', self.node_name)
 
     def get_message(self, msg):
         '''
-        Get and set Ackermann drive message
+        Get and set adMessage
         Parameters
             ----------
             msg : ackermannmsgs.msg.AckermannDrive
@@ -76,36 +75,34 @@ class TFUpdaterNode(object):
         Returns
         -------
         '''
-        self.ad_message = msg
+        self.adMessage = msg
 
     def update_vehicle_location(self, event=None):
         '''
-        Dependent on the Ackermann message it should update the location of the
-        child frame vehicle. Since this method will be called in accordance to
-        the rate, we will have the distance change be a function of the speed
-        and steering angle
-
+        Dependent on the Ackermann message it should update the location
+        of the child frame vehicle. Since this method will be called
+            in accordance to the rate, we will have the distance change
+            be a function of the speed and steering angle
         Parameters
         ----------
         event=None : rospy.TimerEvent
                 information about the event that generated this call
-
         Return
         ------
         None
         '''
-        # get location current location
+        #get location current location
 
-        delta_move = (1 / self.rate) * self.ad_message.speed
-        # use the period time the speed to have the total distance
+        deltaMove = (1 / self.rate) * self.adMessage.speed 
+        #use the period time the speed to have the total distance
 
-        self.theta = self.theta + self.ad_message.steering_angle
+        self.theta = self.theta + self.adMessage.steering_angle
 
-        deltaX = delta_move * math.cos(self.theta)
-        # the translation in x is cosine of steering angle
-        deltaY = delta_move * math.sin(self.theta)
+        deltaX = deltaMove * math.cos(self.theta) 
+        #The translation ins x is cosine of steering angle
+        deltaY = deltaMove * math.sin(self.theta)
 
-        # transform part
+        #transform part
         t = geometry_msgs.msg.TransformStamped()
         t.header.stamp = rospy.Time.now()
         t.header.frame_id = "world"
@@ -115,9 +112,10 @@ class TFUpdaterNode(object):
         t.transform.translation.x = self.x
         t.transform.translation.y = self.y
         t.transform.translation.z = 0.0
-        q = tf_conversions.transformations.quaternion_from_euler(0, 0,
-                                                                 self.theta)
-        # address qs
+        q = tf_conversions.transformations.quaternion_from_euler(0,
+                                                                    0,
+                                                                    self.theta)
+        #address qs
         t.transform.rotation.x = q[0]
         self.qx = q[0]
         t.transform.rotation.y = q[1]
@@ -127,10 +125,9 @@ class TFUpdaterNode(object):
         t.transform.rotation.w = q[3]
         self.qw = q[3]
 
-        # sending transform
+        #Sending Transform
         self.tfBroadcaster.sendTransform(t)
         rospy.logdebug("( %5.2f , %5.2f , %5.2f )", self.x, self.y, self.theta)
-
 
 if __name__ == "__main__":
     # initialize node with rospy

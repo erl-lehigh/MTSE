@@ -14,7 +14,6 @@ from test_paths import test_paths
 class TestPurePursuitNode(object):
     '''
     A class to represent a TestPurePursuitNode
-
     Attributes
     ----------
     node_name : str
@@ -25,7 +24,6 @@ class TestPurePursuitNode(object):
     timer : rospy.Timer
         a variable called "timer" that holds an instance of the class
         rospy.Timer
-
     Methods
     -------
     publish_path(event=None)
@@ -36,10 +34,8 @@ class TestPurePursuitNode(object):
         '''
         Constructs all the necessary attributes for the TestPurePursuitNode
         object.
-
         Parameters
         ----------
-
         '''
         self.node_name = rospy.get_name()
 
@@ -52,12 +48,10 @@ class TestPurePursuitNode(object):
     def publish_path(self, event=None):
         '''
         Publishes the path coordinates for the vehcile to track/follow.
-
         Parameters
         ----------
         event=None : ?? not sure
             # not sure ???
-
         Returns
         -------
         None
@@ -69,7 +63,7 @@ class TestPurePursuitNode(object):
 
         path_coords = test_paths[4]
         # The list above is referencing from a list of tests that are in
-	# a python folder in the test directory
+        # a python folder in the test directory
         for x, y in path_coords:
             pose = PoseStamped()
             pose.header.stamp = rospy.Time.now()
@@ -85,9 +79,9 @@ class TestPurePursuitNode(object):
 
 
 if __name__ == "__main__":
-    # Initialize node with rospy
+    # initialize node with rospy
     rospy.init_node('test_purepursuit', anonymous=False)
-    # Create the node object
+    # create the node object
     _ = TestPurePursuitNode()
-    # Keep the node alive
+    # keep the node alive
     rospy.spin()

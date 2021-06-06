@@ -23,8 +23,6 @@
     <node pkg="rostopic" type="rostopic" name="static_reference_speed"
     args="pub /reference_speed std_msgs/Float64 3" />
 
-
-    <!-- TODO: write test code and add it here as a test. -->
     <test test-name="code" pkg="purepursuit" type="test_code.py"/>
-    
+
 </launch>

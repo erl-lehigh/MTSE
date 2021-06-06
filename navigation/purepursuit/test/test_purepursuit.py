@@ -26,10 +26,10 @@ def dpp():
     upper_threshold_v = rospy.get_param('~upper_threshold_v', 5.36)
     lookahead_gain = rospy.get_param('~lookahead_gain', 2.24)
 
-    vehicle_pose=(vehicle_cords.x, vehicle_cords.y, theta)
+    vehicle_pose = (vehicle_cords.x, vehicle_cords.y, theta)
     instance_of_PurePursuit = PurePursuit(wheelbase, lookahead_min, lookahead_max,
                                           lower_threshold_v, upper_threshold_v,
-                                          lookahead_gain, speed=speed,
+                                          lookahead_gain, speed=speed, 
                                           vehicle_pose=vehicle_pose, path=path)
 
     print('vehicle coords: '+ str(vehicle_cords.x) + ',' + str(vehicle_cords.y))
@@ -82,8 +82,8 @@ def dpp():
     #############
 
     instance_of_PurePursuit.update_lookahead(speed, lookahead_min, lookahead_max,
-					     lower_threshold_v, upper_threshold_v,
-					     lookahead_gain)
+                                             lower_threshold_v, upper_threshold_v,
+                                             lookahead_gain)
     lookahead = instance_of_PurePursuit.get_lookahead()
 
     ###########
@@ -102,7 +102,6 @@ def dpp():
     print('steering angle (rad): ' + str(delta))
     print('angular speed (rad/s): ' + str(omega))
     print('future point: ' + str(future_pt))
-	 
     plt.show()
     return front_pt.x, front_pt.y, r, curv, speed, delta, omega, lookahead, future_pt, path
 
