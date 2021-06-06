@@ -38,9 +38,9 @@ class PurePursuitNode(object):
     path_sub : rospy.Subscriber
         the subscriber for the tracked path
     lookahead_pud : nav_msgs.msg.Path
-	    Circle of radius of the lookahead centeredd at vehicle
+        Circle of radius of the lookahead centeredd at vehicle
     speed_visual_pub : nav_msgs.msg.Path
-	    Cross with points of length of the meters in the speed (m/s) centered at vehicle
+        Cross with points of length of the meters in the speed (m/s) centered at vehicle
     draw_speed_and_lookahead : Boolean
         Whether the shapes should be drawn or not.
     tf_buffer : tf2_ros.Buffer
@@ -93,7 +93,7 @@ class PurePursuitNode(object):
 
         # Create publishers
         self.command_pub = rospy.Publisher('speed_command',
-					                       AckermannDrive,
+                                           AckermannDrive,
                                            queue_size=1)
 
         self.target_pub = rospy.Publisher('~/target', PoseStamped, queue_size=1)
@@ -147,7 +147,7 @@ class PurePursuitNode(object):
             and has a littl explanation as to why there might have been an issue.
         '''
 
-	    # order of tf lokup is parent, child time period
+        # order of tf lokup is parent, child time period
         try:
             trans = self.tf_buffer.lookup_transform(self.parent_frame,
                                                     self.child_frame,
@@ -156,7 +156,7 @@ class PurePursuitNode(object):
         except (tf2_ros.LookupException, tf2_ros.ConnectivityException,
                 tf2_ros.ExtrapolationException) as err:
             rospy.logdebug("e: %s", err)
-	    return
+            return
         quaternion_message = trans.transform.rotation
         quaternion = (quaternion_message.x, quaternion_message.y,
                       quaternion_message.z, quaternion_message.w)
@@ -185,7 +185,7 @@ class PurePursuitNode(object):
         self.purepursuit.path = LineString(pose_list)
 
 
-    def set_speed(self, msg):	#Float64 is the msg that is passed
+    def set_speed(self, msg):    #Float64 is the msg that is passed
         '''
         This method changes the speed based on the speed commanded.
             It also changes the lookahead distance too.
@@ -263,16 +263,16 @@ class PurePursuitNode(object):
 
     def publish_lookahead_shape(self):
         '''
-    	Uses the vehicle location to draw a path circle around the
+        Uses the vehicle location to draw a path circle around the
         vehicle. Publishes the shape.
 
-    	Parameters
-    	----------
-    	None
+        Parameters
+        ----------
+        None
 
-    	Returns
-    	-------
-    	None
+        Returns
+        -------
+        None
         '''
         la_distance = self.purepursuit.lookahead #lookahead distance
         # location of vehicle (center of circle)
@@ -301,7 +301,7 @@ class PurePursuitNode(object):
         Uses the vehicle location to draw a cross with side lengths equal to
         the meters for the meters for second speed.
 
-	    Parameters
+        Parameters
         ----------
         None
 
