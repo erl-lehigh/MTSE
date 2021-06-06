@@ -81,21 +81,21 @@ class TFUpdaterNode(object):
 
     def update_vehicle_location(self, event=None):
         '''
-		Dependent on the Ackermann message it should update the location
-		of the child frame vehicle. Since this method will be called
-			in accordance to the rate, we will have the distance change
-			be a function of the speed and steering angle
+	Dependent on the Ackermann message it should update the location
+	of the child frame vehicle. Since this method will be called
+		in accordance to the rate, we will have the distance change
+		be a function of the speed and steering angle
 
-		Parameters
-		----------
-		event=None : rospy.TimerEvent
-				information about the event that generated this call
+	Parameters
+	----------
+	event=None : rospy.TimerEvent
+			information about the event that generated this call
 
-		Return
-		------
-		None
-		'''
-		#get location current location
+	Return
+	------
+	None
+	'''
+	#get location current location
 
         deltaMove = (1 / self.rate) * self.adMessage.speed 
 		#use the period time the speed to have the total distance
@@ -116,10 +116,9 @@ class TFUpdaterNode(object):
         t.transform.translation.x = self.x
         t.transform.translation.y = self.y
         t.transform.translation.z = 0.0
-        q = tf_conversions.transformations.quaternion_from_euler(0,
-																	0,
-																	self.theta)
-		#address qs
+        q = tf_conversions.transformations.quaternion_from_euler(
+		0, 0, self.theta)
+	#address qs
         t.transform.rotation.x = q[0]
         self.qx = q[0]
         t.transform.rotation.y = q[1]
