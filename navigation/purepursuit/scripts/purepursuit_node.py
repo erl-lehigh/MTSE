@@ -16,6 +16,7 @@ from purepursuit import PurePursuit
 class PurePursuitNode(object):
     '''
     A class to represent a pure pursuit node in ROS
+
     Attributes
     ----------
     node_name : str
@@ -48,6 +49,7 @@ class PurePursuitNode(object):
         the listener for ROS transforms
     timer : rospy.Timer
         the control loop timer
+
     Methods
     -------
     set_path(msg):
@@ -127,9 +129,11 @@ class PurePursuitNode(object):
     def get_vehicle_pose(self):
         '''
         Returns the vehicle's pose (position and orientation).
+
         Parameters
         ----------
         None
+
         Returns
         -------
         tuple
@@ -164,10 +168,12 @@ class PurePursuitNode(object):
         '''
         Generates a path LineString (to be tracked) from a set of position
         coordinates (pose).
+
         Parameters
         ----------
         msg :  nav_msgs.msg.Path
             ROS navigation path message
+
         Returns
         -------
         None
@@ -185,10 +191,12 @@ class PurePursuitNode(object):
             It also changes the lookahead distance too.
         This method also changes the speed in accordance
             of the curvature (inverse proportional)
+
         Parameters
         ----------
         msgs : Float64
             the speed command
+
         Return
         ------
         none
@@ -206,10 +214,12 @@ class PurePursuitNode(object):
         '''
         The control loop computes the vehicle's speed and steering angle if path
         to track is set, and publishes AckermannDrive messages.
+
         Parameters
         ----------
         event=None : rospy.TimerEvent
             information about the event that generated this call
+
         Returns
         -------
         None
@@ -254,9 +264,11 @@ class PurePursuitNode(object):
         '''
         Uses the vehicle location to draw a path circle around the
         vehicle. Publishes the shape.
+
         Parameters
         ----------
         None
+
         Returns
         -------
         None
@@ -287,9 +299,11 @@ class PurePursuitNode(object):
         '''
         Uses the vehicle location to draw a cross with side lengths equal to
         the meters for the meters for second speed.
+
         Parameters
         ----------
         None
+
         Returns
         -------
         None
