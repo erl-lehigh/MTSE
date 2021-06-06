@@ -43,7 +43,7 @@ class PurePursuit:
     compute_speed()
         Returns the computed speed of the vehicle.
     vehicle_front_point()
-         Returns the computed front axle midpoint of vehicle.
+        Returns the computed front axle midpoint of vehicle.
     compute_steering_angle()
         Returns the computed steering angle of the vehicle based on where the
         vehicle is in relation to the path that it is following.
@@ -72,8 +72,8 @@ class PurePursuit:
         Parameters
         ----------
         wheelbase : float
-            specifies the distance between the midpoint of the read and front
-            axle
+            specifies the distance between the midpoint of the read and
+            front axle
         lookahead : float
             specifies the lookahead distance to the path
         lookahead_min : float
@@ -87,8 +87,8 @@ class PurePursuit:
             the upper bound speed, above this speed uses the maximum
             lookahead_max distance
         lookahead_gain : float
-            the scalar to multiply to get lookahead by multiplying with v_cmd
-            when the lookahead is not outside the max or min.
+            the scalar to multiply to get lookahead by multiplying with
+            v_cmd when the lookahead is not outside the max or min.
         path : Path
             path to be tracked for the vehicle
         speed : float
@@ -191,15 +191,14 @@ class PurePursuit:
         float
             lookahead_max - the maximum the lookahead can be (set in configs)
         float
-            lower_threshold_v - the lower bound speed, under this
-                                    speed uses the minimum lookahead_min
-                                    distance
+            lower_threshold_v - the lower bound speed, under this speed uses
+                                the minimum lookahead_min distance
         float
             upper_threshold_v - the upper bound speed, above this speed
-                                    uses the maximum lookahead_max distance
+                                uses the maximum lookahead_max distance
         float
             lookahead_gain - the scalar multiplied by v_cmd to get the
-                                lookahead when the value is not set to max or min
+                             lookahead when the value is not set to max or min
         Return
         ------
         none

@@ -166,8 +166,8 @@ class PurePursuitNode(object):
 
     def set_path(self, msg):
         '''
-        Generates a path LineString (to be tracked) from a set of position
-        coordinates (pose).
+        Generates a path LineString (to be tracked) from a set
+        of position coordinates (pose).
 
         Parameters
         ----------
@@ -188,9 +188,9 @@ class PurePursuitNode(object):
     def set_speed(self, msg):    #Float64 is the msg that is passed
         '''
         This method changes the speed based on the speed commanded.
-            It also changes the lookahead distance too.
+        It also changes the lookahead distance too.
         This method also changes the speed in accordance
-            of the curvature (inverse proportional)
+        of the curvature (inverse proportional)
 
         Parameters
         ----------
@@ -209,7 +209,7 @@ class PurePursuitNode(object):
                 self.purepursuit.lookahead_max, self.purepursuit.lower_threshold_v,
                 self.purepursuit.upper_threshold_v, self.purepursuit.lookahead_gain)
         rospy.logdebug('speed changed to %5.2f m/s', msg.data)
-            #message on speed change
+        #message on speed change
 
     def control_loop(self, event=None):
         '''
