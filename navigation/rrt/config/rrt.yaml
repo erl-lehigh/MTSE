@@ -1,9 +1,12 @@
-rate: 5 # control loop frequency [Hz]
-parent_frame: world # TODO: set correct value
-child_frame: vehicle # TODO: set correct value
-max_iterations: 2000 # maximum interations per control loop
+rate: 0.5 # control loop frequency [Hz]
+parent_frame: world 
+child_frame: vehicle 
+max_iterations: 500 # maximum interations per control loop
 gamma: 40 # RRT*
-dist_threshold: 5 # TODO: tune this
-angle_threshold: 0.3490658503988659 # TODO: tune this
-step_size: 10.0 # TODO: tune this
+dist_threshold: 5 
+angle_threshold: 0.3490658503988659 
+step_size: 10.0 
 goal_bias: 0.3 # proability that the goal is returned by sampler
+tree_pub_topic: planner_tree # expose params for visualization.py
+tree_sub_topic: rrts_tree
+tree_line_width: 0.05
