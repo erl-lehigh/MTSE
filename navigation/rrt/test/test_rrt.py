@@ -1,6 +1,5 @@
 import matplotlib.pyplot as plt
 import sys
-sys.path.append('/home/zoob/SDC/MTSE/navigation/rrt/src/rrt')
 from rrt import RRTPlanner
 from dubins import DubinsState
 from dubins import dubins_isclose, position_distance as distance

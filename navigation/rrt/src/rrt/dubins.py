@@ -295,13 +295,11 @@ def dubins_isclose(state1, state2, dtol=0.01, atol=0.05):
 
 class DynamicDubinsVehicle(object):
     '''
-    TODO: classdocs
+    Implementation of a Dubins Vehicle
     '''
 
     def __init__(self, initial_state, sensor=None, footprint=None):
         '''
-        TODO: Constructor
-
         ..math::
 
             \dot{x} = v \cos(\theta)
@@ -314,8 +312,8 @@ class DynamicDubinsVehicle(object):
         self.current_state = self.initial_state
         self.sensor = sensor
 
-        self.nominal_speed = 1.0 # TODO: not sure if needed
-        self.radius = 1.5 #TODO: not sure if needed
+        self.nominal_speed = 1.0 
+        self.radius = 1.5
 
         self.time_step = 1
         self.minimum_speed = 0.05
@@ -335,7 +333,8 @@ class DynamicDubinsVehicle(object):
                                       (2.6, 1), (-2.5, 1)))
 
     def initialize(self):
-        '''TODO:
+        '''
+        Initializes paths and tree
         '''
         size = self.speed_resolution * self.turn_resolution
         self.inputs = np.zeros((size, 2), dtype=np.float)
@@ -363,7 +362,8 @@ class DynamicDubinsVehicle(object):
         self.tree = kdtree(points)
 
     def get_footprint(self, pose):
-        '''TODO:
+        '''
+        Returns the footprint of the vehicle
         '''
         transformed = sa.translate(self.footprint, pose.x, pose.y)
         transformed = sa.rotate(transformed, angle=pose.yaw, origin='centroid',

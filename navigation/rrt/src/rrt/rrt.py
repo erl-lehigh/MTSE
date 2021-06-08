@@ -6,6 +6,8 @@ RRT Planner.
 import sys
 import itertools as it
 
+import rospy
+
 import numpy as np
 import networkx as nx
 
@@ -23,7 +25,6 @@ class RRTPlanner(object):
 
     def __init__(self, vehicle, max_iterations=2000, gamma=40.0):
         '''Constructor
-        #TODO:
         '''
         self.vehicle = vehicle
 
@@ -35,16 +36,17 @@ class RRTPlanner(object):
 
         self.max_iterations = max_iterations
         self.gamma = gamma
-        self.dist_threshold = 5 #TODO: expose, and tune
-        self.angle_threshold = np.deg2rad(20.0) #TODO: expose, and tune
-        self.step_size = 10.0 #TODO: expose
+        self.dist_threshold = rospy.get_param("dist_threshold", 10)
+        self.angle_threshold = np.deg2rad(rospy.get_param("angle_threshold", 20)) 
+        self.step_size = rospy.get_param("step_size", 10)
 
     def plan(self, goal):
         '''Generates a dynamically feasible path for the ego-car and associated
         speeds (linear, turning).
         Parameters
         ----------
-        TODO:
+        goal (DubinsState) - goal state to plan towards
+
         Returns
         -------
         path (list of DubinsState) - dynamically feasible path
@@ -228,7 +230,6 @@ class RRTPlanner(object):
             candidate_node = self.steer(state, candidate)
             q_new, data_new = candidate_node
 
-            #TODO: expose tolerances
             if dubins_isclose(q_new, candidate, 0.01, 0.05):
                 improved = (data_new['cost_from_root'] < data['cost_from_root'])
 

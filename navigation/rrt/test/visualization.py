@@ -9,7 +9,6 @@ import rospy
 from visualization_msgs.msg import Marker
 from geometry_msgs.msg import Point
 
-# TODO: import needs to match package name, e.g., "rrt"
 from rrt.msg import TreeStamped
 
 
@@ -17,13 +16,15 @@ class TreeVisualizer(object):
 
     def __init__(self):
 
-        # TODO: expose topic name as parameter
-        self.tree_pub = rospy.Publisher("planner_tree", Marker, queue_size=1,
+        # get params
+        self.tree_pub_topic = rospy.get_param("tree_pub_topic", "planner_tree")
+        self.tree_sub_topic = rospy.get_param("tree_sub_topic", "rrts_tree")
+        self.tree_line_width = rospy.get_param("tree_line_width", 0.05)
+        self.tree_pub = rospy.Publisher(self.tree_pub_topic, Marker, queue_size=1,
                                         latch=True)
         self.tree_marker = Marker()
 
-        # TODO: expose topic name as parameter
-        self.tree_sub = rospy.Subscriber("rrts_tree", TreeStamped,
+        self.tree_sub = rospy.Subscriber(self.tree_sub_topic, TreeStamped,
                                          self.updateTree)
 
         self.timer = rospy.Timer(rospy.Duration(1), self.publish_tree)
@@ -37,7 +38,7 @@ class TreeVisualizer(object):
 
         self.tree_marker.header = msg.header
         self.tree_marker.ns = 'tree'
-        self.tree_marker.id = 0 #TODO:
+        self.tree_marker.id = 0 
         self.tree_marker.type = Marker.LINE_LIST
         self.tree_marker.action = Marker.MODIFY
         self.tree_marker.pose.position.x = 0
@@ -47,7 +48,7 @@ class TreeVisualizer(object):
         self.tree_marker.pose.orientation.y = 0
         self.tree_marker.pose.orientation.z = 0
         self.tree_marker.pose.orientation.w = 1
-        self.tree_marker.scale.x = 0.05 #TODO: expose line width as parameter
+        self.tree_marker.scale.x = self.tree_line_width
         self.tree_marker.scale.y = 1.0
         self.tree_marker.scale.z = 1.0
         self.tree_marker.color.g = 1.0
