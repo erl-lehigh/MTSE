@@ -17,7 +17,7 @@ from collections import deque
 
 class RRTNode(object):
     '''
-    Starts RRTNode which will build the rrt tree and 
+    Starts RRTNode which will build the rrt tree and
     find a path from the vehicle to the goal
 
     Subscribers
@@ -27,7 +27,7 @@ class RRTNode(object):
 
     Publishers
     ----------
-    rrts_tree: 
+    rrts_tree:
         rrt tree for visualization
 
     planned path
@@ -96,7 +96,7 @@ class RRTNode(object):
         Converte the user input goal from orientation into quaternion
         Parameters
         ----------
-        msg: 
+        msg:
         coordinate for the goal
 
         Return
@@ -116,7 +116,7 @@ class RRTNode(object):
 
         Parameters
         ----------
-        msg: 
+        msg:
         costmap to be used for rrt
 
         Return
@@ -154,14 +154,14 @@ class RRTNode(object):
 
     def check_path(self, path):
         '''
-        Iterates through all the coordinates in the path check if that 
+        Iterates through all the coordinates in the path check if that
         position is ocupied or not
 
         Parameters
         ----------
         path: list of coordinates
             the coordinates for the path
-        
+
         Returns
         -------
         true or false
@@ -171,7 +171,7 @@ class RRTNode(object):
         if ogm is None:
             rospy.logwarn('No costmap set!')
             return
-            
+
         height = ogm.info.height
         width = ogm.info.width
         grid = np.asarray(ogm.data).reshape((height, width))
@@ -203,7 +203,7 @@ class RRTNode(object):
         Parameters
         ----------
         path: goal pose
-        
+
         Returns
         -------
         DubinsState coordinates of the sampled point
@@ -232,7 +232,7 @@ class RRTNode(object):
             else:
                 x_min = vhx-offset
                 x_max = gx+offset
-                
+
             if vhy > gy:
                 y_min = gy-offset
                 y_max = vhy+offset
@@ -256,8 +256,9 @@ class RRTNode(object):
 
         Parameters
         ----------
-        event
-        
+        event=None : rospy.TimerEvent
+            information about the event that generated this call
+
         Returns
         -------
         None
@@ -320,9 +321,9 @@ class RRTNode(object):
         ----------
         v:      the root node of the rrt tree
 
-        nodes:  the list of nodes of the rrrt tree 
+        nodes:  the list of nodes of the rrrt tree
                     DiGraph.nodes()
-        
+
         Returns
         -------
         Nothing
@@ -343,14 +344,14 @@ class RRTNode(object):
         point.orientation.y = quanternion[1]
         point.orientation.z = quanternion[2]
         point.orientation.w = quanternion[3]
-        
+
         self.tree.nodes.append(point)
         self.tree.parents.append(-1) # init the root
 
         while Q:
             u = Q.popleft()
             neighbors = self.rrt_planner.g.successors(u)
-            for neighbor in neighbors: 
+            for neighbor in neighbors:
                 if not visited[neighbor]:
                     Q.append(neighbor)
                     visited[neighbor] = True

@@ -6,6 +6,7 @@ from nav_msgs.msg import OccupancyGrid
 
 import numpy as np
 
+
 class StaticCostmapPublisher(object):
 
     def __init__(self):
