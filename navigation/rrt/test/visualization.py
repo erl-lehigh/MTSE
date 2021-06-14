@@ -13,6 +13,10 @@ from rrt.msg import TreeStamped
 
 
 class TreeVisualizer(object):
+    '''
+    ROS Node that transforms a tree message into a ROS visualization message
+    to display in `rviz`.
+    '''
 
     def __init__(self):
 
@@ -20,16 +24,18 @@ class TreeVisualizer(object):
         self.tree_pub_topic = rospy.get_param("tree_pub_topic", "planner_tree")
         self.tree_sub_topic = rospy.get_param("tree_sub_topic", "rrts_tree")
         self.tree_line_width = rospy.get_param("tree_line_width", 0.05)
+        self.rate = rospy.get_param("tree_viz_pub_rate", 2)
+        self.period = rospy.Duration(1.0 / self.rate)
         self.tree_pub = rospy.Publisher(self.tree_pub_topic, Marker, queue_size=1,
                                         latch=True)
         self.tree_marker = Marker()
 
         self.tree_sub = rospy.Subscriber(self.tree_sub_topic, TreeStamped,
-                                         self.updateTree)
+                                         self.update_tree)
 
-        self.timer = rospy.Timer(rospy.Duration(1), self.publish_tree)
+        self.timer = rospy.Timer(self.period, self.publish_tree)
 
-    def updateTree(self, msg):
+    def update_tree(self, msg):
         points = []
         for pose, parent in it.izip(msg.nodes, msg.parents):
             if parent >= 0:
@@ -38,7 +44,7 @@ class TreeVisualizer(object):
 
         self.tree_marker.header = msg.header
         self.tree_marker.ns = 'tree'
-        self.tree_marker.id = 0 
+        self.tree_marker.id = 0
         self.tree_marker.type = Marker.LINE_LIST
         self.tree_marker.action = Marker.MODIFY
         self.tree_marker.pose.position.x = 0
