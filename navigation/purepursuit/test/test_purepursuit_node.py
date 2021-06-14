@@ -9,6 +9,7 @@ from nav_msgs.msg import Path
 from geometry_msgs.msg import PoseStamped
 
 from purepursuit import PurePursuit
+from test_paths import test_paths
 
 
 class TestPurePursuitNode(object):
@@ -55,8 +56,8 @@ class TestPurePursuitNode(object):
 
         Parameters
         ----------
-        event=None : ?? not sure
-            # not sure ???
+        event=None : rospy.TimerEvent
+            information about the event that generated this call
 
         Returns
         -------
@@ -66,7 +67,10 @@ class TestPurePursuitNode(object):
         path.header.stamp = rospy.Time.now()
         path.header.frame_id = "world"
 
-        path_coords = [(-1, -1), (2, 1), (4, 0)]
+
+        path_coords = test_paths[4]
+	    # The list above is referencing from a list of tests that are in
+        # a python folder in the test directory
         for x, y in path_coords:
             pose = PoseStamped()
             pose.header.stamp = rospy.Time.now()
@@ -78,12 +82,13 @@ class TestPurePursuitNode(object):
             path.poses.append(pose)
 
         self.path_pub.publish(path)
+        rospy.loginfo('Published path!')
 
 
 if __name__ == "__main__":
-    # Initialize node with rospy
+    # initialize node with rospy
     rospy.init_node('test_purepursuit', anonymous=False)
-    # Create the node object
+    # create the node object
     _ = TestPurePursuitNode()
-    # Keep the node alive
+    # keep the node alive
     rospy.spin()

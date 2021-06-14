@@ -1,0 +1,33 @@
+<launch>
+    <arg name="rviz" default="true"/>
+    <arg name="config" default="$(find purepursuit)/config/purepursuit.yaml"
+         doc="Specify a config"/>
+
+    <arg name="output" default="screen" doc="Output display"/>
+    <arg name="param_file_name" default="default" doc="Specify a param file"/>
+    <arg name="req" default="true"/>
+
+    <arg name="pkg_name" value="purepursuit" doc="name of the package"/>
+    <arg name="node_name" default="purepursuit" doc="name of the node"/>
+    <arg name="node_type" default="purepursuit_node.py" doc="name of the type"/>
+
+    <node pkg="$(arg pkg_name)" type="test_purepursuit_node.py" name="planned_path"/>
+
+    <node pkg="$(arg pkg_name)" type="$(arg node_type)" name="$(arg node_name)"
+          output="$(arg output)" required="$(arg req)">
+        <rosparam command="load" file="$(arg config)" />
+    </node>
+
+    <group if="$(arg rviz)">
+        <node type="rviz" name="rviz" pkg="rviz" args="-d $(find purepursuit)/launch/rviz/rviz_config.rviz"/>
+    </group>
+
+    <!-- launch tf updater -->
+    <node pkg="$(arg pkg_name)" type="tf_updater_node.py" name="vehicle_broadcaster"/>
+
+    <node pkg="$(arg pkg_name)" type="variable_speed_node.py" name="variable_speed">
+        <param name="speed_amplitude" value="0.05" />
+        <param name="base_speed" value="3.5" />
+    </node>
+
+</launch>

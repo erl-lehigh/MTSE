@@ -1,0 +1,12 @@
+<launch>
+    <arg name="pkg_name" value="purepursuit" doc="name of the package"/>
+    <arg name="node_name" default="planned" doc="name of the node"/>
+    <arg name="node_type" default="purepursuit_test_node.py" doc="name of the type"/>
+
+    <arg name="config" default="$(find purepursuit)/config/purepursuit.yaml"/>
+
+    <node pkg="rostopic" type="rostopic" name="static_reference_speed"
+          args="pub /reference_speed std_msgs/Float64 3" />
+
+    <test test-name="code" pkg="purepursuit" type="test_code.py"/>
+</launch>
