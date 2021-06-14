@@ -1,15 +1,16 @@
 #! /usr/bin/env python
 
-import rostest
 import unittest
 from math import pi
-import matplotlib.pyplot as plt
 
+import matplotlib.pyplot as plt
 from shapely.geometry import Point, LineString
 from purepursuit import PurePursuit
 import rospy
+import rostest
 
 from test_paths import test_paths
+
 
 def dpp():
 
