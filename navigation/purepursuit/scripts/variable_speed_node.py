@@ -41,8 +41,8 @@ class VariableSpeedNode(object):
 
         #Create Publishers
         self.reference_speed_pub = rospy.Publisher('reference_speed',
-                                Float64,
-                                queue_size = 1)
+                                        Float64,
+                                        queue_size = 1)
 
         # Create timers
         self.timer = rospy.Timer(rospy.Duration(1.0 / self.rate),

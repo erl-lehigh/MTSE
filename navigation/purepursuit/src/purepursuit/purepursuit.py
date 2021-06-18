@@ -60,8 +60,8 @@ class PurePursuit:
 
     # constructor
     def __init__(self, wheelbase, lookahead_min,
-             lookahead_max, lower_threshold_v, upper_threshold_v,
-         lookahead_gain, speed=None, vehicle_pose=None,
+                 lookahead_max, lower_threshold_v, upper_threshold_v,
+                 lookahead_gain, speed=None, vehicle_pose=None,
                  path=None):
         '''
         Initializes the PurePursuit object by passing input parameters
