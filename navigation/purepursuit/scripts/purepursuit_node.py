@@ -185,7 +185,7 @@ class PurePursuitNode(object):
         self.purepursuit.path = LineString(pose_list)
 
 
-    def set_speed(self, msg):    #Float64 is the msg that is passed
+    def set_speed(self, msg):
         '''
         This method changes the speed based on the speed commanded.
         It also changes the lookahead distance too.
