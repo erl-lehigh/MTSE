@@ -6,6 +6,7 @@ import rostest
 
 import test_purepursuit
 
+
 class Test_PurePursuit_Calculations(unittest.TestCase):
     def test_pp(self):
         output = test_purepursuit.dpp()

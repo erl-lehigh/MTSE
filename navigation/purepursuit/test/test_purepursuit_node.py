@@ -11,6 +11,7 @@ from geometry_msgs.msg import PoseStamped
 from purepursuit import PurePursuit
 from test_paths import test_paths
 
+
 class TestPurePursuitNode(object):
     '''
     A class to represent a TestPurePursuitNode
@@ -55,8 +56,8 @@ class TestPurePursuitNode(object):
 
         Parameters
         ----------
-        event=None : ?? not sure
-            # not sure ???
+        event=None : rospy.TimerEvent
+            information about the event that generated this call
 
         Returns
         -------
@@ -81,7 +82,7 @@ class TestPurePursuitNode(object):
             path.poses.append(pose)
 
         self.path_pub.publish(path)
-        print('I got here!')
+        rospy.loginfo('Published path!')
 
 
 if __name__ == "__main__":
@@ -89,5 +90,5 @@ if __name__ == "__main__":
     rospy.init_node('test_purepursuit', anonymous=False)
     # create the node object
     _ = TestPurePursuitNode()
-    # ceep the node alive
+    # keep the node alive
     rospy.spin()

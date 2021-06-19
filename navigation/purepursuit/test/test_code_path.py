@@ -6,6 +6,7 @@ import rostest
 
 import test_future_pt
 
+
 class Test_Only_Future_Point(unittest.TestCase):
     def test_pp(self):
         output = test_future_pt.dpp()

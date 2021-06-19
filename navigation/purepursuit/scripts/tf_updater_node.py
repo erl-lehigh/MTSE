@@ -83,8 +83,8 @@ class TFUpdaterNode(object):
         '''
         Dependent on the Ackermann message it should update the location
         of the child frame vehicle. Since this method will be called
-        in accordance to the rate, we will have the distance change be a
-        function of the speed and steering angle
+        in accordance to the rate, we will have the distance change
+        be a function of the speed and steering angle
 
         Parameters
         ----------

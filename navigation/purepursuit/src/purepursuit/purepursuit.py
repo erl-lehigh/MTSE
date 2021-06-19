@@ -154,6 +154,9 @@ class PurePursuit:
         Returns the computed future point on the path for the
         vehicle to keep track of.
 
+        NOTE: When either the path or vehicle_positions are not set, then `None`
+        is returned.
+
         Parameters
         ----------
         None
@@ -173,7 +176,7 @@ class PurePursuit:
             dist_on_path = (self.lookahead ** 2 - closest_dist ** 2) ** 0.5
             arc_dist = self.path.project(self.vehicle_position)
             return self.path.interpolate(arc_dist + dist_on_path)
-
+        return None
 
     def update_lookahead(self, v_cmd,
                          lookahead_min, lookahead_max,
