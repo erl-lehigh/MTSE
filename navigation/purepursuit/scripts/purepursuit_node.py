@@ -110,7 +110,7 @@ class PurePursuitNode(object):
                                                     PoseStamped,
                                                     queue_size=1)
 
-            # Create subscribers
+        # Create subscribers
         self.path_sub = rospy.Subscriber('planned_path', Path, self.set_path)
         self.speed_sub = rospy.Subscriber('reference_speed', Float64,
                                           self.set_speed)
