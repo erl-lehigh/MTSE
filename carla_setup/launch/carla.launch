@@ -37,6 +37,9 @@
         <arg name="spawn_point" value="$(arg spawn_point)"/>
     </include>
 
+    <!-- !!! This is the stating the test note which is kinda hacky -->
+    <node pkg="carla_setup" type="test_carla_ackermann_control.py" name="ros_to_carla_speed_controll"/>
+
     <include file="$(find carla_ackermann_control)/launch/carla_ackermann_control.launch"/>
 
     <!-- We start the rviz config-->
