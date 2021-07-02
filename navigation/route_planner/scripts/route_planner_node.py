@@ -5,13 +5,13 @@ Route Planner Node that communicates with ROS
 '''
 
 import rospy
-import tf2_ros
+import tf2_ros   # difference between tf2_ros and tf2?
 
 from std_msgs.msg import Header
 from nav_msgs.msg import Path
 from geometry_msgs.msg import PoseStamped
 
-from route_planner import RoutePlanner
+from route_planner import RoutePlanner  #this import is not working for some reason.  
 
 
 class RoutePlannerNode(object):
@@ -49,7 +49,7 @@ class RoutePlannerNode(object):
             the route and its reference path.
     '''
 
-    def __init__(self):
+    def __init__(self):        #this method runs when the program is called.  It looks like it does a lot of different tasks
         '''
         RoutePlannerNode Constructor
 
@@ -62,7 +62,7 @@ class RoutePlannerNode(object):
         None
         '''
         # Set the node's name
-        self.node_name = rospy.get_name()
+        self.node_name = rospy.get_name()        #idk how this works if we never declared the name of the node yet
         # Gets any parameters on the node
         self.rate = rospy.get_param('~rate', 1)
         self.parent_frame = rospy.get_param('~parent_frame', 'world')
@@ -71,24 +71,24 @@ class RoutePlannerNode(object):
         self.network_range = rospy.get_param('~network_range', 1500)
         self.network_type = rospy.get_param('~network_type', 'drive')
 
-        self.period = rospy.Duration(1.0 / self.rate)
+        self.period = rospy.Duration(1.0 / self.rate)    # what is the the period of?
 
-        self.route_planner = RoutePlanner(self.address,
+        self.route_planner = RoutePlanner(self.address,           # this is calling the RoutePlanner class.  It contains some of the parameters from above in the argument
                                           distance=self.network_range,
                                           network_type=self.network_type)
         # Plot graph
-        self.route_planner.setup_plot()
+        self.route_planner.setup_plot()  #this is a method in RoutePlanner that Displays the static road map
 
         # Gets the destination from the user
         destination = input("Address of Destination (in quotes) : ")
 
         # Converts the address given to latitude and longitude
-        self.dest = self.route_planner.geocode(query=destination)
+        self.dest = self.route_planner.geocode(query=destination)        #goes to geocode method in RoutePlanner class
 
         # Common header for all
-        self.header = Header(frame_id=self.parent_frame)
+        self.header = Header(frame_id=self.parent_frame)                #what is a header ? I saw it is imported from std_msgs I think it is to communicate timestamped data
 
-        self.route_msg = Path()  # Path message for route publishing
+        self.route_msg = Path()  # Path message for route publishing                   #what is Path? It is also imported
         self.route_msg.header.frame_id = self.parent_frame  # Set the frame_id
 
         self.path_msg = Path()  # Path message for reference path publishing
@@ -96,7 +96,7 @@ class RoutePlannerNode(object):
 
         # Creates publishers
         # Publisher for route
-        self.route_pub = rospy.Publisher('route', Path, queue_size=10)
+        self.route_pub = rospy.Publisher('route', Path, queue_size=10)      #path is name of topic being published to
         # Publisher for reference path
         self.reference_path_pub = rospy.Publisher('reference_path', Path,
                                                   queue_size=10)
@@ -108,7 +108,7 @@ class RoutePlannerNode(object):
         # Crate timers
         self.timer = rospy.Timer(self.period, self.control_loop)
 
-        rospy.loginfo('[%s] Node started!', self.node_name)
+        rospy.loginfo('[%s] Node started!', self.node_name)   #displays that the node we named has started
 
     def get_vehicle_location(self):
         '''
