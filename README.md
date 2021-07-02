@@ -10,43 +10,29 @@ Team Members:
   - Brian Zhu
   - Gustavo Cardona
   - Disha Kamale
+  - Dan Cahill
   
   
- ## Summary of current PRs: 
+ ## Branch purpose:
+
+ This branch was created by Dan and is where code for stopping behavior will be worked on.  
  
- 1. [Feature/dynamic purepursuit](https://github.com/wbriang/MTSE/pull/13):
+ I currently have no experience with writing nodes and using ros. I will be adding comments to other
+ files like route_planner_node.py and route_planner.py as a way to keep note of things I am learning so I can apply it to my code. 
 
-  - Studies the speed depdendence on look-ahead distance.
-  - Currently has some conflicts with master that need to be resolved before commiting new changes. 
+## The stopping behavior
 
-2. [Fix/prepursuitintegration](https://github.com/wbriang/MTSE/pull/12):
+a node is to be created that will know when a stop sign is detected and then stop the car at the desired point.  Then the car will switch back to driving
+  -the node will know it needs to stop based on Diep's sign detection or from the Carla api.  
 
-  - Currently blocked; other PRs need to be merged first. 
+another node I plan on making is for stop lights
 
-3. [Feature/goalplanner](https://github.com/wbriang/MTSE/pull/11): 
-
-  - Ready to be tested and then merged. 
+there also has to be code written that will allow the car to switch behaviors
 
 
-## Summary of branches:
+## Questions I have
 
-1. [feature/rrt](https://github.com/wbriang/MTSE/tree/feature/rrt):
+Should there be an individual node for each stopping scenario? Like one node for a stop sign, one for a stop light, and another for stopped cars or obstacles?
 
-  - Contains the path planning codes
-  - Current status: Not working properly 
-  - Needs to be merged after correcting 
-  
-2. [integration/fullnavigationstack](https://github.com/wbriang/MTSE/tree/integration/fullnavigationstack):
 
-  - contains a cleaned-up version of [tmp/nav_stack_integration](https://github.com/wbriang/MTSE/tree/tmp/nav_stack_integation)
-
-3. [feature/savelidarinfo](https://github.com/wbriang/MTSE/tree/feature/savelidarinfo):
-
-  - Current status: issues converting the pointcloud data to Laser_Scan message. 
  
-4. [feature/main_launch](https://github.com/wbriang/MTSE/tree/feature/main_launch): 
-
-  - Current status: Contains commits from both main and rrt branches. The rrt commits either need to be reverted or need to create another branch and start over with main_launch files. 
-
-
-TODOs: The branches [feature/goalplanner](https://github.com/wbriang/MTSE/tree/feature/goalplanner), [feature/localizationAMCL](https://github.com/wbriang/MTSE/tree/feature/localizationAMCL) and [feature/dynamic_purepursuit](https://github.com/wbriang/MTSE/tree/feature/dynamic_purepursuit) need tp integrated into master before making other (huge) integrations. 
