@@ -7,11 +7,11 @@ Route Planner Node that communicates with ROS
 import rospy
 import tf2_ros   # difference between tf2_ros and tf2?
 
-from std_msgs.msg import Header       #might need someone to explain exactly what are the Header and Path message types
-from nav_msgs.msg import Path
-from geometry_msgs.msg import PoseStamped
+from std_msgs.msg import Header       #the header message type contains metadata and timestamped stuff
+from nav_msgs.msg import Path            #path type - an array of poses that represents a Path for a robot to follow
+from geometry_msgs.msg import PoseStamped  #another message type
 
-from route_planner import RoutePlanner  #why is there an error when importing this Class?
+from route_planner import RoutePlanner  #from the route planner package in the navigation folder, import the class RoutePlanner
 
 
 class RoutePlannerNode(object):
@@ -64,14 +64,14 @@ class RoutePlannerNode(object):
         # Set the node's name
         self.node_name = rospy.get_name()        #I think the node name becomes the name of the node initialized in the '__main__'
         # Gets any parameters on the node
-        self.rate = rospy.get_param('~rate', 1)
-        self.parent_frame = rospy.get_param('~parent_frame', 'world')
+        self.rate = rospy.get_param('~rate', 1)            # gets parameters from route_planner.yaml file in config folder
+        self.parent_frame = rospy.get_param('~parent_frame', 'world')        #if no parameter for 'parent_frame', deault it's value to 'world'
         self.child_frame = rospy.get_param('~child_frame', 'vehicle')
         self.address = rospy.get_param('~address')
         self.network_range = rospy.get_param('~network_range', 1500)
         self.network_type = rospy.get_param('~network_type', 'drive')
 
-        self.period = rospy.Duration(1.0 / self.rate)    # how is the period used in this code?
+        self.period = rospy.Duration(1.0 / self.rate)    
 
         self.route_planner = RoutePlanner(self.address,           # this is creating object for the RoutePlanner class.  It contains some of the parameters from above in the argument
                                           distance=self.network_range,
@@ -86,9 +86,9 @@ class RoutePlannerNode(object):
         self.dest = self.route_planner.geocode(query=destination)        #goes to geocode method in RoutePlanner class
 
         # Common header for all
-        self.header = Header(frame_id=self.parent_frame)                #what is going on on this line? I think it is to communicate timestamped data or something
+        self.header = Header(frame_id=self.parent_frame)                #idemtifies things going on each instance
 
-        self.route_msg = Path()  # Path message for route publishing                   #What exactly is happening here?
+        self.route_msg = Path()  # Path message for route publishing                   #empty path array
         self.route_msg.header.frame_id = self.parent_frame  # Set the frame_id
 
         self.path_msg = Path()  # Path message for reference path publishing      #how is this different from the Path() called 3 lines earlier?
@@ -177,10 +177,8 @@ class RoutePlannerNode(object):
             rospy.logdebug('Vehicle position not available!')
             return
 
-        route = self.route_planner.get_route(orig, self.dest)          #calls methods form route_planner which is the RoutePlanner class
-        route_coords = self.route_planner.get_route_coords(route)
-        road_coords = self.route_planner.get_road_coords(route)
-        self.route_planner.plot_route(road_coords)
+        route = self.route_planner.get_route(orig, self.dest)          #calls methods forRoutePlanner(self.address, # this is creating object for the RoutePlanner class.  It contains some of the parameters from above in the argument
+                                    
 
         # Publish route
         self.route_msg.header.stamp = rospy.Time.now()  # Set the stamp
@@ -204,5 +202,5 @@ if __name__ == '__main__':     #this is the first section of code that runs when
     # rospy.spin()
     # Hack to update plot from the main thread due to TkInter issue
     while not rospy.is_shutdown():
-        route_planner_node.route_planner.update_plot()               #what goes on here?
+        route_planner_node.route_planner.update_plot()             
         rospy.sleep(route_planner_node.period)                  
