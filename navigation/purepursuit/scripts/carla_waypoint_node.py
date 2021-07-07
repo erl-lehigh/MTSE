@@ -44,9 +44,10 @@ class CarlaWaypointNode(object):
         self.node_name = rospy.get_name()
 
         # Initial Carla Code
-        client = carla.Client("localhost", 2000)    #connect to server
+        client = carla.Client("localhost", 2000)    #connect to server,
+                                                    #`-world-port=2000` if needed
         client.set_timeout(10)                      #set timeout
-        world = client.load_world('Town01')         #get access to the world info
+        world = client.load_world('Town03')         #get access to the world info
         self.world_map = world.get_map()                 #needed for waypoints (map)
         starting_point = carla.Transform(carla.Location(x=220.053, y=-5, z=0),
                                          carla.Rotation(pitch=0, yaw=180, roll=0))
