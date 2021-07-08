@@ -4,7 +4,7 @@
 - A new package is to be created that will handle stopping behavior.  It will be code that is implemented when the car is told to stop due to an incoming stop sign or object. 
 - This code will be part of a larger node in the navigation stack that decides whether the car should stop or continue its normal pursuit based on incoming data about the surroundings.  We will refer to the larger node as the *‘arbiter’*.  
 When the arbiter decides that the car needs to stop, this stop behavior code wil be implemented
-- I think this branch will probably contain all of this stuff eventhough the name of the branch is stop_behavior
+- I think this branch will probably contain all of this stuff even though the name of the branch is stop_behavior
 
 ## How will it work?
 
