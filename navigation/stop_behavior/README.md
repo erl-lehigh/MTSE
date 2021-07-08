@@ -4,6 +4,7 @@
 - A new package is to be created that will handle stopping behavior.  It will be code that is implemented when the car is told to stop due to an incoming stop sign or object. 
 - This code will be part of a larger node in the navigation stack that decides whether the car should stop or continue its normal pursuit based on incoming data about the surroundings.  We will refer to the larger node as the *‘arbiter’*.  
 When the arbiter decides that the car needs to stop, this stop behavior code wil be implemented
+- I think this branch will probably contain all of this stuff eventhough the name of the branch is stop_behavior
 
 ## How will it work?
 
@@ -26,7 +27,7 @@ When the arbiter decides that the car needs to stop, this stop behavior code wil
 ## Resources
 
 - This [github page](https://github.com/qiaoxu123/Self-Driving-Cars/blob/master/Part4-Motion_Planning_for_Self-Driving_Cars/Module5-Principles_of_Behaviour_Planning/Module5-Principles_of_Behaviour_Planning.md) on Behavioral Planning and finite state machines
-- - A finite state machine is what the arbiter will be like
+    - A finite state machine is what the arbiter will be like
 
 ## Ideas
 
@@ -42,7 +43,7 @@ When the arbiter decides that the car needs to stop, this stop behavior code wil
 - How about the behavior when the car transitions from stop to pure pursuit?
 - What should be my workspace? And should I do the Carla-Ros bridge thing?
 - How to deal with environmental noise or the car not being exactly stopped or at stop point
-- - Having a tolerance
+    - Having a tolerance
 - How to deal with edge cases that require emergency stops
 - Determining the proper/safest way for the car to accelerate or decelerate
 accelerometer?
