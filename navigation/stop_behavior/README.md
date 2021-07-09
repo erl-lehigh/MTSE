@@ -46,4 +46,4 @@ When the arbiter decides that the car needs to stop, this stop behavior code wil
     - Having a tolerance
 - How to deal with edge cases that require emergency stops
 - Determining the proper/safest way for the car to accelerate or decelerate
-accelerometer?
+accelerometer? 
