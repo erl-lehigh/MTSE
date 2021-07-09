@@ -35,4 +35,3 @@ there also has to be code written that will allow the car to switch behaviors
 Should there be an individual node for each stopping scenario? Like one node for a stop sign, one for a stop light, and another for stopped cars or obstacles?
 
 
- 
