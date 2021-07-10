@@ -18,6 +18,8 @@
 
   <buildtool_depend>catkin</buildtool_depend>
 
+  <depend>rospy</depend>
+
 
   <!-- The export tag contains other, unspecified, tags -->
   <export>
