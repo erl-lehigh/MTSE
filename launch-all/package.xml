@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>launch_all</name>
+  <name>launch-all</name>
   <version>0.0.0</version>
-  <description>The launch_all package</description>
+  <description>The launch-all package</description>
 
   <!-- One maintainer tag required, multiple allowed, one person per tag -->
   <!-- Example:  -->

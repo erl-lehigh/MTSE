@@ -9,7 +9,7 @@
     </group>
 
     <group if="$(arg rviz)">
-        <node type="rviz" name="rviz" pkg="rviz" args="-d $(find launch_all)/rviz/rviz_config.rviz"/>
+        <node type="rviz" name="rviz" pkg="rviz" args="-d $(find launch-all)/rviz/rviz_config.rviz"/>
     </group>
 
     <!-- The other nodes should be added once they have been -->
