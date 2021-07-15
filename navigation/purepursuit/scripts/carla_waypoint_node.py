@@ -42,24 +42,25 @@ class CarlaWaypointNode(object):
 
         '''
         self.node_name = rospy.get_name()
+        self.message_path = Path()
 
-        # Initial Carla Code
-        client = carla.Client("localhost", 2000)    #connect to server,
-                                                    #`-world-port=2000` if needed
-        client.set_timeout(10)                      #set timeout
-        world = client.load_world('Town03')         #get access to the world info
-        self.world_map = world.get_map()                 #needed for waypoints (map)
-        starting_point = carla.Transform(carla.Location(x=220.053, y=-5, z=0),
-                                         carla.Rotation(pitch=0, yaw=180, roll=0))
-        self.waypoint = self.world_map.get_waypoint(starting_point.location)
-                                                    #set initial location
-
+        # Create subs
+        self.waypoint_sub = rospy.Subscriber('/carla/ego_vehicle/waypoints',
+                                             Path, self.set_path)
+        # If the above gives issues, remove first /
+        # Check rqt for figuring if it is working
 
         # Create publishers
         self.path_pub  = rospy.Publisher('planned_path', Path, queue_size=1)
         self.timer = rospy.Timer(rospy.Duration(0.5), self.publish_path,
                                  oneshot=False)
         rospy.loginfo('[%s] Node started!', self.node_name)
+
+    def set_path(self, msg):
+        '''
+        Just set the msg to self.message_path, so it can be republished in published path
+        '''
+        self.message_path = msg
 
     def publish_path(self, event=None):
         '''
@@ -74,19 +75,8 @@ class CarlaWaypointNode(object):
         -------
         None
         '''
-        path_forward = self.waypoint.next(10)
-        path = Path()
-        path.header.stamp = rospy.Time.now()
-        path.header.frame_id = "map" # If this give issues change to "world"
-        for point in path_forward:  #uses waypoint locations to make a path
-            pose = PoseStamped()
-            pose.header.stamp = rospy.Time.now()
-            pose.header.frame_id = "map"   # If this give issues change to "world"
-            pose.pose.position.x = point.location.x
-            pose.pose.position.y =  point.location.y
-            path.poses.append(pose)
-        self.waypoint = path_forward[-1]
-        self.path_pub.publish(path)
+        if self.message_path != Path():
+            self.path_pub.publish(self.message_path)
 
 
 if __name__ == "__main__":
