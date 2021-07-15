@@ -44,14 +44,15 @@ class StopBehaviorNode(object):
         self.parent_frame = rospy.get_param('~parent_frame', 'world')
         self.child_frame = rospy.get_param('~child_frame', 'vehicle')
 
-        self.ackerman_speed = 0     #speed of car
-        self.ackerman_steerangle = 0 #steering angle                                                
-        self.distance = 0      #gets the distance to the stop sign when it is detected              
-        self.time_stamp = 0    #variable to mark the time that a stop sign is detected
-        self.new_sign = False     #becomes true when a stop sign is detected     
-        self.counter = 1                   
+        self.ackerman_speed = 0.0     #speed of car
+        self.ackerman_steerangle = 0.0 #steering angle  
+                                                      
+        self.distance = 0.0      #gets the distance to the stop sign when it is detected             #maybe make these into their own message type at some point
+        self.new_sign = False     #becomes true when a stop sign is detected  
 
-        self.test_var = 1
+        self.time_stamp = 0.0    #variable to mark the time that a stop sign is detected         
+        self.counter = 1         #counter used in the math for slowing car down
+
         #Create Publisher objects 
         self.stop_command_pub = rospy.Publisher('stop_speed_command',   #this will publish the commands telling the car to slow to a stop
                                                 AckermannDrive,        #message type
@@ -67,7 +68,7 @@ class StopBehaviorNode(object):
                              self.sign_detector)         #every time something is recieved, runs sign_detector method
 
         #one-shot timer to mimic when a sign is detected
-        timer = rospy.Timer(rospy.Duration(10), self.sign_detector, oneshot=True)
+        timer = rospy.Timer(rospy.Duration(7), self.sign_detector, oneshot=True)
 
 
 
@@ -83,7 +84,7 @@ class StopBehaviorNode(object):
     def sign_detector(self, data):                   #may want to add code that re-checks if there is a need to stop
         
         self.time_stamp = time.time()            #gets the distance that the car is from the sign and the time at which it recieves the message
-        self.distance =  20    #data.data    in meters   
+        self.distance =  10.0    #data.data    in meters   
         self.new_sign = True     #True means there is a sign
         print('Stop sign = %s  Distance to sign is %3d m' %(self.new_sign, self.distance))  #logs message recieved (speed) in terminal
         
@@ -115,15 +116,26 @@ class StopBehaviorNode(object):
 
         self.msg.steering_angle = self.ackerman_steering
         self.msg.steering_angle_velocity = 0.0
-        self.msg.speed = self.ackerman_speed - 1*self.counter
-        self.msg.acceleration = 1.0
+        #self.msg.speed = self.ackerman_speed - 1*self.counter
+        self.msg.acceleration = 0.0
         self.msg.jerk = 0.0
 
+
+        #math for the slowing down  (constant acceleration) 
+        #initial is at the time stamp when the car detects a vehicle
+        #known variables: initial time, initial velocity, initial distance to stop sign
+        #unknown variables: acceleration, time to stop
+
+        self.initVelo = self.ackerman_speed               
+        self.initTime = self.time_stamp
+        #self.distance = already initialized
+        self.timeToStop = (2*self.distance) / self.initVelo    #may have a certain scenario where need to stop as soon as possible so we can define this and solve for distance
+        self.acceleration = (self.initVelo**2) / (2*self.distance)  #since this loop is currently runnung every (1) second can do (speed - acceleration) to slow car down
+
+        self.msg.speed = self.ackerman_speed - (self.acceleration*self.counter)
+                
         self.stop_command_pub.publish(self.msg)
-
         rospy.loginfo('SLOWING DOWN! %s m/s', self.msg.speed)
-
-        #put math for the slowing down
 
 
 
