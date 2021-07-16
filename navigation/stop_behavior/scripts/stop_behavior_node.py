@@ -63,7 +63,7 @@ class StopBehaviorNode(object):
                             AckermannDrive,         #message type
                             self.callback)          #every time something is recieved from this topic, it runs callback
 
-        self.stop_sign_sub = rospy.Subscriber('stop_sign',   #subscribes to 'stop sign' topic that tells you the distance to the stop sign
+        self.stop_sign_sub = rospy.Subscriber('stop_sign',   #subscribes to 'stop sign' topic that tells you the distance to the stop sign using hokuyo
                             Float32,         #message type
                              self.sign_detector)         #every time something is recieved, runs sign_detector method
 
@@ -84,7 +84,7 @@ class StopBehaviorNode(object):
     def sign_detector(self, data):                   #may want to add code that re-checks if there is a need to stop
         
         self.time_stamp = time.time()            #gets the distance that the car is from the sign and the time at which it recieves the message
-        self.distance =  10.0    #data.data    in meters   
+        self.distance =  15.0    #data.data    in meters   
         self.new_sign = True     #True means there is a sign
         print('Stop sign = %s  Distance to sign is %3d m' %(self.new_sign, self.distance))  #logs message recieved (speed) in terminal
         
@@ -97,7 +97,9 @@ class StopBehaviorNode(object):
                 print("Car Stopped")
                 break
 
-            time.sleep(1)   
+            time.sleep(1)
+
+        self.new_sign = False
 
 
 
@@ -125,9 +127,9 @@ class StopBehaviorNode(object):
         #initial is at the time stamp when the car detects a vehicle
         #known variables: initial time, initial velocity, initial distance to stop sign
         #unknown variables: acceleration, time to stop
-
-        self.initVelo = self.ackerman_speed               
+        
         self.initTime = self.time_stamp
+        self.initVelo = self.ackerman_speed               
         #self.distance = already initialized
         self.timeToStop = (2*self.distance) / self.initVelo    #may have a certain scenario where need to stop as soon as possible so we can define this and solve for distance
         self.acceleration = (self.initVelo**2) / (2*self.distance)  #since this loop is currently runnung every (1) second can do (speed - acceleration) to slow car down
