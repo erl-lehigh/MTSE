@@ -130,11 +130,11 @@ class StopBehaviorNode(object):
 
         if self.new_sign == True:
             if self.current_distance >= self.min_stop_distance:  # if car is not close enough to the stop point (most likely it will not stop exactly at point) and protects from divide by zero
-                self.initVelo = self.ackermann_speed 
-                self.initDistance = self.distance
+                #self.initVelo = self.ackermann_speed 
+                #self.initDistance = self.distance
                 #self.initTime = self.time_stamp         
                 #self.timeToStop = (2*self.distance) / self.initVelo    #may have a certain scenario where need to stop as soon as possible so we can define this and solve for distance
-                self.acceleration = (self.initVelo**2) / (2*self.initDistance)  
+                self.acceleration = (self.current_velo**2) / (2*self.current_distance)  
 
                 self.msg.speed = self.current_velo - (self.acceleration*self.period.to_sec())
                     
@@ -159,8 +159,6 @@ class StopBehaviorNode(object):
     #add in stop duration 
     #Keep it at sign == True and then after a certain time say sign is false and continue
     #Use if statement 
-    
-    #try higher freuency (10 hertz)
 
 
 if __name__ == "__main__":
