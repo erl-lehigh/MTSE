@@ -1,1 +1,5 @@
-<yo>
+<launch>
+    <include>
+    <node pkg="stop_behavior" type="stop_behavior_node.py" name="stop_behavior_node" output="screen" required="$(arg req)"/>
+    </node>
+</launch>
