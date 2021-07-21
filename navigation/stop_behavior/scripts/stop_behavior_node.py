@@ -47,7 +47,7 @@ class StopBehaviorNode(object):
         
         '''
         #Initial Stuff
-        self.rate = 2   #rospy.get_param('~rate',1)
+        self.rate = 10   #rospy.get_param('~rate',1)
         self.period = rospy.Duration(1.0 / self.rate)   #period is 1 hertz (1 cyle per second)
         self.node_name = rospy.get_name()
         self.parent_frame = rospy.get_param('~parent_frame', 'world')
@@ -140,11 +140,10 @@ class StopBehaviorNode(object):
                     
                 self.stop_command_pub.publish(self.msg)
                 
-
                 #update distance and speed
-                self.current_velo = self.msg.speed
-                self.current_distance = self.current_distance - (((self.initVelo + self.current_velo) / 2)*(self.period.to_sec()))  
                 
+                self.current_distance = self.current_distance - (((self.current_velo + self.msg.speed) / 2)*(self.period.to_sec()))   #current_velo in this equation is actually the previous speed
+                self.current_velo = self.msg.speed  
 
                 rospy.loginfo('SLOWING DOWN! %2.5s m/s   Acc = %2.5s m/s^2, Dist = %2.5s ', self.msg.speed, self.acceleration, self.current_distance)
 
