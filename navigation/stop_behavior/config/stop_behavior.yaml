@@ -1,6 +1,6 @@
 #hi this is a yaml file I am going to copy the code from the pure pursti yaml file for now
 
-rate: 1.0 # control loop frequency [Hz]
+rate: 1 # control loop frequency [Hz]
 parent_frame: world # Parent Reference frame (world)
 child_frame: vehicle # Child Reference frame (vehicle)
 wheelbase: 1 # distance between vehicle's front and reat axles [m]
