@@ -6,6 +6,7 @@ import time
                        
 from ackermann_msgs.msg import AckermannDrive                   
 from std_msgs.msg import Float32
+from stop_behavior.msg import TrafficSignStamped
 
 class StopBehaviorNode(object):
     '''
@@ -19,7 +20,7 @@ class StopBehaviorNode(object):
             Steering angle  
         distance : Float32
             the distance from car to stop point. 
-            Will be calculated by camera/Hokuyo sensors and published to topic /stop_sign that this code subscribes to
+            Will be calculated by camera/Hokuyo sensors and published to topic /traffic_sign that this code subscribes to
             It will also be updated as the car approaches the stop point
         new_sign : Boolean
             True when sign is detected in ahead of vehicle, False when no sign is detected
@@ -81,8 +82,8 @@ class StopBehaviorNode(object):
                             AckermannDrive,        
                             self.get_commands)          #every time something is recieved in this topic, it runs get_commads to get speed and steering angle
 
-        self.stop_sign_sub = rospy.Subscriber('stop_sign',   #subscribes to 'stop_sign' topic.  When a stop sign is present, the stop_sign topic gets a message that is the distance from the car to the sign
-                            Float32,        #replace with custom sign message that will have all the stuff in it
+        self.stop_sign_sub = rospy.Subscriber('traffic_sign',   #subscribes to 'traffic_sign' topic.  When a stop sign is present, the traffic_sign topic gets a message that is the distance from the car to the sign
+                            TrafficSignStamped,        #replace with custom sign message that will have all the stuff in it
                             self.sign_detector)         #every time something is recieved in this topic, runs sign_detector method
 
         self.timer = rospy.Timer(self.period, self.stop_the_car)  #calls sign_detector function at a certain rate 
@@ -106,12 +107,12 @@ class StopBehaviorNode(object):
         a callback type method that gives the distance from the car to the stop sign and time stamps it
         
         '''
-        self.time_stamp = time.time()            
-        self.distance =  data.data    #in meters   
+        self.time_stamp = data.header.stamp          
+        self.distance =  data.distance    #in meters   
         self.current_speed = self.ackermann_speed
         self.current_distance = self.distance
         self.new_sign = True     #True means there is a sign
-        print('Stop sign = %s  Distance to sign is %3d m' %(self.new_sign, self.distance))  #logs message recieved (speed) in terminal
+        print("%s sign = %s  Distance to sign is %3d m" %(data.traffic_sign, self.new_sign, self.distance))  #logs message recieved (speed) in terminal
         
 
     def stop_the_car(self, event=None):        #need to figure out a way to call this method to stop the car,  event needed with the timer
