@@ -1,12 +1,10 @@
 #hi this is a yaml file I am going to copy the code from the pure pursti yaml file for now
 
-rate: 1 # control loop frequency [Hz]
-parent_frame: world # Parent Reference frame (world)
-child_frame: vehicle # Child Reference frame (vehicle)
-wheelbase: 1 # distance between vehicle's front and reat axles [m]
-lookahead_min: 3 # the minimum lookahead [m], additionallly the initial value of the lookahead
-lookahead_max: 12 # the maximum lookahead [m]
-lower_velocity_threshold: 1.34 # the lower threshold of the velocity that cooresponds to lookahead_min
-upper_velocity_threshold: 5.36 # the above, but for max/upper
-lookahead_gain: 2.24 # this is the scalar to multiply with v_cmd if in between the extremes
-draw_speed_and_lookahead: True # True if the speed "X" and the lookahead circle should be drawn
+rate: 10 # control loop frequency [Hz]
+parent_frame: world # parent reference frame (world)
+child_frame: vehicle # child reference frame (vehicle)
+min_stop_distance: 0.4 # minimum distance from car to stopping point for car to stop (in meters)
+stopping_time:  5.0 # duration for car at stop point (seconds)
+
+
+

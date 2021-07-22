@@ -29,22 +29,26 @@ class StopBehaviorNode(object):
             the amount of times per second the cwill run
         timer : Timer
             Continuosly running timer that calls sign_detector function at a certain rate
+        current_distance : Float32
+            keeps track of current distance car is from stop point
+        current_speed : Float32
+            keeps track of current speed of car
 
     Publishers
     --------
-    stop_command 
+        stop_command 
 
     Subscribers
     --------
-    command
-    stop_sign
+        command
+        stop_sign
 
     '''
     
     def __init__(self):
         '''
         Initializes necessary variables and creates publisher and subscriber objects
-        
+
         '''
         #Initial Stuff
         self.rate = 10   #rospy.get_param('~rate',1)
@@ -52,6 +56,8 @@ class StopBehaviorNode(object):
         self.node_name = rospy.get_name()
         self.parent_frame = rospy.get_param('~parent_frame', 'world')
         self.child_frame = rospy.get_param('~child_frame', 'vehicle')
+        self.min_stop_distance = rospy.get_param('~min_stop_distance', 0.4)  
+        self.stopping_time = rospy.get_param('~stopping_time', 5) 
 
         self.ackermann_speed = 0.0     
         self.ackermann_steering = 0.0 
@@ -60,12 +66,10 @@ class StopBehaviorNode(object):
         self.new_sign = False     #Iniitalized as false which means no stop sign is present 
 
         self.time_stamp = 0.0    #variable to mark the time that a stop sign is detected         
-        self.min_stop_distance = 0.4
-
-        self.counter = 1
+        self.time_left = self.stopping_time
 
         self.current_distance = 0.0
-        self.current_velo = 0.0
+        self.current_speed = 0.0
 
         #Create Publisher objects 
         self.stop_command_pub = rospy.Publisher('stop_speed_command',   #this will publish the commands telling the car to slow to a stop
@@ -78,7 +82,7 @@ class StopBehaviorNode(object):
                             self.get_commands)          #every time something is recieved in this topic, it runs get_commads to get speed and steering angle
 
         self.stop_sign_sub = rospy.Subscriber('stop_sign',   #subscribes to 'stop_sign' topic.  When a stop sign is present, the stop_sign topic gets a message that is the distance from the car to the sign
-                            Float32,      
+                            Float32,        #replace with custom sign message that will have all the stuff in it
                             self.sign_detector)         #every time something is recieved in this topic, runs sign_detector method
 
         self.timer = rospy.Timer(self.period, self.stop_the_car)  #calls sign_detector function at a certain rate 
@@ -104,7 +108,7 @@ class StopBehaviorNode(object):
         '''
         self.time_stamp = time.time()            
         self.distance =  data.data    #in meters   
-        self.current_velo = self.ackermann_speed
+        self.current_speed = self.ackermann_speed
         self.current_distance = self.distance
         self.new_sign = True     #True means there is a sign
         print('Stop sign = %s  Distance to sign is %3d m' %(self.new_sign, self.distance))  #logs message recieved (speed) in terminal
@@ -134,27 +138,28 @@ class StopBehaviorNode(object):
                 #self.initDistance = self.distance
                 #self.initTime = self.time_stamp         
                 #self.timeToStop = (2*self.distance) / self.initVelo    #may have a certain scenario where need to stop as soon as possible so we can define this and solve for distance
-                self.acceleration = (self.current_velo**2) / (2*self.current_distance)  
+                self.acceleration = (self.current_speed**2) / (2*self.current_distance)  
 
-                self.msg.speed = self.current_velo - (self.acceleration*self.period.to_sec())
+                self.msg.speed = self.current_speed - (self.acceleration*self.period.to_sec())
                     
                 self.stop_command_pub.publish(self.msg)
                 
                 #update distance and speed
-                
-                self.current_distance = self.current_distance - (((self.current_velo + self.msg.speed) / 2)*(self.period.to_sec()))   #current_velo in this equation is actually the previous speed
-                self.current_velo = self.msg.speed  
+                self.current_distance = self.current_distance - (((self.current_speed + self.msg.speed) / 2)*(self.period.to_sec()))   #current_velo in this equation is actually the previous speed
+                self.current_speed = self.msg.speed  
 
                 rospy.loginfo('SLOWING DOWN! %2.5s m/s   Acc = %2.5s m/s^2, Dist = %2.5s ', self.msg.speed, self.acceleration, self.current_distance)
 
             else: 
                 self.msg.speed = 0
                 self.stop_command_pub.publish(self.msg)
-                print("Car Stopped")
-            
-                rospy.sleep(3)
+                print("Car Stopped ", self.time_left)
 
-                self.new_sign = False
+                if self.time_left <= 0:
+                    self.time_left = self.stopping_time
+                    self.new_sign = False
+                else:
+                    self.time_left = self.time_left - self.period.to_sec()
 
     #add in stop duration 
     #Keep it at sign == True and then after a certain time say sign is false and continue
@@ -169,3 +174,15 @@ if __name__ == "__main__":
     # keep the node alive
     rospy.spin()
 
+#custom messages
+    #see tutorial
+
+#TrafficSignStamped
+    #header with time stamp       
+    #String         - gives type of sign ex: Stop, Yield, ...
+    #Float32  - distance to sign - detected by sensors
+
+#start multiplexor  - will be another package
+    #takes in commands from pure puresuit and stop
+    #outputs one of them depending on whether there is a sign or not
+    #needs to know when stop behavior is done so it can go back to publishing pure pursuit
