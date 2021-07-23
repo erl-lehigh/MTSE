@@ -30,6 +30,10 @@ class StopBehaviorNode(object):
             the amount of times per second the cwill run
         timer : Timer
             Continuosly running timer that calls sign_detector function at a certain rate
+        time_stamp : Float32
+            holds the time that a message is recieved to the traffic_sign topic
+        time_left : Float 32
+            the time left that the car must remain stopped at stop sign
         current_distance : Float32
             keeps track of current distance car is from stop point
         current_speed : Float32
@@ -64,9 +68,9 @@ class StopBehaviorNode(object):
         self.ackermann_steering = 0.0 
                                                       
         self.distance = 0.0      
-        self.new_sign = False     #Iniitalized as false which means no stop sign is present 
+        self.new_sign = False     
 
-        self.time_stamp = 0.0    #variable to mark the time that a stop sign is detected         
+        self.time_stamp = 0.0          
         self.time_left = self.stopping_time
 
         self.current_distance = 0.0
@@ -135,14 +139,9 @@ class StopBehaviorNode(object):
 
         if self.new_sign == True:
             if self.current_distance >= self.min_stop_distance:  # if car is not close enough to the stop point (most likely it will not stop exactly at point) and protects from divide by zero
-                #self.initVelo = self.ackermann_speed 
-                #self.initDistance = self.distance
-                #self.initTime = self.time_stamp         
                 #self.timeToStop = (2*self.distance) / self.initVelo    #may have a certain scenario where need to stop as soon as possible so we can define this and solve for distance
                 self.acceleration = (self.current_speed**2) / (2*self.current_distance)  
-
                 self.msg.speed = self.current_speed - (self.acceleration*self.period.to_sec())
-                    
                 self.stop_command_pub.publish(self.msg)
                 
                 #update distance and speed
@@ -162,10 +161,6 @@ class StopBehaviorNode(object):
                 else:
                     self.time_left = self.time_left - self.period.to_sec()
 
-    #add in stop duration 
-    #Keep it at sign == True and then after a certain time say sign is false and continue
-    #Use if statement 
-
 
 if __name__ == "__main__":
     # initialize node with rospy
@@ -174,16 +169,3 @@ if __name__ == "__main__":
     StopBehaviorNode()
     # keep the node alive
     rospy.spin()
-
-#custom messages
-    #see tutorial
-
-#TrafficSignStamped
-    #header with time stamp       
-    #String         - gives type of sign ex: Stop, Yield, ...
-    #Float32  - distance to sign - detected by sensors
-
-#start multiplexor  - will be another package
-    #takes in commands from pure puresuit and stop
-    #outputs one of them depending on whether there is a sign or not
-    #needs to know when stop behavior is done so it can go back to publishing pure pursuit
