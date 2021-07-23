@@ -1,4 +1,4 @@
-#hi this is a yaml file I am going to copy the code from the pure pursti yaml file for now
+#hi this is a yaml file I am going to copy the code from the pure pursuit yaml file for now
 
 rate: 10 # control loop frequency [Hz]
 parent_frame: world # parent reference frame (world)
