@@ -9,6 +9,7 @@ from shapely.geometry import Point, LineString
 from purepursuit import PurePursuit
 import rospy
 
+
 def dpp():
     fig = plt.figure()
     ax1 = fig.add_subplot(1,1,1)
@@ -29,7 +30,7 @@ def dpp():
     vehicle_pose = (vehicle_cords.x, vehicle_cords.y, theta)
     instance_of_PurePursuit = PurePursuit(wheelbase, lookahead_min, lookahead_max,
                                           lower_threshold_v, upper_threshold_v,
-                                          lookahead_gain, speed=speed, 
+                                          lookahead_gain, speed=speed,
                                           vehicle_pose=vehicle_pose, path=path)
 
     print('vehicle coords: '+ str(vehicle_cords.x) + ',' + str(vehicle_cords.y))
@@ -104,6 +105,7 @@ def dpp():
     print('future point: ' + str(future_pt))
     plt.show()
     return front_pt.x, front_pt.y, r, curv, speed, delta, omega, lookahead, future_pt, path
+
 
 if __name__ == '__main__':
     print(dpp())

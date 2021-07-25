@@ -154,6 +154,9 @@ class PurePursuit:
         Returns the computed future point on the path for the
         vehicle to keep track of.
 
+        NOTE: When either the path or vehicle_positions are not set, then `None`
+        is returned.
+
         Parameters
         ----------
         None
@@ -163,17 +166,17 @@ class PurePursuit:
         shapely.geometry.Point
             computed future point
         '''
-        if self.path == None:
-            return Point(0.0, 0.0)
+        if self.path is None:
+            return None
         closest_dist = 0
-        if self.vehicle_position != None:
+        if self.vehicle_position is not None:
             closest_dist = min(
                         self.vehicle_position.distance(self.closest_point()),
                         self.lookahead)
             dist_on_path = (self.lookahead ** 2 - closest_dist ** 2) ** 0.5
             arc_dist = self.path.project(self.vehicle_position)
             return self.path.interpolate(arc_dist + dist_on_path)
-
+        return None
 
     def update_lookahead(self, v_cmd,
                          lookahead_min, lookahead_max,
@@ -308,7 +311,7 @@ class PurePursuit:
         float
             computed curvature
         '''
-        if self.future_point() == None or self.vehicle_position == None:
+        if self.future_point() is None or self.vehicle_position is None:
             return .5
         lookahead_point = np.array(self.future_point()) - self.vehicle_position
         line_of_sight_angle = np.arctan2(lookahead_point[1], lookahead_point[0])
