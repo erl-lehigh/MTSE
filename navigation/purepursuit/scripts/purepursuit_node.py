@@ -252,7 +252,7 @@ class PurePursuitNode(object):
                             msg.speed,
                             msg.steering_angle)
             self.command_pub.publish(msg)
-            rospy.loginfo(msg)              #######just to help dan with his code for now 
+            #rospy.loginfo(msg)              #######just to help dan with his code for now 
             self.target_pub.publish(pose_msg)
             self.vehicle_location_pub.publish(vehicle_location_msg)
 

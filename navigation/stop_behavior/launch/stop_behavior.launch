@@ -10,6 +10,9 @@
     <arg name="pkg_name" value="stop_behavior" doc="name of the package"/>
     <arg name="node_name" default="Stop Behavior" doc="name of the node"/>
     <arg name="node_type" default="stop_behavior_node.py" doc="name of the type"/>
+    
+    <include file="$(find purepursuit)/launch/purepursuit_movement.launch" >
+    </include>
 
     <node pkg="$(arg pkg_name)" type="$(arg node_type)" name="$(arg node_name)"
           output="$(arg output)" required="$(arg req)">
