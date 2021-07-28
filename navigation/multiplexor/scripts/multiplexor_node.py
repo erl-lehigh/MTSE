@@ -58,8 +58,9 @@ class Multiplexor(object):
         self.distance = 0.0      
         self.new_sign = False     
 
-        self.current_distance = 0.0
-        self.current_speed = 0.0
+
+        self.stop_message = AckermannDrive()
+        self.purepursuit_message = AckermannDrive()
 
         #Create Publisher objects 
         self.vehicle_command_pub = rospy.Publisher('multiplexor_command',   #this will publish the commands for the vehicle
@@ -80,7 +81,7 @@ class Multiplexor(object):
                             self.sign_detected)        
 
 
-        self.timer = rospy.Timer(self.period, self.sign_detected)  #calls sign_detected function at a certain rate
+        #self.timer = rospy.Timer(self.period, self.sign_detected)  #calls sign_detected function at a certain rate
 
 
 
@@ -89,16 +90,18 @@ class Multiplexor(object):
         a callback type method that makes the purepursuit commands get sent to the car
 
         '''
-        self.vehicle_command_pub.Publish(data.data)
-
+        self.purepursuit_message = data
+        if self.new_sign == False:
+            rospy.loginfo('Purepursuit: Speed = % 3.3s ',data.speed)
 
     def run_stopbehavior(self, data):                  
         '''
         a callback type method that makes the stop behavior commands get sent to the car
         
         '''
-        self.vehicle_command_pub.Publish(data.data)
-
+        self.stop_message = data
+        if self.new_sign == True:
+            rospy.loginfo('Stopping: Speed = % 3.3s ',data.speed)
         
     def sign_detected(self, data):      
 
@@ -106,10 +109,14 @@ class Multiplexor(object):
        a callback type method that is run when a sign is detected.  It then directs the code to perform the proper action. 
        
         '''
-        if data.data.traffic_sign == "stop":
-            self.run_stopbehavior()
+        if data.traffic_sign == "stop":
+            self.new_sign = True
+            self.vehicle_command_pub.publish(self.stop_message)
+            print("sending stop_behavior commands") 
         else:
-            self.run_purepursuit()
+            self.new_sign = False
+            self.vehicle_command_pub.publish(self.purepursuit_message)
+            print("sending purepursuit commands")
         
 
 
