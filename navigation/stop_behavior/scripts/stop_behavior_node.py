@@ -5,7 +5,6 @@ import math
 import time
                        
 from ackermann_msgs.msg import AckermannDrive                   
-from std_msgs.msg import Float32
 from stop_behavior.msg import TrafficSignStamped
 
 class StopBehaviorNode(object):
@@ -111,12 +110,13 @@ class StopBehaviorNode(object):
         a callback type method that gives the distance from the car to the stop sign and time stamps it
         
         '''
-        self.time_stamp = data.header.stamp          
-        self.distance =  data.distance    #in meters   
-        self.current_speed = self.ackermann_speed
-        self.current_distance = self.distance
-        self.new_sign = True     #True means there is a sign
-        print("%s sign = %s  Distance to sign is %3d m" %(data.traffic_sign, self.new_sign, self.distance))  #logs message recieved (speed) in terminal
+        if data.traffic_sign == 'stop':
+            self.time_stamp = data.header.stamp          
+            self.distance =  data.distance    #in meters   
+            self.current_speed = self.ackermann_speed
+            self.current_distance = self.distance
+            self.new_sign = True     #True means there is a stop sign
+            print("%s sign = %s  Distance to sign is %3d m" %(data.traffic_sign, self.new_sign, self.distance))  #logs message recieved (speed) in terminal
         
 
     def stop_the_car(self, event=None):        #need to figure out a way to call this method to stop the car,  event needed with the timer
