@@ -37,7 +37,7 @@ class Multiplexor(object):
 
     Subscribers
     --------
-        command
+        pure_pursuit
         stop_sign
         traffic_sign
 
@@ -62,12 +62,12 @@ class Multiplexor(object):
         self.current_speed = 0.0
 
         #Create Publisher objects 
-        self.vehicle_command_pub = rospy.Publisher('multiplexor output',   #this will publish the commands telling the car to slow to a stop
-                                                AckermannDrive,        #message type
+        self.vehicle_command_pub = rospy.Publisher('multiplexor_command',   #this will publish the commands for the vehicle
+                                                AckermannDrive,        
                                                 queue_size=1)
 
         #Create Subscriber objects 
-        self.command_sub = rospy.Subscriber('speed_command',  #subscribes to the 'speed_command' topic that pure pursuit publishes to
+        self.pure_pursuit_sub = rospy.Subscriber('speed_command',  #subscribes to the 'speed_command' topic that pure pursuit publishes to
                             AckermannDrive,        
                             self.run_purepursuit)          
 
@@ -80,35 +80,36 @@ class Multiplexor(object):
                             self.sign_detected)        
 
 
-        #self.timer = rospy.Timer(self.period, self.stop_the_car)  #calls sign_detector function at a certain rate 
+        self.timer = rospy.Timer(self.period, self.sign_detected)  #calls sign_detected function at a certain rate
 
 
 
-    def run_puerpursuit(self, data):            #gets speed & steering angle generated from pure pursuit
+    def run_purepursuit(self, data):            
         '''
         a callback type method that makes the purepursuit commands get sent to the car
 
         '''
-        
+        self.vehicle_command_pub.Publish(data.data)
 
 
-
-    def run_stopbehavior(self, data):                   #may want to add code that re-checks if there is a need to stop
+    def run_stopbehavior(self, data):                  
         '''
         a callback type method that makes the stop behavior commands get sent to the car
         
         '''
-        
+        self.vehicle_command_pub.Publish(data.data)
 
         
-
-    def sign_detector(self, event=None):        #need to figure out a way to call this method to stop the car,  event needed with the timer
+    def sign_detected(self, data):      
 
         '''
        a callback type method that is run when a sign is detected.  It then directs the code to perform the proper action. 
        
         '''
-        
+        if data.data.traffic_sign == "stop":
+            self.run_stopbehavior()
+        else:
+            self.run_purepursuit()
         
 
 
