@@ -55,7 +55,7 @@ class Multiplexor(object):
         self.parent_frame = rospy.get_param('~parent_frame', 'world')
         self.child_frame = rospy.get_param('~child_frame', 'vehicle')
                                            
-        self.distance = 0.0      
+           
         self.new_sign = False     
 
 
@@ -81,7 +81,7 @@ class Multiplexor(object):
                             self.sign_detected)        
 
 
-        #self.timer = rospy.Timer(self.period, self.sign_detected)  #calls sign_detected function at a certain rate
+        self.timer = rospy.Timer(self.period, self.send_to_car)  #calls sign_detected function at a certain rate
 
 
 
@@ -91,8 +91,6 @@ class Multiplexor(object):
 
         '''
         self.purepursuit_message = data
-        if self.new_sign == False:
-            rospy.loginfo('Purepursuit: Speed = % 3.3s ',data.speed)
 
     def run_stopbehavior(self, data):                  
         '''
@@ -100,24 +98,31 @@ class Multiplexor(object):
         
         '''
         self.stop_message = data
-        if self.new_sign == True:
-            rospy.loginfo('Stopping: Speed = % 3.3s ',data.speed)
         
     def sign_detected(self, data):      
-
         '''
        a callback type method that is run when a sign is detected.  It then directs the code to perform the proper action. 
        
         '''
         if data.traffic_sign == "stop":
             self.new_sign = True
+        else:
+            self.new_sign = False
+    
+
+    def send_to_car(self, event=None):
+        ''' 
+        method that is constatnly publishing to the car 
+        
+        '''
+
+        if self.new_sign == True:
             self.vehicle_command_pub.publish(self.stop_message)
             print("sending stop_behavior commands") 
         else:
             self.new_sign = False
             self.vehicle_command_pub.publish(self.purepursuit_message)
             print("sending purepursuit commands")
-        
 
 
 if __name__ == "__main__":
