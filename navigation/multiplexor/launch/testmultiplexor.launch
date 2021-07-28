@@ -2,13 +2,13 @@
 
     <arg name="pkg_name" value="multiplexor" doc="name of the package"/>
     <arg name="node_name" default="multiplexor" doc="name of the node"/>
-    <!--arg name="node_type" default="multiplexor_node.py" doc="name of the type"/>  -->
+    <arg name="node_type" default="multiplexor_node.py" doc="name of the type"/> 
     <arg name="output" default="screen" doc="Output display"/>
 
     <include file="$(find purepursuit)/launch/purepursuit_movement.launch" >
     </include>
 
-    <node pkg="$(arg pkg_name)" type="multiplexor_node.py" name="$(arg node_name)" output="$(arg output)">
+    <node pkg="$(arg pkg_name)" type="$(arg node_type)" name="$(arg node_name)" output="$(arg output)">
     </node>
 
 </launch>
