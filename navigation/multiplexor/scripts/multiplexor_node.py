@@ -16,19 +16,15 @@ class Multiplexor(object):
     ----------
         new_sign : Boolean
             True when sign is detected in ahead of vehicle, False when no sign is detected
-        period : Duration
-            the amount of times per second the code will run
+        sign_type : String
+            stores the type of sign
+        stop_message : AckermannDrive
+            stores stop behavior speed commands
+        purepursuit_message : AckermannDrive
+            stores purepursuit speed commands
         timer : Timer
             Continuosly running timer that calls siend_to_car function at a certain rate
-        time_stamp : Float32
-            holds the time that a message is recieved to the traffic_sign topic
-        current_distance : Float32
-            keeps track of current distance car is from stop point
-        current_speed : Float32
-            keeps track of current speed of car
-        sign_type : String
-            Stores the type of sign
-
+        
     Publishers
     --------
         vehicle_command
@@ -44,7 +40,6 @@ class Multiplexor(object):
     def __init__(self):
         '''
         Initializes necessary variables and creates publisher and subscriber objects
-
         '''
         #Initial Stuff
         self.rate = 10   #rospy.get_param('~rate',1)
@@ -80,39 +75,32 @@ class Multiplexor(object):
         self.timer = rospy.Timer(self.period, self.send_to_car)  #calls sign_detected function at a certain rate
 
 
-
     def run_purepursuit(self, data):            
         '''
         a callback type method that stores purepursuit commands
-
         '''
         self.purepursuit_message = data
 
     def run_stopbehavior(self, data):                  
         '''
-        a callback type method that store stop behavior commands
-
+        a callback type method that stores stop behavior commands
         '''
         self.stop_message = data
         
     def sign_detected(self, data):      
         '''
        a callback type method that is run when a sign is detected
-       
         '''
         if data.traffic_sign == "stop":
             self.new_sign = True
         else:
             self.new_sign = False
-
         self.sign_type = data.traffic_sign
 
     def send_to_car(self, event=None):
         ''' 
         method that is constatnly publishing to the car the correct commands
-        
         '''
-
         if self.new_sign == True and self.sign_type == "stop":
             self.vehicle_command_pub.publish(self.stop_message)
             print("sending stop_behavior commands") 
