@@ -14,22 +14,20 @@ class Multiplexor(object):
 
     Attributes
     ----------
-        distance : Float32
-            the distance from car to stop point. 
-            Will be calculated by camera/Hokuyo sensors and published to topic /traffic_sign that this code subscribes to
-            It will also be updated as the car approaches the stop point
         new_sign : Boolean
             True when sign is detected in ahead of vehicle, False when no sign is detected
         period : Duration
-            the amount of times per second the cwill run
+            the amount of times per second the code will run
         timer : Timer
-            Continuosly running timer that calls sign_detector function at a certain rate
+            Continuosly running timer that calls siend_to_car function at a certain rate
         time_stamp : Float32
             holds the time that a message is recieved to the traffic_sign topic
         current_distance : Float32
             keeps track of current distance car is from stop point
         current_speed : Float32
             keeps track of current speed of car
+        sign_type : String
+            Stores the type of sign
 
     Publishers
     --------
@@ -53,12 +51,10 @@ class Multiplexor(object):
         self.period = rospy.Duration(1.0 / self.rate)   #period is 1 hertz (1 cyle per second)
         self.node_name = rospy.get_name()
         self.parent_frame = rospy.get_param('~parent_frame', 'world')
-        self.child_frame = rospy.get_param('~child_frame', 'vehicle')
-                                           
+        self.child_frame = rospy.get_param('~child_frame', 'vehicle')                 
            
         self.new_sign = False     
-
-
+        self.sign_type = ""
         self.stop_message = AckermannDrive()
         self.purepursuit_message = AckermannDrive()
 
@@ -87,36 +83,37 @@ class Multiplexor(object):
 
     def run_purepursuit(self, data):            
         '''
-        a callback type method that makes the purepursuit commands get sent to the car
+        a callback type method that stores purepursuit commands
 
         '''
         self.purepursuit_message = data
 
     def run_stopbehavior(self, data):                  
         '''
-        a callback type method that makes the stop behavior commands get sent to the car
-        
+        a callback type method that store stop behavior commands
+
         '''
         self.stop_message = data
         
     def sign_detected(self, data):      
         '''
-       a callback type method that is run when a sign is detected.  It then directs the code to perform the proper action. 
+       a callback type method that is run when a sign is detected
        
         '''
         if data.traffic_sign == "stop":
             self.new_sign = True
         else:
             self.new_sign = False
-    
+
+        self.sign_type = data.traffic_sign
 
     def send_to_car(self, event=None):
         ''' 
-        method that is constatnly publishing to the car 
+        method that is constatnly publishing to the car the correct commands
         
         '''
 
-        if self.new_sign == True:
+        if self.new_sign == True and self.sign_type == "stop":
             self.vehicle_command_pub.publish(self.stop_message)
             print("sending stop_behavior commands") 
         else:

@@ -129,6 +129,7 @@ class StopBehaviorNode(object):
         self.msg = AckermannDrive()  #Initialize message as AckermanDrive type
 
         self.msg.steering_angle = self.ackermann_steering
+        self.msg.speed = self.ackermann_speed
         self.msg.steering_angle_velocity = 0.0
         self.msg.acceleration = 0.0
         self.msg.jerk = 0.0
@@ -160,6 +161,8 @@ class StopBehaviorNode(object):
                     self.new_sign = False
                 else:
                     self.time_left = self.time_left - self.period.to_sec()
+        else:
+            self.stop_command_pub.publish(self.msg)
 
 
 if __name__ == "__main__":
