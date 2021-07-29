@@ -107,7 +107,7 @@ class StopBehaviorNode(object):
 
     def sign_detector(self, data):                   #may want to add code that re-checks if there is a need to stop
         '''
-        a callback type method that gives the distance from the car to the stop sign and time stamps it
+        a callback #self.stop_command_pub.publish(self.msg)type method that gives the distance from the car to the stop sign and time stamps it
         
         '''
         if data.traffic_sign == 'stop':
@@ -143,7 +143,6 @@ class StopBehaviorNode(object):
                 #self.timeToStop = (2*self.distance) / self.initVelo    #may have a certain scenario where need to stop as soon as possible so we can define this and solve for distance
                 self.acceleration = (self.current_speed**2) / (2*self.current_distance)  
                 self.msg.speed = self.current_speed - (self.acceleration*self.period.to_sec())
-                self.stop_command_pub.publish(self.msg)
                 
                 #update distance and speed
                 self.current_distance = self.current_distance - (((self.current_speed + self.msg.speed) / 2)*(self.period.to_sec()))   #current_velo in this equation is actually the previous speed
@@ -153,16 +152,17 @@ class StopBehaviorNode(object):
 
             else: 
                 self.msg.speed = 0
-                self.stop_command_pub.publish(self.msg)
                 print("Car Stopped ", self.time_left)
 
                 if self.time_left <= 0:
                     self.time_left = self.stopping_time
                     self.new_sign = False
+                    self.msg.jerk = 10.0
                 else:
                     self.time_left = self.time_left - self.period.to_sec()
-        else:
-            self.stop_command_pub.publish(self.msg)
+
+        self.stop_command_pub.publish(self.msg)
+
 
 
 if __name__ == "__main__":

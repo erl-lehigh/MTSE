@@ -52,6 +52,7 @@ class Multiplexor(object):
         self.sign_type = ""
         self.stop_message = AckermannDrive()
         self.purepursuit_message = AckermannDrive()
+        self.switch_back = "no"
 
         #Create Publisher objects 
         self.vehicle_command_pub = rospy.Publisher('multiplexor_command',   #this will publish the commands for the vehicle
@@ -86,6 +87,8 @@ class Multiplexor(object):
         a callback type method that stores stop behavior commands
         '''
         self.stop_message = data
+        if self.stop_message.jerk == 10.0:
+            self.switch_back = "yes"
         
     def sign_detected(self, data):      
         '''
@@ -99,12 +102,16 @@ class Multiplexor(object):
 
     def send_to_car(self, event=None):
         ''' 
-        method that is constatnly publishing to the car the correct commands
+        method that is constatnly publishing the correct commands to the car 
         '''
         if self.new_sign == True and self.sign_type == "stop":
             self.vehicle_command_pub.publish(self.stop_message)
             print("sending stop_behavior commands") 
+            if self.switch_back == "yes":
+                print("Car done stopping. Switching to purepursuit")
+                self.new_sign = False
         else:
+            self.switch_back = "no"
             self.new_sign = False
             self.vehicle_command_pub.publish(self.purepursuit_message)
             print("sending purepursuit commands")
