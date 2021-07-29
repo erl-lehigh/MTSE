@@ -44,7 +44,7 @@ class TFUpdaterNode(object):
         self.child_frame = rospy.get_param('~child_frame', 'vehicle')
         #self.counter = -5
         #Create Subscriber
-        self.command_sub = rospy.Subscriber('speed_command',
+        self.command_sub = rospy.Subscriber('multiplexor_command',
                             AckermannDrive,
                             self.get_message)
         #Create AckermannDrive Message holder

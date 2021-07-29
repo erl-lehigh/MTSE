@@ -5,7 +5,7 @@
     <arg name="node_type" default="multiplexor_node.py" doc="name of the type"/> 
     <arg name="output" default="screen" doc="output display"/>
 
-    <include file="$(find purepursuit)/launch/purepursuit_move_with_variable_speed.launch" >
+    <include file="$(find purepursuit)/launch/purepursuit_movement.launch" >
     </include>
 
     <node pkg="$(arg pkg_name)" type="$(arg node_type)" name="$(arg node_name)" output="$(arg output)">
