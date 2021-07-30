@@ -13,13 +13,13 @@
     then press tab and you should get: 
 
     rostopic pub /traffic_sign stop_behavioTrafficSignStamped "header:
-    seq: 0
-    stamp:
-        secs: 0
-        nsecs: 0
-    frame_id: ''
-    traffic_sign: 'stop'
-    distance: 15.0" 
+    seq: 0  
+    stamp:  
+        secs: 0  
+        nsecs: 0  
+    frame_id: ''  
+    traffic_sign: 'stop'   
+    distance: 15.0"   
 
 - For now there is only a stop sign so enter ‘stop’ for the traffic_sign:  and a number for the distance ex: 15.0
 - You can keep entering this command to test consecutive signs
