@@ -6,9 +6,9 @@
 
 # In order to test run the multiplexor in its current state:
 1. Switch to stop behavior branch in our github repository 
-2. In terminal, Enter → roslaunch multiplexor testmultiplexor.launch
+2. In terminal, Enter → `roslaunch multiplexor testmultiplexor.launch`
 3. In a new terminal window, publish a custom message to the /traffic_sign topic:
-    - Enter → rostopic pub /traffic_sign stop_behavior/TrafficSignStamped "h      
+    - Enter → `rostopic pub /traffic_sign stop_behavior/TrafficSignStamped "h`      
 
     then press tab and you should get: 
 
@@ -19,7 +19,7 @@
         nsecs: 0  
     frame_id: ''  
     traffic_sign: 'stop'   
-    distance: 15.0"   
+    distance: 15.0"
 
 - For now there is only a stop sign so enter ‘stop’ for the traffic_sign:  and a number for the distance ex: 15.0
 - You can keep entering this command to test consecutive signs
