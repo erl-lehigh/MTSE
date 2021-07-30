@@ -18,8 +18,8 @@
         secs: 0  
         nsecs: 0  
     frame_id: ''  
-    traffic_sign: 'stop'   
-    distance: 15.0"
+    traffic_sign: ''   
+    distance: "
 
 - For now there is only a stop sign so enter ‘stop’ for the traffic_sign:  and a number for the distance ex: 15.0
 - You can keep entering this command to test consecutive signs
