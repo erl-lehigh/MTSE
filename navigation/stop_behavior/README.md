@@ -47,3 +47,4 @@
 - How to deal with edge cases that require emergency stops
 - Determining the proper/safest way for the car to accelerate or decelerate
  
+# See the multiplexor packaage readme for running the multiplexor and the stop behavior along side it

@@ -46,7 +46,6 @@ class StopBehaviorNode(object):
     --------
         command
         stop_sign
-
     '''
     
     def __init__(self):
@@ -92,7 +91,6 @@ class StopBehaviorNode(object):
         self.timer = rospy.Timer(self.period, self.stop_the_car)  #calls sign_detector function at a certain rate 
 
 
-
     def get_commands(self, data):            #gets speed & steering angle generated from pure pursuit
         '''
         a callback type method that gets the car's speed and steering angle each time they are published to speed_command topic
@@ -104,8 +102,7 @@ class StopBehaviorNode(object):
         self.ackermann_steering = data.steering_angle
 
 
-
-    def sign_detector(self, data):                   #may want to add code that re-checks if there is a need to stop
+    def sign_detector(self, data):                   
         '''
         a callback #self.stop_command_pub.publish(self.msg)type method that gives the distance from the car to the stop sign and time stamps it
         
@@ -118,38 +115,30 @@ class StopBehaviorNode(object):
             self.new_sign = True     #True means there is a stop sign
             print("%s sign = %s  Distance to sign is %3d m" %(data.traffic_sign, self.new_sign, self.distance))  #logs message recieved (speed) in terminal
         
-
-    def stop_the_car(self, event=None):        #need to figure out a way to call this method to stop the car,  event needed with the timer
-
+    def stop_the_car(self, event=None):     
         '''
         Method that takes the speed commands and modifies them to stop the car
         Only changing the speed of the car NOT the acceleration, jerk, steering velocity
         '''
-        
+    
         self.msg = AckermannDrive()  #Initialize message as AckermanDrive type
-
         self.msg.steering_angle = self.ackermann_steering
         self.msg.speed = self.ackermann_speed
         self.msg.steering_angle_velocity = 0.0
         self.msg.acceleration = 0.0
         self.msg.jerk = 0.0
 
-
         #math for the slowing down  (constant acceleration) 
         #**we are ONLY changing speed commands not acceleration in this code**
-
         if self.new_sign == True:
-            if self.current_distance >= self.min_stop_distance:  # if car is not close enough to the stop point (most likely it will not stop exactly at point) and protects from divide by zero
+            if self.current_distance >= self.min_stop_distance:  
                 #self.timeToStop = (2*self.distance) / self.initVelo    #may have a certain scenario where need to stop as soon as possible so we can define this and solve for distance
                 self.acceleration = (self.current_speed**2) / (2*self.current_distance)  
                 self.msg.speed = self.current_speed - (self.acceleration*self.period.to_sec())
-                
                 #update distance and speed
                 self.current_distance = self.current_distance - (((self.current_speed + self.msg.speed) / 2)*(self.period.to_sec()))   #current_velo in this equation is actually the previous speed
                 self.current_speed = self.msg.speed  
-
                 rospy.loginfo('SLOWING DOWN! %2.5s m/s   Acc = %2.5s m/s^2, Dist = %2.5s ', self.msg.speed, self.acceleration, self.current_distance)
-
             else: 
                 self.msg.speed = 0
                 print("Car Stopped ", self.time_left)
@@ -162,8 +151,6 @@ class StopBehaviorNode(object):
                     self.time_left = self.time_left - self.period.to_sec()
 
         self.stop_command_pub.publish(self.msg)
-
-
 
 if __name__ == "__main__":
     # initialize node with rospy
