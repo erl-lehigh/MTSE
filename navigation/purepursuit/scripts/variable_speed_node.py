@@ -11,8 +11,8 @@ from std_msgs.msg import Float64
 
 class VariableSpeedNode(object):
     '''
-    This node is meant for calculating a variable speed in order to show the
-    relationship between lookahead and speed
+    This node is meant for calculating a variable speed in order to
+    show the relationship between lookahead and speed
 
     Attributes
     ----------
@@ -29,9 +29,8 @@ class VariableSpeedNode(object):
 
     def __init__(self):
         '''
-        Initializes by setting publisher and set the
-            start time which will be used to calculate
-            the speed
+        Initializes by setting publisher and set the start time
+        which will be used to calculate the speed
         '''
         #set start time
         self.startTime = time.time()
@@ -42,8 +41,8 @@ class VariableSpeedNode(object):
 
         #Create Publishers
         self.reference_speed_pub = rospy.Publisher('reference_speed',
-                                Float64,
-                                queue_size = 1)
+                                        Float64,
+                                        queue_size = 1)
 
         # Create timers
         self.timer = rospy.Timer(rospy.Duration(1.0 / self.rate),

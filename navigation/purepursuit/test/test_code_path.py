@@ -13,6 +13,5 @@ class Test_Only_Future_Point(unittest.TestCase):
         for distance in output:
             self.assertTrue(distance < .001) #check if point is on the line.
 
-
 if __name__ == "__main__":
     rostest.rosrun('template_ros_package', 'test_code_path', Test_Only_Future_Point)

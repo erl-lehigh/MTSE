@@ -89,14 +89,13 @@ class TFUpdaterNode(object):
         Parameters
         ----------
         event=None : rospy.TimerEvent
-                information about the event that generated this call
+            information about the event that generated this call
 
         Return
         ------
         None
         '''
         #get location current location
-
         deltaMove = (1 / self.rate) * self.adMessage.speed
         #use the period time the speed to have the total distance
 
