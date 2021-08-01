@@ -201,7 +201,8 @@ class PurePursuitNode(object):
         ------
         none
         '''
-        new_speed = msg.data
+        curvature = self.purepursuit.compute_curvature() #calc curvature
+        new_speed = msg.data * (1 - curvature) # speed(inverse curvature)
         self.purepursuit.speed = new_speed
         self.purepursuit.update_lookahead(
                 new_speed, self.purepursuit.lookahead_min,
