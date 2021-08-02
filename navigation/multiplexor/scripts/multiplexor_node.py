@@ -52,6 +52,8 @@ class Multiplexor(object):
         self.sign_type = ""
         self.stop_message = AckermannDrive()
         self.purepursuit_message = AckermannDrive()
+        self.emergency_message =  AckermannDrive()
+        self.emergency_message.speed = 0.0
         self.switch_back = "no"
 
         #Create Publisher objects 
@@ -110,6 +112,11 @@ class Multiplexor(object):
             if self.switch_back == "yes":
                 print("Car done stopping. Switching to purepursuit")
                 self.new_sign = False
+            
+        elif self.sign_type == "emergency":
+            self.vehicle_command_pub.publish(self.emergency_message)
+            print('EMERGENCY STOP')
+
         else:
             self.switch_back = "no"
             self.new_sign = False
