@@ -1,0 +1,17 @@
+<launch>
+    <arg name="carla_bridge" default="True"/>
+    <arg name="rviz" default="true"/>
+
+    <group if="$(arg carla_bridge)">
+        <include file="$(find carla_setup)/launch/carla.launch"/>
+        <node pkg="carla_setup" type="test_carla_ackermann_control.py" 
+              name="carla_ackermann" output="screen" required="True" />
+    </group>
+
+    <group if="$(arg rviz)">
+        <node type="rviz" name="rviz" pkg="rviz" args="-d $(find launch_all)/rviz/rviz_config.rviz"/>
+    </group>
+
+    <!-- The other nodes should be added once they have been -->
+    <!-- individually tested in their integration branches.   -->
+</launch>
