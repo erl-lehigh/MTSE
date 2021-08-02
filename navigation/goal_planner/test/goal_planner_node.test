@@ -1,0 +1,21 @@
+<launch>
+    <arg name="pkg_name" value="goal_planner" doc="name of the package"/>
+    <arg name="node_name" default="goal_planner_test" doc="name of the node"/>
+    <arg name="node_type" default="goal_planner_test_node.py" doc="name of the type"/>
+
+    <arg name="config" default="$(find goal_planner)/config/goal_planner.yaml"/>
+
+    <!-- launch goal planner node -->
+    <include file="$(find goal_planner)/launch/goal_planner.launch">
+        <arg name="config" value="$(arg config)"/>
+    </include>
+
+    <!-- launch dummy static vehicle transform w.r.t. world frame -->
+    <node pkg="tf2_ros" type="static_transform_publisher"
+          name="vehicle_broadcaster"
+          args="-40.6079 75.381 0 0 0 0 1 world vehicle"/>
+
+    <!-- TODO: write test code and add it here as a test. -->
+    <!-- test pkg="$(arg pkg_name)" type="$(arg node_type)"
+          test-name="$(arg node_name)"/ -->
+</launch>
