@@ -108,25 +108,25 @@ class Multiplexor(object):
         '''
         if self.new_sign == True and self.sign_type == "stop":
             self.vehicle_command_pub.publish(self.stop_message)
-            print("sending stop_behavior commands") 
+            rospy.logdebug("sending stop_behavior commands") 
             if self.switch_back == "yes":
-                print("Car done stopping. Switching to purepursuit")
+                rospy.logdebug("Car done stopping. Switching to purepursuit")
                 self.new_sign = False
             
         elif self.sign_type == "emergency":
             self.vehicle_command_pub.publish(self.emergency_message)
-            print('EMERGENCY STOP')
+            rospy.logdebug('EMERGENCY STOP')
 
         else:
             self.switch_back = "no"
             self.new_sign = False
             self.vehicle_command_pub.publish(self.purepursuit_message)
-            print("sending purepursuit commands")
+            rospy.logdebug("sending purepursuit commands")
 
 
 if __name__ == "__main__":
     # initialize node with rospy
-    rospy.init_node('multiplexor', anonymous=False)
+    rospy.init_node('multiplexor', anonymous=False, log_level=rospy.DEBUG)
     # create the node object
     Multiplexor()
     # keep the node alive
