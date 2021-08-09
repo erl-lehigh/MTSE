@@ -2,7 +2,7 @@
     <!-- Initial Argument Stating -->
     <arg name="carla_bridge" default="True"/>
     <arg name="dynamic_purepursuit" default="True"/>
-    <arg name="rviz" default="True"/>
+    <arg name="rviz" default="False"/>
 
     <!-- Node Launching -->
     <group if="$(arg carla_bridge)">
@@ -32,7 +32,7 @@
         <node pkg="$(arg pkg_name)" type="tf_updater_node.py" name="vehicle_broadcaster"/>
         <!-- + speed -->
         <node pkg="rostopic" type="rostopic" name="static_reference_speed"
-            args="pub /reference_speed std_msgs/Float64 3" />
+            args="pub /reference_speed std_msgs/Float64 10" />
     </group>
     <!-- RVIZ launch -->
     <group if="$(arg rviz)">

@@ -72,7 +72,7 @@ class PurePursuitNode(object):
         self.node_name = rospy.get_name()
 
         # Read parameters
-        self.rate = rospy.get_param('~rate', 1)
+        self.rate = rospy.get_param('~rate', 20)
         self.parent_frame = rospy.get_param('~parent_frame', 'map')
         self.child_frame = rospy.get_param('~child_frame', 'ego_vehicle_filtered')
         wheelbase = rospy.get_param('~wheelbase', 1)
