@@ -10,7 +10,7 @@
             "sensor_tick": 0.05,
             "gamma": 2.2,
             "shutter_speed": 60.0,
-            "iso": 1200.0,
+            "iso": 25.0,
             "fstop": 1.4,
             "min_fstop": 1.2,
             "blade_count": 5,
@@ -43,7 +43,7 @@
             "lens_kcube": 0.0,
             "lens_x_size": 0.08,
             "lens_y_size": 0.08,
-            "bloom_intensity": 0.375,
+            "bloom_intensity": 0.675,
             "lens_flare_intensity": 0.1
         },
         {
