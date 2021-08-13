@@ -39,7 +39,7 @@ class CarlaWaypointNode(object):
         self.node_name = rospy.get_name()
 
         # Initial Carla Code
-        client = carla.Client("localhost", 2000)    #connect to server
+        client = carla.Client("127.0.0.1", 2000)    #connect to server
         client.set_timeout(10)                      #set timeout
         world = client.load_world('Town03')         #get access to the world info
         self.world_map = world.get_map()                 #needed for waypoints (map)
@@ -74,8 +74,8 @@ class CarlaWaypointNode(object):
             pose = PoseStamped()
             pose.header.stamp = rospy.Time.now()
             pose.header.frame_id = "map"   # If this give issues change to "world"
-            pose.pose.position.x = point.location.x
-            pose.pose.position.y =  point.location.y
+            pose.pose.position.x = point.transform.location.x
+            pose.pose.position.y = point.transform.location.y
             path.poses.append(pose)
         self.waypoint = path_forward[-1]
         self.path_pub.publish(path)
