@@ -54,7 +54,7 @@ class StopBehaviorNode(object):
 
         '''
         #Initial Stuff
-        self.rate = 10   #rospy.get_param('~rate',1)
+        self.rate = rospy.get_param('~rate', 10)
         self.period = rospy.Duration(1.0 / self.rate)   #period is 1 hertz (1 cyle per second)
         self.node_name = rospy.get_name()
         self.parent_frame = rospy.get_param('~parent_frame', 'world')

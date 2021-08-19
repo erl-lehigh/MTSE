@@ -1,6 +1,6 @@
 #hi this is a yaml file I am going to copy the code from the pure pursuit yaml file for now
 
-rate: 10 # control loop frequency [Hz]
+rate: 1 # control loop frequency [Hz]
 parent_frame: world # parent reference frame (world)
 child_frame: vehicle # child reference frame (vehicle)
 min_stop_distance: 0.4 # minimum distance from car to stopping point for car to stop (in meters)
