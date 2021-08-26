@@ -41,7 +41,12 @@ class CarlaWaypointNode(object):
         # Initial Carla Code
         client = carla.Client("127.0.0.1", 2000)    #connect to server
         client.set_timeout(10)                      #set timeout
-        world = client.load_world('Town03')         #get access to the world info
+        #world = client.load_world('Town03')         #get access to the world info
+        world = client.get_world()
+        '''
+        load_world loads a completely new world, the current world is killed.
+        get_world loads the current world
+        '''
         self.world_map = world.get_map()                 #needed for waypoints (map)
         starting_point = carla.Transform(carla.Location(x=220.053, y=-5, z=0),
                                          carla.Rotation(pitch=0, yaw=180, roll=0))
