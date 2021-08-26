@@ -22,7 +22,7 @@
         <arg name="req" default="true"/>
         <!-- DPP nodes -->
         <!-- + path -->
-        <node pkg="$(arg pkg_name)" type="carla_waypoint_node.py" name="planned_path"/>
+        <node pkg="$(arg pkg_name)" type="random_waypoint_node.py" name="planned_path"/>
         <!-- + purepursuit_node launch -->
         <node pkg="$(arg pkg_name)" type="$(arg node_type)" name="$(arg node_name)"
             output="$(arg output)" required="$(arg req)">
