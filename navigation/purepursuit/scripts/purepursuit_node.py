@@ -1,5 +1,6 @@
 #! /usr/bin/env python
 import math
+import pprint
 
 import rospy
 import tf2_ros
@@ -182,6 +183,7 @@ class PurePursuitNode(object):
         self.purepursuit.set_vehicle_pose(vehicle_pose)
         pose_list = [(pose.pose.position.x, pose.pose.position.y)
                      for pose in msg.poses]
+        pose_list = [(vehicle_pose[3].x, vehicle_pose[3].y)] + pose_list
         self.purepursuit.path = LineString(pose_list)
 
 

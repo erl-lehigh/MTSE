@@ -71,7 +71,7 @@ class CarlaWaypointNode(object):
         -------
         None
         '''
-        path_forward = self.waypoint.next(10)
+        path_forward = self.waypoint.next(1000)
         path = Path()
         path.header.stamp = rospy.Time.now()
         path.header.frame_id = "map" # If this give issues change to "world"
