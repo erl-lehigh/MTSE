@@ -1,6 +1,6 @@
 <launch>
     <arg name="rviz" default="False"/>
-    <arg name="config" default="$(find multiplexor)/config/multiplexor.yaml"
+    <arg name="config" default="$(find stop_behavior)/config/stop_behavior.yaml"
          doc="Specify a config"/>
 
     <arg name="output" default="screen" doc="Output display"/>
@@ -11,8 +11,15 @@
     <arg name="node_name" default="multiplexor" doc="name of the node"/>
     <arg name="node_type" default="multiplexor_node.py" doc="name of the type"/>
 
+    <include file="$(find purepursuit)/launch/purepursuit_movement.launch" >
+    </include>
+
     <node pkg="$(arg pkg_name)" type="$(arg node_type)" name="$(arg node_name)"
           output="$(arg output)" required="$(arg req)">
+    </node>
+
+    <node pkg="stop_behavior" type="stop_behavior_node.py" name="stop_behavior" output="$(arg output)" launch-prefix="xterm -e">
         <rosparam command="load" file="$(arg config)" />
     </node>
+    
 </launch>
