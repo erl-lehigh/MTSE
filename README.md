@@ -10,6 +10,7 @@ Team Members:
   - Brian Zhu
   - Gustavo Cardona
   - Disha Kamale
+  - Daniel Cahill
   
   
  ## Summary of current PRs: 

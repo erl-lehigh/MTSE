@@ -195,7 +195,7 @@ class RoutePlanner(object):
         plt.draw() # Draw canvas and mark as changed
         plt.pause(0.001) # Display changes
 
-    def plot_route(self, route_coords):
+    def plot_route(self, route_coords):  #?? I might need an explanation for this.  What is meant by manually draw?
         '''
         Plots the route onto the map.
 
