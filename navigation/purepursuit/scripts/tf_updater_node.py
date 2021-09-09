@@ -8,7 +8,7 @@ import time
 import tf_conversions
 
 from nav_msgs.msg import Path
-from ackermann_msgs.msg import AckermannDrive
+from ackermann_msgs.msg import AckermannDrive, AckermannDriveStamped
 
 import geometry_msgs.msg
 
@@ -44,8 +44,8 @@ class TFUpdaterNode(object):
         self.child_frame = rospy.get_param('~child_frame', 'vehicle')
         #self.counter = -5
         #Create Subscriber
-        self.command_sub = rospy.Subscriber('speed_command',
-                            AckermannDrive,
+        self.command_sub = rospy.Subscriber('ackermann_cmd',
+                            AckermannDriveStamped,
                             self.get_message)
         #Create AckermannDrive Message holder
         self.adMessage = AckermannDrive( 0.0, 0, 0, 0, 0)
@@ -77,7 +77,7 @@ class TFUpdaterNode(object):
         Returns
         -------
         '''
-        self.adMessage = msg
+        self.adMessage = msg.drive # get the Ackermann Drive Part from the stamped message
 
     def update_vehicle_location(self, event=None):
         '''

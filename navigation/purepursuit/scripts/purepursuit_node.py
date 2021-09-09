@@ -5,9 +5,9 @@ import rospy
 import tf2_ros
 import tf.transformations as tr
 from nav_msgs.msg import Path
-from ackermann_msgs.msg import AckermannDrive
+from ackermann_msgs.msg import AckermannDrive, AckermannDriveStamped
 from geometry_msgs.msg import PoseStamped
-from std_msgs.msg import Float64
+from std_msgs.msg import Float64, Header
 from shapely.geometry import LineString
 
 from purepursuit import PurePursuit
@@ -92,8 +92,8 @@ class PurePursuitNode(object):
                                        speed=0)
 
         # Create publishers
-        self.command_pub = rospy.Publisher('speed_command',
-                                           AckermannDrive,
+        self.command_pub = rospy.Publisher('ackermann_cmd',
+                                           AckermannDriveStamped,
                                            queue_size=1)
 
         self.target_pub = rospy.Publisher('~/target', PoseStamped, queue_size=1)
@@ -227,8 +227,13 @@ class PurePursuitNode(object):
         '''
         msg = AckermannDrive(1.0, 0, 0, 0, 0)
         pose_msg = PoseStamped()
-        pose_msg.header.stamp = rospy.Time.now()
-        pose_msg.header.frame_id = self.parent_frame 
+        stmp = rospy.Time.now()
+        frame = self.parent_frame
+        header = Header()
+        header.stamp = stmp
+        header.frame = frame
+        pose_msg.header.stamp = stmp
+        pose_msg.header.frame_id = frame
         #The frame is the parent id so the below locations 
         #align with  get_vehicle_pose()
         vehicle_location_msg = PoseStamped()
@@ -252,7 +257,10 @@ class PurePursuitNode(object):
             rospy.logdebug("AckDrvMsg: %5.2f m/s %5.2f rad",
                             msg.speed,
                             msg.steering_angle)
-            self.command_pub.publish(msg)
+            drive_stamped = AckermannDriveStamped()
+            drive_stamped.header = header
+            drive_stamped.drive = msg
+            self.command_pub.publish(drive_stamped)
             self.target_pub.publish(pose_msg)
             self.vehicle_location_pub.publish(vehicle_location_msg)
 
