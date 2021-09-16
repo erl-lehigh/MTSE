@@ -1,0 +1,4 @@
+<launch>
+    <arg name="pkg_name" value="purepursuit" doc="name of the package"/>
+    <node pkg="$(arg pkg_name)" type="straight_forward.py" name="straight_forward"/>
+</launch>
