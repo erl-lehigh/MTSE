@@ -183,7 +183,11 @@ class PurePursuitNode(object):
         self.purepursuit.set_vehicle_pose(vehicle_pose)
         pose_list = [(pose.pose.position.x, pose.pose.position.y)
                      for pose in msg.poses]
-        pose_list = [(vehicle_pose[3].x, vehicle_pose[3].y)] + pose_list
+        print("---------------")
+        vehicle_xy = (vehicle_pose[0], vehicle_pose[1])
+        pose_list.insert(0, vehicle_xy)
+        for pose in pose_list:
+            print("%f, %f" % pose)
         self.purepursuit.path = LineString(pose_list)
 
 

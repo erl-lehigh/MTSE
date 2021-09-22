@@ -236,12 +236,23 @@ class VehicleControllerNode(object):
         None
         '''
 
-        rospy.loginfo(map3D.opendrive)
+        #rospy.loginfo(map3D.opendrive)
 
         client = carla.Client('localhost', 2000)
         client.set_timeout(2)
         carla_world = client.get_world()
         cmap = carla_world.get_map()
+
+        # wps = cmap.generate_waypoints(1)
+        
+        # rospy.loginfo('[Number of waypoints] %d', len(wps))
+
+        # cmap.save_to_disk('~/Downloads/carla_map.xodr')
+        # line = '' + str(wps[0].transform.location.x) + ', ' + str(wps[0].transform.location.y) + ','
+        # print(line)
+        # for wp in wps[0].next_until_lane_end(2):
+        #     line = '' + str(wp.transform.location.x) + ', ' + str(wp.transform.location.y) + ','
+        #     print(line)
 
         # The following is a list(tuple(carla.Waypoint,carla.Waypoint))
         cmap_topology = cmap.get_topology()
@@ -275,17 +286,17 @@ class VehicleControllerNode(object):
         self.ackermann_msg = cmd_msgs
 
         # Debug information
-        rospy.loginfo('\n'.join(['Desired',
-                                 'speed: %5.3f m/s',
-                                 'acceleration: %5.3f m/s^2',
-                                 'jerk: %5.3f m/s^3',
-                                 'steering angle: %5.4f radians',
-                                 'angular velocity: %5.4f radians/s']),
-                      self.ackermann_msg.speed,
-                      self.ackermann_msg.acceleration,
-                      self.ackermann_msg.jerk,
-                      self.ackermann_msg.steering_angle,
-                      self.ackermann_msg.steering_angle_velocity)
+        # rospy.loginfo('\n'.join(['Desired',
+        #                          'speed: %5.3f m/s',
+        #                          'acceleration: %5.3f m/s^2',
+        #                          'jerk: %5.3f m/s^3',
+        #                          'steering angle: %5.4f radians',
+        #                          'angular velocity: %5.4f radians/s']),
+        #               self.ackermann_msg.speed,
+        #               self.ackermann_msg.acceleration,
+        #               self.ackermann_msg.jerk,
+        #               self.ackermann_msg.steering_angle,
+        #               self.ackermann_msg.steering_angle_velocity)
 
         # Broadcasts the message
         self.ack_control_pub.publish(self.ackermann_msg)
