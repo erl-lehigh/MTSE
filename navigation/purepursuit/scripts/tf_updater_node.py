@@ -44,9 +44,12 @@ class TFUpdaterNode(object):
         self.child_frame = rospy.get_param('~child_frame', 'vehicle')
         #self.counter = -5
         #Create Subscriber
-        self.command_sub = rospy.Subscriber('ackermann_cmd',
-                            AckermannDriveStamped,
-                            self.get_message)
+        #self.command_sub = rospy.Subscriber('ackermann_cmd',
+        #                    AckermannDriveStamped,
+        #                    self.get_message)
+	self.command_sub = rospy.Subscriber('/vesc/low_level/ackermann_cmd_mux/input/navigation',
+					    AckermannDriveStamped,
+					    self.get_message)
         #Create AckermannDrive Message holder
         self.adMessage = AckermannDrive( 0.0, 0, 0, 0, 0)
         #Iterables
@@ -59,7 +62,7 @@ class TFUpdaterNode(object):
         self.qz = 0
         self.qw = 0
         ##Orientation(Angle)
-        self.theta = -1.0
+        self.theta = 0.0
         #Create TF
         self.tfBroadcaster = tf2_ros.TransformBroadcaster()
         # Create timers

@@ -25,6 +25,6 @@
     <node pkg="$(arg pkg_name)" type="tf_updater_node.py" name="vehicle_broadcaster"/>
 
     <node pkg="rostopic" type="rostopic" name="static_reference_speed"
-    args="pub /reference_speed std_msgs/Float64 5" />
+    args="pub /reference_speed std_msgs/Float64 2.0" />
 
 </launch>

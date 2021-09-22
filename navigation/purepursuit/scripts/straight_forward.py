@@ -8,7 +8,7 @@ from nav_msgs.msg import Path
 from ackermann_msgs.msg import AckermannDrive, AckermannDriveStamped
 from geometry_msgs.msg import PoseStamped
 from std_msgs.msg import Float64, Header
-from shapely.geometry import LineString
+
 
 from purepursuit import PurePursuit
 
@@ -24,6 +24,7 @@ class StraightForwardNode(object):
     timer : rospy.Timer
         the control loop timer
 
+
     Methods
     -------
     publish_forward
@@ -38,11 +39,13 @@ class StraightForwardNode(object):
         purepursuit method is also publised.
         '''
         self.node_name = rospy.get_name()
+	self.rate = 10
 
         # Create publishers
-        self.command_pub = rospy.Publisher('/vesc/low_level/ackermann_cmd_max/input/navigation',
+        self.command_pub = rospy.Publisher('/vesc/low_level/ackermann_cmd_mux/input/navigation',
                                            AckermannDriveStamped,
                                            queue_size=1)
+	
 
         # Create timers
         self.timer = rospy.Timer(rospy.Duration(1.0 / self.rate),
@@ -51,16 +54,16 @@ class StraightForwardNode(object):
         rospy.logdebug('[%s] Node started!', self.node_name)
 
     def publish_forward(self, event=None):
-        msg = AckermannDrive(0, 0, 1, 0, 0)
+        msg = AckermannDrive(0, 0, 2.0, 0, 0)
         stmp = rospy.Time.now()
         frame = ''
         header = Header()
         header.stamp = stmp
-        header.frame = frame
+        header.frame_id = frame
         drive_stamped = AckermannDriveStamped()
         drive_stamped.header = header
         drive_stamped.drive = msg
-        self.command_pud.publish(drive_stamped)
+        self.command_pub.publish(drive_stamped)
 
 if __name__ == "__main__":
     # initialize node with rospy

@@ -92,7 +92,11 @@ class PurePursuitNode(object):
                                        speed=0)
 
         # Create publishers
-        self.command_pub = rospy.Publisher('ackermann_cmd',
+        #self.command_pub = rospy.Publisher('ackermann_cmd',
+                                #           AckermannDriveStamped,
+                                  #         queue_size=1)
+	
+	self.command_pub = rospy.Publisher('/vesc/low_level/ackermann_cmd_mux/input/navigation',
                                            AckermannDriveStamped,
                                            queue_size=1)
 
@@ -231,7 +235,7 @@ class PurePursuitNode(object):
         frame = self.parent_frame
         header = Header()
         header.stamp = stmp
-        header.frame = frame
+        header.frame_id = frame
         pose_msg.header.stamp = stmp
         pose_msg.header.frame_id = frame
         #The frame is the parent id so the below locations 
