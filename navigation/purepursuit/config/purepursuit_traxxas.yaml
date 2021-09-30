@@ -1,0 +1,10 @@
+rate: 1.0 # control loop frequency [Hz]
+parent_frame: world # Parent Reference frame (world)
+child_frame: vehicle # Child Reference frame (vehicle)
+wheelbase: 0.33 # distance between vehicle's front and reat axles [m] (13 in)
+lookahead_min: 0.5 # the minimum lookahead [m], additionallly the initial value of the lookahead
+lookahead_max: 5 # the maximum lookahead [m]
+lower_velocity_threshold: 1.00 # the lower threshold of the velocity that cooresponds to lookahead_min
+upper_velocity_threshold: 5.00 # the above, but for max/upper
+lookahead_gain: 1.125 # this is the scalar to multiply with v_cmd if in between the extremes
+draw_speed_and_lookahead: True # True if the speed "X" and the lookahead circle should be drawn
