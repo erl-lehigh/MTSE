@@ -243,21 +243,21 @@ class VehicleControllerNode(object):
         carla_world = client.get_world()
         cmap = carla_world.get_map()
 
-        # wps = cmap.generate_waypoints(1)
+        wps = cmap.generate_waypoints(1)
         
         # rospy.loginfo('[Number of waypoints] %d', len(wps))
 
         # cmap.save_to_disk('~/Downloads/carla_map.xodr')
         # line = '' + str(wps[0].transform.location.x) + ', ' + str(wps[0].transform.location.y) + ','
         # print(line)
-        # for wp in wps[0].next_until_lane_end(2):
-        #     line = '' + str(wp.transform.location.x) + ', ' + str(wp.transform.location.y) + ','
+        # for wp in wps:
+        #     line = '' + str(wp.transform.location.x) + ', ' + str(wp.transform.location.y) + ', ' + str(wp.lane_type) + ','
         #     print(line)
 
         # The following is a list(tuple(carla.Waypoint,carla.Waypoint))
         cmap_topology = cmap.get_topology()
 
-        rospy.loginfo(cmap_topology[0][0].transform.location)
+        # rospy.loginfo(cmap_topology[0][0].transform.location)
         graph = nx.DiGraph()
         graph.add_edges_from(cmap_topology)
         for u in graph:

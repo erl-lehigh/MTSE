@@ -3,7 +3,7 @@
 '''
 Test Pure Pusrsuit Node
 '''
-
+import math
 import rospy
 from nav_msgs.msg import Path
 from geometry_msgs.msg import PoseStamped
@@ -55,6 +55,8 @@ class CarlaWaypointNode(object):
         self.all_waypoints = self.world_map.generate_waypoints(1)
         self.vehicle_location = carla.Location(x=210.053, y=5, z=0)
         self.vehicle_euler_angles = (0,180,0)
+        self.view_range = 1.55 #the range in either direction which a car
+        # is concerned with.
         self.waypoint = self.find_closest(self.vehicle_location)
                                                     #set initial location
 
@@ -81,6 +83,7 @@ class CarlaWaypointNode(object):
         orientation = msg.pose.orientation
         orientation_list = [orientation.x, orientation.y, orientation.z, orientation.w]
         self.vehicle_euler_angles = euler_from_quaternion(orientation_list)
+        print('Angle: ' + str(self.vehicle_euler_angles))
         next_waypoint = self.find_closest(self.vehicle_location)
 
     def publish_path(self, event=None):
@@ -109,7 +112,8 @@ class CarlaWaypointNode(object):
             pose.pose.position.x = point.transform.location.x
             pose.pose.position.y = point.transform.location.y
             path.poses.append(pose)
-            rospy.loginfo("%s", point.lane_type)
+            # rospy.loginfo("%s", point.lane_type)
+        print(self.vehicle_location.x)
         next_waypoint = self.find_closest(self.vehicle_location)
         # next_waypoint = self.find_closest(self.vehicle_location, waypoints=path_forward)
         # if next_waypoint == []:
@@ -131,10 +135,27 @@ class CarlaWaypointNode(object):
             if waypoint.lane_type in ["Restricted", "Border", "Sidewalk", "Parking", "Median"]:
                 continue
             dist = location.distance(waypoint.transform.location)
-            if dist <= distance:
+            if dist <= distance and self.is_waypoint_in_view(waypoint.transform.location):
                 return waypoint
         # return self.find_closest(location, distance=distance+1, waypoints=waypoints)
         return []
+
+    def is_waypoint_in_view(self, location):
+        '''
+        Uses the waypoint locations and calculates the angle to the current location
+        (where the +X axis is 0 radians). Once the angle is calculated, if it is in
+        the range of the vehicle's view, then true is returned (else false)
+        '''
+        delta_x = location.x - self.vehicle_location.x
+        delta_y = location.y - self.vehicle_location.y
+        angle = math.atan2(delta_y, delta_x)
+        # the Euler angle should align with the above because both are atan2 based
+        if math.abs(angle - self.vehicle_euler_angles[2]) > self.view_range:
+            return False
+        return True
+
+
+
 
 if __name__ == "__main__":
     # initialize node with rospy
