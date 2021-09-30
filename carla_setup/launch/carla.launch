@@ -11,7 +11,7 @@
     <arg name="sensor_definition_file"
          default="$(find carla_setup)/config/ego_vehicle_sensors.json"/>
     <!-- use comma separated format "x,y,z,roll,pitch,yaw" -->
-    <arg name="spawn_point" default="210.053,-5.0,0,0,90,0"/>
+    <arg name="spawn_point" default="210.053,-5.0,0,0,180,0"/>
     <arg name="town" default=''/>
     <arg name='synchronous_mode' default=''/>
     <arg name='synchronous_mode_wait_for_vehicle_control_command' default=''/>

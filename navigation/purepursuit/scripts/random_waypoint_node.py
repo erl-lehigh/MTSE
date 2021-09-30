@@ -149,8 +149,11 @@ class CarlaWaypointNode(object):
         delta_x = location.x - self.vehicle_location.x
         delta_y = location.y - self.vehicle_location.y
         angle = math.atan2(delta_y, delta_x)
+        output = "[%0.3f, %0.3f] Calculated: %0.3f - TF: %0.3f" % (delta_x, delta_y,angle, self.vehicle_euler_angles[2])
+        print(output)
+        # Note: seems that the car is -pi but that math doesn't work with values in Q2
         # the Euler angle should align with the above because both are atan2 based
-        if math.abs(angle - self.vehicle_euler_angles[2]) > self.view_range:
+        if abs(angle - self.vehicle_euler_angles[2]) > self.view_range:
             return False
         return True
 
