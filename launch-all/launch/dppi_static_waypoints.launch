@@ -1,0 +1,41 @@
+<launch>
+    <!-- Initial Argument Stating -->
+    <arg name="carla_bridge" default="True"/>
+    <arg name="dynamic_purepursuit" default="True"/>
+    <arg name="rviz" default="False"/>
+
+    <!-- Node Launching -->
+    <group if="$(arg carla_bridge)">
+        <include file="$(find carla_setup)/launch/carla.launch"/>
+        <node pkg="carla_setup" type="test_carla_ackermann_control.py"
+              name="carla_ackermann" output="screen" required="True" />
+    </group>
+
+    <group if="$(arg dynamic_purepursuit)">
+        <!-- Initial Arg Setting -->
+        <arg name="pkg_name" value="purepursuit" doc="name of the package"/>
+        <arg name="node_name" default="purepursuit" doc="name of the node"/>
+        <arg name="node_type" default="purepursuit_node.py" doc="name of the type"/>
+        <arg name="config" default="$(find purepursuit)/config/purepursuit_carla.yaml"
+            doc="Specify a config"/>
+        <arg name="output" default="screen" doc="Output display"/>
+        <arg name="req" default="true"/>
+        <!-- DPP nodes -->
+        <!-- + path -->
+        <node pkg="$(arg pkg_name)" type="static_waypoint_node.py" name="planned_path" output="$(arg output)"/>
+        <!-- + purepursuit_node launch -->
+        <node pkg="$(arg pkg_name)" type="$(arg node_type)" name="$(arg node_name)"
+            output="$(arg output)" required="$(arg req)">
+            <rosparam command="load" file="$(arg config)" />
+        </node>
+        <!-- + tf updater -->
+        <node pkg="$(arg pkg_name)" type="tf_updater_node.py" name="vehicle_broadcaster"/>
+        <!-- + speed -->
+        <node pkg="rostopic" type="rostopic" name="static_reference_speed"
+            args="pub /reference_speed std_msgs/Float64 11.2" />
+    </group>
+    <!-- RVIZ launch -->
+    <group if="$(arg rviz)">
+        <node type="rviz" name="rviz" pkg="rviz" args="-d $(find purepursuit)/launch/rviz/rviz_config.rviz"/>
+    </group>
+</launch>
