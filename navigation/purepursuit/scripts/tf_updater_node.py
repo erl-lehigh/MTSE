@@ -37,7 +37,7 @@ class TFUpdaterNode(object):
         to the  the ackermann 'speed_command'
         '''
         #Initial Stuff
-        self.rate = rospy.get_param('~rate', 1)
+        self.rate = 20 #rospy.get_param('~rate', 1)
         self.period = rospy.Duration(1.0 / self.rate)
         self.node_name = rospy.get_name()
         self.parent_frame = rospy.get_param('~parent_frame', 'world')
