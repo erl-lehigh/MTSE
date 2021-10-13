@@ -8,6 +8,7 @@ import time
 import tf_conversions
 
 from nav_msgs.msg import Path
+from geometry_msgs.msg import PoseStamped
 from ackermann_msgs.msg import AckermannDrive, AckermannDriveStamped
 
 import geometry_msgs.msg
@@ -47,9 +48,13 @@ class TFUpdaterNode(object):
         #self.command_sub = rospy.Subscriber('ackermann_cmd',
         #                    AckermannDriveStamped,
         #                    self.get_message)
-	self.command_sub = rospy.Subscriber('/vesc/low_level/ackermann_cmd_mux/input/navigation',
-					    AckermannDriveStamped,
-					    self.get_message)
+        self.command_sub = rospy.Subscriber('/vesc/low_level/ackermann_cmd_mux/input/navigation',
+                                            AckermannDriveStamped,
+                                            self.get_message)
+
+        self.opti_sub = rospy.Subscriber('/vrpn_client_node/SDC/pose',
+                                         PoseStamped,
+                                         self.set_location)
         #Create AckermannDrive Message holder
         self.adMessage = AckermannDrive( 0.0, 0, 0, 0, 0)
         #Iterables
@@ -67,7 +72,7 @@ class TFUpdaterNode(object):
         self.tfBroadcaster = tf2_ros.TransformBroadcaster()
         # Create timers
         self.timer = rospy.Timer(rospy.Duration(1.0 / self.rate),
-                                 self.update_vehicle_location)
+                                 None)
         rospy.logdebug('[%s] Node started!', self.node_name)
 
     def get_message(self, msg):
@@ -81,6 +86,24 @@ class TFUpdaterNode(object):
         -------
         '''
         self.adMessage = msg.drive # get the Ackermann Drive Part from the stamped message
+
+    def set_location(self, msg):
+        #transform part
+        t = geometry_msgs.msg.TransformStamped()
+        t.header.stamp = rospy.Time.now()
+        t.header.frame_id = "world"
+        t.child_frame_id = "vehicle"
+        t.transform.translation.x = msg.pose.position.x
+        t.transform.translation.y = msg.pose.position.y
+        t.transform.translation.z = 0.0
+        t.transform.rotation.x = msg.pose.orientation.x
+        t.transform.rotation.y = msg.pose.orientation.y
+        t.transform.rotation.z = msg.pose.orientation.z
+        t.transform.rotation.w = msg.pose.orientation.w
+
+        #Sending Transform
+        self.tfBroadcaster.sendTransform(t)
+
 
     def update_vehicle_location(self, event=None):
         '''

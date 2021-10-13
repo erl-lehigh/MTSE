@@ -68,8 +68,8 @@ class TestPurePursuitNode(object):
         path.header.frame_id = "world"
 
 
-        path_coords = test_paths[4]
-	    # The list above is referencing from a list of tests that are in
+        path_coords = test_paths[7]
+        # The list above is referencing from a list of tests that are in
         # a python folder in the test directory
         for x, y in path_coords:
             pose = PoseStamped()
