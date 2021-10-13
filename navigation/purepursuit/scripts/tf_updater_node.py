@@ -72,7 +72,7 @@ class TFUpdaterNode(object):
         self.tfBroadcaster = tf2_ros.TransformBroadcaster()
         # Create timers
         self.timer = rospy.Timer(rospy.Duration(1.0 / self.rate),
-                                 None)
+                                 self.update_vehicle_location)
         rospy.logdebug('[%s] Node started!', self.node_name)
 
     def get_message(self, msg):
@@ -121,41 +121,41 @@ class TFUpdaterNode(object):
         ------
         None
         '''
-        #get location current location
-        deltaMove = (1 / self.rate) * self.adMessage.speed
-        #use the period time the speed to have the total distance
+        # #get location current location
+        # deltaMove = (1 / self.rate) * self.adMessage.speed
+        # #use the period time the speed to have the total distance
 
-        self.theta = self.theta + self.adMessage.steering_angle
+        # self.theta = self.theta + self.adMessage.steering_angle
 
-        deltaX = deltaMove * math.cos(self.theta)
-        #The translation ins x is cosine of steering angle
-        deltaY = deltaMove * math.sin(self.theta)
+        # deltaX = deltaMove * math.cos(self.theta)
+        # #The translation ins x is cosine of steering angle
+        # deltaY = deltaMove * math.sin(self.theta)
 
-        #transform part
-        t = geometry_msgs.msg.TransformStamped()
-        t.header.stamp = rospy.Time.now()
-        t.header.frame_id = "world"
-        t.child_frame_id = "vehicle"
-        self.x = self.x + deltaX
-        self.y = self.y + deltaY
-        t.transform.translation.x = self.x
-        t.transform.translation.y = self.y
-        t.transform.translation.z = 0.0
-        q = tf_conversions.transformations.quaternion_from_euler(
-        0, 0, self.theta)
-        #address qs
-        t.transform.rotation.x = q[0]
-        self.qx = q[0]
-        t.transform.rotation.y = q[1]
-        self.qy = q[1]
-        t.transform.rotation.z = q[2]
-        self.qz = q[2]
-        t.transform.rotation.w = q[3]
-        self.qw = q[3]
+        # #transform part
+        # t = geometry_msgs.msg.TransformStamped()
+        # t.header.stamp = rospy.Time.now()
+        # t.header.frame_id = "world"
+        # t.child_frame_id = "vehicle"
+        # self.x = self.x + deltaX
+        # self.y = self.y + deltaY
+        # t.transform.translation.x = self.x
+        # t.transform.translation.y = self.y
+        # t.transform.translation.z = 0.0
+        # q = tf_conversions.transformations.quaternion_from_euler(
+        # 0, 0, self.theta)
+        # #address qs
+        # t.transform.rotation.x = q[0]
+        # self.qx = q[0]
+        # t.transform.rotation.y = q[1]
+        # self.qy = q[1]
+        # t.transform.rotation.z = q[2]
+        # self.qz = q[2]
+        # t.transform.rotation.w = q[3]
+        # self.qw = q[3]
 
-        #Sending Transform
-        self.tfBroadcaster.sendTransform(t)
-        rospy.logdebug("( %5.2f , %5.2f , %5.2f )", self.x, self.y, self.theta)
+        # #Sending Transform
+        # self.tfBroadcaster.sendTransform(t)
+        rospy.logdebug("()")
 
 if __name__ == "__main__":
     # initialize node with rospy
