@@ -4,6 +4,7 @@
 Test Pure Pusrsuit Node
 '''
 import math
+import pandas as pd
 import rospy
 from nav_msgs.msg import Path
 from geometry_msgs.msg import PoseStamped
@@ -53,6 +54,47 @@ class CarlaWaypointNode(object):
         # len_wps = len(self.world_map.generate_waypoints(1))
         # rospy.loginfo('[\n\nfrom random\n\n\Number of waypoints] %d', len_wps)
         self.all_waypoints = self.world_map.generate_waypoints(1)
+        all_points_x = []
+        all_points_y = []
+        all_points_is_junction = []
+        junctions = []
+        start_x = []
+        start_y = []
+        end_x = []
+        end_y = []
+        junction_id = []
+        for wp in self.all_waypoints:
+            all_points_x.append(wp.transform.location.x)
+            all_points_y.append(wp.transform.location.y)
+            in_junction = wp.is_junction
+            all_points_is_junction.append(in_junction)
+            if in_junction:
+                junctions.append(wp.get_junction())
+        for junct in junctions:
+            if junct.id not in junction_id:
+                wp_pairs = junct.get_waypoints(carla.LaneType.Any)
+                for wp_pair in wp_pairs:
+                    start_x.append(wp_pair[0].transform.location.x)
+                    start_y.append(wp_pair[0].transform.location.y)
+                    end_x.append(wp_pair[1].transform.location.x)
+                    end_y.append(wp_pair[1].transform.location.y)
+                    junction_id.append(junct.id)
+        all_dict = {
+            'x': all_points_x,
+            'y': all_points_y,
+            'in_junction': in_junction
+        }
+        junction_dict = {
+            'junction_id': junction_id,
+            'start x': start_x,
+            'start y': start_y,
+            'end x': end_x,
+            'end y': end_y
+        }
+        pd.DataFrame.to_csv(pd.DataFrame(data=all_dict), 'all_points.csv', index=False)
+        pd.DataFrame.to_csv(pd.DataFrame(data=junction_dict), 'junction_points.csv', index=False)
+        
+
         self.vehicle_location = carla.Location(x=210.053, y=5, z=0)
         self.vehicle_euler_angles = (0,180,0)
         self.view_range = 1.55 #the range in either direction which a car
