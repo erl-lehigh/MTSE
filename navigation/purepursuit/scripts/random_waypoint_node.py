@@ -53,6 +53,8 @@ class CarlaWaypointNode(object):
         self.world_map = world.get_map()                 #needed for waypoints (map)
         # len_wps = len(self.world_map.generate_waypoints(1))
         # rospy.loginfo('[\n\nfrom random\n\n\Number of waypoints] %d', len_wps)
+        waypoints_dict = {}
+        junctions_dict = {}
         self.all_waypoints = self.world_map.generate_waypoints(1)
         all_points_x = []
         all_points_y = []
@@ -66,6 +68,7 @@ class CarlaWaypointNode(object):
         for wp in self.all_waypoints:
             all_points_x.append(wp.transform.location.x)
             all_points_y.append(wp.transform.location.y)
+            waypoints_dict[wp.id] = wp
             in_junction = wp.is_junction
             all_points_is_junction.append(in_junction)
             if in_junction:
@@ -74,11 +77,21 @@ class CarlaWaypointNode(object):
             if junct.id not in junction_id:
                 wp_pairs = junct.get_waypoints(carla.LaneType.Any)
                 for wp_pair in wp_pairs:
+                    start_id = wp_pair[0].id
+                    end_id = wp_pair[1].id
+                    if start_id in junctions_dict.keys():
+                        junctions_dict[start_id].append(end_id)
+                    else:
+                        junctions_dict[start_id] = [end_id] 
                     start_x.append(wp_pair[0].transform.location.x)
                     start_y.append(wp_pair[0].transform.location.y)
                     end_x.append(wp_pair[1].transform.location.x)
                     end_y.append(wp_pair[1].transform.location.y)
                     junction_id.append(junct.id)
+        with open('wp_dict.txt', 'w+') as fp:
+            fp.write(str(waypoints_dict))
+        with open('junctions_dict.txt', 'w+') as fp:
+            fp.write(str(junctions_dict))
         all_dict = {
             'x': all_points_x,
             'y': all_points_y,
