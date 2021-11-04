@@ -5,6 +5,8 @@ Test Pure Pusrsuit Node
 '''
 import math
 import pandas as pd
+import networkx as nx
+import pickle
 import rospy
 from nav_msgs.msg import Path
 from geometry_msgs.msg import PoseStamped
@@ -73,25 +75,80 @@ class CarlaWaypointNode(object):
             all_points_is_junction.append(in_junction)
             if in_junction:
                 junctions.append(wp.get_junction())
+        num_junc_waypoints = 0
+        num_junc_overlap = 0
+        junc_wp_dict = {}
+        junc_ids = []
         for junct in junctions:
             if junct.id not in junction_id:
                 wp_pairs = junct.get_waypoints(carla.LaneType.Any)
                 for wp_pair in wp_pairs:
                     start_id = wp_pair[0].id
                     end_id = wp_pair[1].id
+                    junc_ids.append(end_id)
+                    junc_ids.append(start_id)
+                    num_junc_waypoints += 2
+                    if start_id in waypoints_dict.keys():
+                        num_junc_overlap += 1
+                    if end_id in waypoints_dict.keys():
+                        num_junc_overlap += 1
                     if start_id in junctions_dict.keys():
                         junctions_dict[start_id].append(end_id)
                     else:
                         junctions_dict[start_id] = [end_id] 
+                    junc_wp_dict[start_id] = wp_pair[0]
+                    junc_wp_dict[end_id] = wp_pair[1]
                     start_x.append(wp_pair[0].transform.location.x)
                     start_y.append(wp_pair[0].transform.location.y)
                     end_x.append(wp_pair[1].transform.location.x)
                     end_y.append(wp_pair[1].transform.location.y)
                     junction_id.append(junct.id)
-        with open('wp_dict.txt', 'w+') as fp:
-            fp.write(str(waypoints_dict))
-        with open('junctions_dict.txt', 'w+') as fp:
-            fp.write(str(junctions_dict))
+
+        location_graph = nx.Graph()
+        waypoint_graph = nx.Graph()
+
+        wp_ids = list(waypoints_dict.keys())
+        wp_ids.extend(junc_ids)
+        for wp_id in wp_ids:
+            if wp_id in waypoints_dict.keys():
+                waypoint_graph.add_nodes_from([(wp_id, {'waypoint': waypoints_dict[wp_id]})])
+                location_graph.add_nodes_from([(wp_id, {
+                    'x': waypoints_dict[wp_id].transform.location.x,
+                    'y': waypoints_dict[wp_id].transform.location.y
+                })])
+            elif wp_id in junc_wp_dict.keys(): 
+                waypoint_graph.add_nodes_from([(wp_id, {'waypoint': junc_wp_dict[wp_id]})])
+                location_graph.add_nodes_from([(wp_id, {
+                    'x': junc_wp_dict[wp_id].transform.location.x,
+                    'y': junc_wp_dict[wp_id].transform.location.y
+                })])
+        for wp_id in wp_ids:
+            if wp_id in waypoints_dict.keys():
+                wp = waypoints_dict[wp_id]
+                next_wps = wp.next(.2)
+                for next_wp in next_wps:
+                    location_graph.add_edge(wp.id, next_wp.id)
+                    waypoint_graph.add_edge(wp.id, next_wp.id)
+                if wp_id in junctions_dict.keys():
+                    location_graph.add_edge(wp.id, junctions_dict[wp.id][0])
+                    waypoint_graph.add_edge(wp.id, junctions_dict[wp.id][0])
+            elif wp_id in junc_wp_dict.keys():
+                wp = junc_wp_dict[wp_id]
+                next_wps = wp.next(.2)
+                for next_wp in next_wps:
+                    location_graph.add_edge(wp.id, next_wp.id)
+                    waypoint_graph.add_edge(wp.id, next_wp.id)
+                if wp_id in junctions_dict.keys():
+                    location_graph.add_edge(wp.id, junctions_dict[wp.id][0])
+                    waypoint_graph.add_edge(wp.id, junctions_dict[wp.id][0])
+
+        pickle.dump(location_graph, open('location_graph.txt', 'w+'))
+        # pickle.dump(waypoint_graph, open('waypoint_graph.txt', 'w+'))
+
+        # with open('wp_dict.txt', 'w+') as fp:
+        #     fp.write(str(waypoints_dict))
+        # with open('junctions_dict.txt', 'w+') as fp:
+        #     fp.write(str(junctions_dict))
         all_dict = {
             'x': all_points_x,
             'y': all_points_y,
