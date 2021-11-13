@@ -109,19 +109,28 @@ class CarlaWaypointNode(object):
 
         wp_ids = list(waypoints_dict.keys())
         wp_ids.extend(junc_ids)
+        ## Dictionary version
+        # for wp_id in wp_ids:
+        #     if wp_id in waypoints_dict.keys():
+        #         waypoint_graph.add_nodes_from([(wp_id, {'waypoint': waypoints_dict[wp_id]})])
+        #         location_graph.add_nodes_from([(wp_id, {
+        #             'x': waypoints_dict[wp_id].transform.location.x,
+        #             'y': waypoints_dict[wp_id].transform.location.y
+        #         })])
+        #     elif wp_id in junc_wp_dict.keys(): 
+        #         waypoint_graph.add_nodes_from([(wp_id, {'waypoint': junc_wp_dict[wp_id]})])
+        #         location_graph.add_nodes_from([(wp_id, {
+        #             'x': junc_wp_dict[wp_id].transform.location.x,
+        #             'y': junc_wp_dict[wp_id].transform.location.y
+        #         })])
+        ## Tuple Version of x, y
         for wp_id in wp_ids:
             if wp_id in waypoints_dict.keys():
                 waypoint_graph.add_nodes_from([(wp_id, {'waypoint': waypoints_dict[wp_id]})])
-                location_graph.add_nodes_from([(wp_id, {
-                    'x': waypoints_dict[wp_id].transform.location.x,
-                    'y': waypoints_dict[wp_id].transform.location.y
-                })])
+                location_graph.add_nodes_from([(wp_id, {'location': (waypoints_dict[wp_id].transform.location.x, waypoints_dict[wp_id].transform.location.y)})])
             elif wp_id in junc_wp_dict.keys(): 
                 waypoint_graph.add_nodes_from([(wp_id, {'waypoint': junc_wp_dict[wp_id]})])
-                location_graph.add_nodes_from([(wp_id, {
-                    'x': junc_wp_dict[wp_id].transform.location.x,
-                    'y': junc_wp_dict[wp_id].transform.location.y
-                })])
+                location_graph.add_nodes_from([(wp_id, {'location': (junc_wp_dict[wp_id].transform.location.x, junc_wp_dict[wp_id].transform.location.y)})])
         for wp_id in wp_ids:
             if wp_id in waypoints_dict.keys():
                 wp = waypoints_dict[wp_id]
