@@ -136,20 +136,33 @@ class CarlaWaypointNode(object):
                 wp = waypoints_dict[wp_id]
                 next_wps = wp.next(.2)
                 for next_wp in next_wps:
+                    if next_wp.id not in wp_ids:
+                        waypoint_graph.add_nodes_from([(next_wp.id, {'waypoint': next_wp})])
+                        location_graph.add_nodes_from([(next_wp.id, {'location': (next_wp.transform.location.x, next_wp.transform.location.y)})])
                     location_graph.add_edge(wp.id, next_wp.id)
                     waypoint_graph.add_edge(wp.id, next_wp.id)
                 if wp_id in junctions_dict.keys():
+                    if junctions_dict[wp.id][0] not in wp_ids:
+                        waypoint_graph.add_nodes_from([(junctions_dict[wp.id][0], {'waypoint': junc_wp_dict[junctions_dict[wp.id][0]]})])
+                        location_graph.add_nodes_from([(junctions_dict[wp.id][0], {'location': (junc_wp_dict[junctions_dict[wp.id][0]].transform.location.x, junc_wp_dict[junctions_dict[wp.id][0]].transform.location.y)})])
                     location_graph.add_edge(wp.id, junctions_dict[wp.id][0])
                     waypoint_graph.add_edge(wp.id, junctions_dict[wp.id][0])
             elif wp_id in junc_wp_dict.keys():
                 wp = junc_wp_dict[wp_id]
                 next_wps = wp.next(.2)
                 for next_wp in next_wps:
+                    if next_wp.id not in wp_ids:
+                        waypoint_graph.add_nodes_from([(next_wp.id, {'waypoint': next_wp})])
+                        location_graph.add_nodes_from([(next_wp.id, {'location': (next_wp.transform.location.x, next_wp.transform.location.y)})])
                     location_graph.add_edge(wp.id, next_wp.id)
                     waypoint_graph.add_edge(wp.id, next_wp.id)
                 if wp_id in junctions_dict.keys():
+                    if junctions_dict[wp.id][0] not in wp_ids:
+                        waypoint_graph.add_nodes_from([(junctions_dict[wp.id][0], {'waypoint': junc_wp_dict[junctions_dict[wp.id][0]]})])
+                        location_graph.add_nodes_from([(junctions_dict[wp.id][0], {'location': (junc_wp_dict[junctions_dict[wp.id][0]].transform.location.x, junc_wp_dict[junctions_dict[wp.id][0]].transform.location.y)})])
                     location_graph.add_edge(wp.id, junctions_dict[wp.id][0])
                     waypoint_graph.add_edge(wp.id, junctions_dict[wp.id][0])
+
 
         pickle.dump(location_graph, open('location_graph.txt', 'w+'))
         # pickle.dump(waypoint_graph, open('waypoint_graph.txt', 'w+'))
