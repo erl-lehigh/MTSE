@@ -1,0 +1,84 @@
+<launch>
+    <!-- Initial Argument Stating -->
+    <arg name="carla_bridge" default="True"/>
+    <arg name="dynamic_purepursuit" default="True"/>
+    <arg name="rrt" default="True"/>
+    <arg name="rviz" default="False"/>
+
+    <!-- Node Launching -->
+    <group if="$(arg carla_bridge)">
+        <include file="$(find carla_setup)/launch/carla.launch"/>
+        <node pkg="carla_setup" type="test_carla_ackermann_control.py"
+              name="carla_ackermann" output="screen" required="True" />
+    </group>
+
+    <group if="$(arg dynamic_purepursuit)">
+        <!-- Initial Arg Setting -->
+        <arg name="pkg_name" value="purepursuit" doc="name of the package"/>
+        <arg name="node_name" default="purepursuit" doc="name of the node"/>
+        <arg name="node_type" default="purepursuit_node.py" doc="name of the type"/>
+        <arg name="config" default="$(find purepursuit)/config/purepursuit_carla.yaml"
+            doc="Specify a config"/>
+        <arg name="output" default="screen" doc="Output display"/>
+        <arg name="req" default="true"/>
+        <!-- DPP nodes -->
+
+        <!-- + path -->
+        <!--  Instead of artificial path we will use RRT 
+        <node pkg="$(arg pkg_name)" type="random_waypoint_node.py" name="planned_path" output="$(arg output)"/>
+        -->
+
+        <!-- + purepursuit_node launch -->
+        <node pkg="$(arg pkg_name)" type="$(arg node_type)" name="$(arg node_name)"
+            output="$(arg output)" required="$(arg req)">
+            <rosparam command="load" file="$(arg config)" />
+        </node>
+        <!-- + tf updater -->
+        <node pkg="$(arg pkg_name)" type="tf_updater_node.py" name="vehicle_broadcaster"/>
+        <!-- + speed -->
+        <node pkg="rostopic" type="rostopic" name="static_reference_speed"
+            args="pub /reference_speed std_msgs/Float64 4" />
+    </group>
+
+    <group if="$(arg rrt)">
+        <!-- Initial Arg Setting -->
+        <arg name="pkg_name" value="rrt" doc="name of the package"/>
+        <arg name="node_name" default="rrt" doc="name of the node"/>
+        <arg name="node_type" default="rrt_node.py" doc="name of the type"/>
+        <arg name="config" default="$(find rrt)/config/rrt.yaml"/>
+
+        <!-- launch RRT node -->
+        <include file="$(find rrt)/launch/rrt.launch">
+            <arg name="config" value="$(arg config)"/>
+        </include>
+
+        <!-- TF update should already come from purepursuit tf updater node-->
+
+        <!-- TESTER: publish dummy static goal for the vehicle -->
+        <node pkg="rostopic" type="rostopic" name="rrt_goal"
+            args="pub /goal geometry_msgs/PoseStamped
+            &quot;{header: {frame_id: 'world'},
+                    pose: {position: {x: 103.566, y: -2.934, z: 0},
+                            orientation: {x: 0, y: 0, z: 0, w: 1}}}&quot;"/>
+
+        <!-- TESTER: publish static costmap -->
+        <node pkg="$(arg pkg_name)" type="static_costmap_publisher.py"
+            name="static_costmap_publisher"/>
+
+        <!-- Publish visualization node -->
+        <node pkg="$(arg pkg_name)" type="visualization.py"
+            name="visualization"/>
+
+        <!-- TODO: Launch node that publishes dynamic goals -->
+
+        <!-- TODO: Launch node that publishes dynamic costmap -->
+
+    </group>
+
+    <!-- RVIZ launch -->
+    <group if="$(arg rviz)">
+        <!--<node type="rviz" name="rviz" pkg="rviz" args="-d $(find purepursuit)/launch/rviz/rviz_config.rviz"/> -->
+        <node type="rviz" name="rviz" pkg="rviz" args="-d $(find rrt)/rrt_config.rviz"/>
+    </group>
+
+</launch>

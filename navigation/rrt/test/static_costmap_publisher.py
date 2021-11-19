@@ -43,7 +43,7 @@ class StaticCostmapPublisher(object):
         grid  = 100 * np.ones((self.grid_msg.info.height, self.grid_msg.info.width),
                               dtype=np.int8)
         w = 10
-        case = 'medium2'
+        case = ''
 
         if case == 'medium2':
             grid[self.grid_msg.info.height/2-2*w:self.grid_msg.info.height/2+2*w, :] = 0
