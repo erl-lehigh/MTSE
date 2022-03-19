@@ -104,7 +104,7 @@ class StopBehaviorNode(object):
 
     def sign_detector(self, data):                   
         '''
-        a callback #self.stop_command_pub.publish(self.msg)type method that gives the distance from the car to the stop sign and time stamps it
+        a callback type method that gives the distance from the car to the stop sign and time stamps it
         
         '''
         if data.traffic_sign == 'stop':
