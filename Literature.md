@@ -10,4 +10,5 @@ This file keeps track of the research papers helpful for problem formulation and
 
 
 # Reinforcement Learning: 
-
+1. [Risk-aware active inverse reinforcement learning](https://proceedings.mlr.press/v87/brown18a)
+2. [Risk-Aware High-level Decisions for Automated Driving at Occluded Intersections with Reinforcement Learning](https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=9304606)
