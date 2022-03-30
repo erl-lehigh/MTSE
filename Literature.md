@@ -8,7 +8,7 @@ This file keeps track of the research papers helpful for problem formulation and
 3. [Dynamic Risk Density for Autonomous Navigation in Cluttered Environments without Object Detection](https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=8793813)
 4. [How Should a Robot Assess Risk?
 Towards an Axiomatic Theory of Risk in
-Robotics] (https://arxiv.org/pdf/1710.11040.pdf)
+Robotics](https://arxiv.org/pdf/1710.11040.pdf)
 
 
 
