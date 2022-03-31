@@ -7,7 +7,7 @@ import tf.transformations as tr
 from nav_msgs.msg import Path
 from ackermann_msgs.msg import AckermannDrive
 from geometry_msgs.msg import PoseStamped, PoseArray
-from std_msgs.msg import Float64
+from std_msgs.msg import Float64, Bool
 from shapely.geometry import LineString
 
 class CheckSurroundingNode(object):
@@ -62,11 +62,12 @@ class CheckSurroundingNode(object):
         self.rate = rospy.get_param('~rate', 1)
         self.parent_frame = rospy.get_param('~parent_frame', 'world')
         self.child_frame = rospy.get_param('~child_frame', 'vehicle')
+        self.safety_distance = rospy.get_param('~safety_distance', 6)
 
         self.period = rospy.Duration(1.0 / self.rate)
 
         self.surrounding_pub = rospy.Publisher('surrounding',
-                                                PoseStamped, #TODO: should switch to be like Dan's message
+                                                Bool, #TODO: should switch to be like Dan's message
                                                 queue_size=1)
 
         self.obstacle_sub = rospy.Subscriber('obstacles',
@@ -122,20 +123,28 @@ class CheckSurroundingNode(object):
         return (trans.transform.translation.x, trans.transform.translation.y,
                 orientation, quaternion_message)
 
+    '''
+    Message will be a PoseArray (Header, Poses[])
+    '''
     def get_obstacles(self, msg):
-        self.obstacles = msg.poses       # get the poses of the obstacles
-        # TODO: might need the header as well
+        self.obstacles = msg.poses      # get the poses of the obstacles 
+
 
     def update_surrounding(self, event=None):
         ego_pose = self.get_vehicle_pose()
         ego_x = ego_pose[0]
         ego_y = ego_pose[1]
         ego_orientation = ego_pose[2]
-        surrounding_msg = PoseStamped()
+        surrounding_msg = Bool()
+        surrounding_msg.data = True
         for obstacle in self.obstacles:
             obstacle_x = obstacle.position.x
             obstacle_y = obstacle.position.y
             distance = math.sqrt((ego_x - obstacle_x)**2 + (ego_y - obstacle_y)**2)
+            if distance <= self.safety_distance:
+                # if there is something too close, then break and send false message
+                surrounding_msg.data = False
+                break
         self.surrounding_pub.publish(surrounding_msg)
 
 
