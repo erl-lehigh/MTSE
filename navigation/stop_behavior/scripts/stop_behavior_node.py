@@ -84,7 +84,7 @@ class StopBehaviorNode(object):
                             AckermannDrive,        
                             self.get_commands)          #every time something is recieved in this topic, it runs get_commads to get speed and steering angle
 
-        self.stop_sign_sub = rospy.Subscriber('traffic_sign',   #subscribes to 'traffic_sign' topic.  When a stop sign is present, the traffic_sign topic gets a message that is the distance from the car to the sign
+        rospy.Subscriber('traffic_sign',   #subscribes to 'traffic_sign' topic.  When a stop sign is present, the traffic_sign topic gets a message that is the distance from the car to the sign
                             TrafficSignStamped,        #replace with custom sign message that will have all the stuff in it
                             self.sign_detector)         #every time something is recieved in this topic, runs sign_detector method
 

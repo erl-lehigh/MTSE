@@ -26,7 +26,7 @@ class YieldBehaviorNode(object):
         min_stop_distance: Float32
             A constant value that determines the minimum distance from the car to the stop light where the car is good to be stopped (so the code doesn't break if the car is barely in front or behind stop point)
         period : Duration
-            the amount of times per second the cwill run
+            the amount of times per second the code will run
         timer : Timer
             Continuosly running timer that calls sign_detector function at a certain rate
         time_stamp : Float32
@@ -84,7 +84,7 @@ class YieldBehaviorNode(object):
                             AckermannDrive,        
                             self.get_commands)          #every time something is recieved in this topic, it runs get_commads to get speed and steering angle
 
-        self.stop_sign_sub = rospy.Subscriber('traffic_sign',   #subscribes to 'traffic_sign' topic.  When a yield sign or need to yield is present, the traffic_sign topic gets a message that is the distance from the car to the sign
+        self.yield_sign_sub = rospy.Subscriber('traffic_sign',   #subscribes to 'traffic_sign' topic.  When a yield sign or need to yield is present, the traffic_sign topic gets a message that is the distance from the car to the sign
                             TrafficSignStamped,        #custom sign message 
                             self.sign_detector)         #every time something is recieved in this topic, runs sign_detector method
 
@@ -153,8 +153,8 @@ class YieldBehaviorNode(object):
 
 if __name__ == "__main__":
     # initialize node with rospy
-    rospy.init_node('stop_behavior', anonymous=False)
+    rospy.init_node('yield_behavior', anonymous=False)
     # create the node object
-    StopBehaviorNode()
+    YieldBehaviorNode()
     # keep the node alive
     rospy.spin()

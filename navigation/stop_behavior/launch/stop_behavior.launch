@@ -1,10 +1,7 @@
 <launch>
     <arg name="rviz" default="False"/>
-    <arg name="config" default="$(find stop_behavior)/config/stop_behavior.yaml"
-         doc="Specify a config"/>
-
+    <arg name="stop_config" default="$(find stop_behavior)/config/stop_behavior.yaml" doc="Specify a config"/>
     <arg name="output" default="screen" doc="Output display"/>
-    <arg name="param_file_name" default="default" doc="Specify a param file"/>
     <arg name="req" default="true"/>
 
     <arg name="pkg_name" value="stop_behavior" doc="name of the package"/>
