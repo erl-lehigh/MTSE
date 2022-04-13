@@ -11,7 +11,7 @@
     <arg name="node_name" default="purepursuit" doc="name of the node"/>
     <arg name="node_type" default="purepursuit_node.py" doc="name of the type"/>
 	<!-- vrpn arguments-->
-    <arg name="server" default="192.168.2.6"/>
+    <arg name="server" default="192.168.0.222"/>
     <arg name="port" default="3883"/>
     <arg name="ip" default="vicon"/>
     <arg name="frameName" default="SDC"/>
@@ -30,7 +30,7 @@
     <node pkg="$(arg pkg_name)" type="tf_updater_node.py" name="vehicle_broadcaster"/>
 
     <node pkg="rostopic" type="rostopic" name="static_reference_speed"
-    args="pub /reference_speed std_msgs/Float64 3" />
+    args="pub /reference_speed std_msgs/Float64 4" />
 
 	<!-- publish external pose received from optitrack -->
 	<node name="currentpose" pkg="purepursuit" type="publish_external_pose_vrpn.py" output="screen">
