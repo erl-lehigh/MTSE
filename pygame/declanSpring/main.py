@@ -1,8 +1,4 @@
-from email.header import Header
-from email.mime import image
-from http.server import ThreadingHTTPServer
 import os
-from turtle import back, width
 import cv2
 import numpy as np
 import pygame
@@ -10,7 +6,7 @@ import pygame
 from map_info import map_start
 
 image_file = './C3_map.png'
-image_file = './merge_map.png'
+# image_file = './merge_map.png'
 start_loc = map_start[image_file]
 background = cv2.imread(image_file)
 
@@ -28,7 +24,7 @@ WIDTH, HEIGHT = background.shape[1::-1]
 WIN = pygame.display.set_mode((int(WIDTH/2), int(HEIGHT/2)))
 pygame.display.set_caption("Car Test")
 
-BACKGROUND = pygame.transform.scale(pygame.image.load('./C3_map_2.png'), (int(WIDTH), int(HEIGHT)))
+# BACKGROUND = pygame.transform.scale(pygame.image.load('./C3_map_2.png'), (int(WIDTH), int(HEIGHT)))
 
 
 #Debug: print when pass yellow and white lines
